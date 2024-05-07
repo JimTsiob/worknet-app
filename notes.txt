@@ -1,0 +1,2 @@
+1. To model mapper to exoume gia na kanoume update tis klaseis xwris na prepei na kanoume update OLA ta pedia kathe fora.
+2. Egine custom model mapper class wste na einai to configuration Strict se kathe service / controller etc.

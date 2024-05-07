@@ -1,5 +1,6 @@
 package com.example.worknet.dto;
 
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class EducationDTO {
     private LocalDate endDate;
     private Float grade;
     private String description;
+    private UserDTO user;
 
 
     public String getSchool() {
@@ -71,5 +73,13 @@ public class EducationDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 }

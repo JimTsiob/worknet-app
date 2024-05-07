@@ -1,17 +1,16 @@
 package com.example.worknet.controllers;
 
+
 import com.example.worknet.dto.EducationDTO;
 import com.example.worknet.entities.Education;
+import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.EducationService;
-import com.example.worknet.services.EducationServiceImpl;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/educations")
@@ -20,62 +19,83 @@ public class EducationController {
     @Autowired
     private EducationService educationService;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final StrictModelMapper modelMapper = new StrictModelMapper();
+
 
     @GetMapping("/")
-    public ResponseEntity<List<EducationDTO>> getAllEducations() {
+    public ResponseEntity<?> getAllEducations() {
         List<Education> educations = educationService.getAllEducations();
-        List<EducationDTO> educationDTOs = educations.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(educationDTOs, HttpStatus.OK);
-    }
 
-    @PostMapping("/")
-    public ResponseEntity<EducationDTO> addEducation(@RequestBody EducationDTO educationDTO) {
-        Education education = convertToEntity(educationDTO);
-        Education createdEducation = educationService.addEducation(education);
-        EducationDTO createdEducationDTO = convertToDTO(createdEducation);
-        return new ResponseEntity<>(createdEducationDTO, HttpStatus.CREATED);
+        List<EducationDTO> educationDTOList =  educations.stream()
+                .map(education -> modelMapper.map(education, EducationDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(educationDTOList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EducationDTO> getEducationById(@PathVariable Long id) {
+    public ResponseEntity<?> getEducationById(@PathVariable Long id) {
         Education education = educationService.getEducationById(id);
-        if (education != null) {
-            EducationDTO educationDTO = convertToDTO(education);
+
+        EducationDTO educationDTO =  modelMapper.map(education, EducationDTO.class);
+        if (educationDTO != null){
             return ResponseEntity.ok(educationDTO);
-        } else {
-            return ResponseEntity.notFound().build();
+        }else{
+            String errorMessage = "Education with ID " + id + " not found.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+    }
+
+    @PostMapping("/")
+    public ResponseEntity<?> addEducation(@RequestBody EducationDTO educationDTO) {
+        try {
+            Education education = modelMapper.map(educationDTO, Education.class);
+
+            educationService.addEducation(education);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Education added successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to add education: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EducationDTO> updateEducation(@PathVariable Long id, @RequestBody EducationDTO educationDTO) {
-        Education educationToUpdate = convertToEntity(educationDTO);
-        Education updatedEducation = educationService.updateEducation(id, educationToUpdate);
-        if (updatedEducation != null) {
-            EducationDTO updatedEducationDTO = convertToDTO(updatedEducation);
-            return ResponseEntity.ok(updatedEducationDTO);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateEducation(@PathVariable Long id, @RequestBody EducationDTO educationDTO) {
+        try {
+            // Check if the user with the given id exists
+            Education existingEducation = educationService.getEducationById(id);
+            if (existingEducation == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Education with ID " + id + " does not exist.");
+            }
+
+            modelMapper.map(educationDTO, existingEducation);
+
+            educationService.updateEducation(id, existingEducation);
+
+            return ResponseEntity.ok("Education updated successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to update education with id: " + id + " / error message: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEducation(@PathVariable Long id) {
-        educationService.deleteEducation(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteEducation(@PathVariable Long id) {
+        try {
+            // Check if the education with the given id exists
+            Education existingEducation = educationService.getEducationById(id);
+            if (existingEducation == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Education with ID " + id + " does not exist.");
+            }
+
+            educationService.deleteEducation(id);
+
+            return ResponseEntity.ok("Education deleted successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to delete education: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
     }
 
-    // Helper method to convert Education entity to DTO
-    private EducationDTO convertToDTO(Education education) {
-        return modelMapper.map(education, EducationDTO.class);
-    }
-
-    // Helper method to convert EducationDTO to entity
-    private Education convertToEntity(EducationDTO educationDTO) {
-        return modelMapper.map(educationDTO, Education.class);
-    }
 }

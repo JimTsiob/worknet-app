@@ -3,8 +3,8 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.UserDTO;
 import com.example.worknet.entities.User;
+import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +19,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final StrictModelMapper modelMapper = new StrictModelMapper();
 
 
     @GetMapping("/")
@@ -67,7 +66,7 @@ public class UserController {
             // Check if the user with the given id exists
             User existingUser = userService.getUserById(id);
             if (existingUser == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
             }
 
             modelMapper.map(userDTO, existingUser);
@@ -87,7 +86,7 @@ public class UserController {
             // Check if the user with the given id exists
             User existingUser = userService.getUserById(id);
             if (existingUser == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
             }
 
             // Assuming userService.deleteUser(id) deletes the user from the database
