@@ -1,54 +1,21 @@
-package com.example.worknet.entities;
+package com.example.worknet.dto;
 
-
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "education")
-public class Education {
+public class EducationDTO {
 
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "school")
     private String school;
-
-    @Column(name = "degree")
     private String degree;
-
-    @Column(name = "field_of_study")
     private String fieldOfStudy;
-
-    @Column(name = "start_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
-
-    @Column(name = "end_date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
-
-    @Column(name = "grade")
     private Float grade;
-
-    @Column(name = "description")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    public Education() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getSchool() {
         return school;
@@ -104,13 +71,5 @@ public class Education {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }
