@@ -63,7 +63,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
         try {
-            // Check if the user with the given id exists
+
             User existingUser = userService.getUserById(id);
             if (existingUser == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
@@ -83,7 +83,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
-            // Check if the user with the given id exists
+
             User existingUser = userService.getUserById(id);
             if (existingUser == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");

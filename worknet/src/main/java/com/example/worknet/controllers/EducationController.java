@@ -63,7 +63,7 @@ public class EducationController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEducation(@PathVariable Long id, @RequestBody EducationDTO educationDTO) {
         try {
-            // Check if the user with the given id exists
+
             Education existingEducation = educationService.getEducationById(id);
             if (existingEducation == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Education with ID " + id + " does not exist.");
@@ -83,7 +83,7 @@ public class EducationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEducation(@PathVariable Long id) {
         try {
-            // Check if the education with the given id exists
+
             Education existingEducation = educationService.getEducationById(id);
             if (existingEducation == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Education with ID " + id + " does not exist.");
