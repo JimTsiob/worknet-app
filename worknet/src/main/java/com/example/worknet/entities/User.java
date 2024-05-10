@@ -23,8 +23,11 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "phoneNumber")
+    @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "profile_picture")
+    private String profilePicture;
 
     @OneToMany(mappedBy = "user")
     private List<Education> educations;
@@ -41,8 +44,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Certification> certifications;
 
-    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
-    private CustomFile image;
+    @OneToMany(mappedBy = "user")
+    private List<CustomFile> files;
 
     public User() {}
 
@@ -126,11 +129,19 @@ public class User {
         this.certifications = certifications;
     }
 
-    public CustomFile getImage() {
-        return image;
+    public List<CustomFile> getFiles() {
+        return files;
     }
 
-    public void setImage(CustomFile image) {
-        this.image = image;
+    public void setFiles(List<CustomFile> files) {
+        this.files = files;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }

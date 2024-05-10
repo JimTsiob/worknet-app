@@ -1,11 +1,14 @@
 package com.example.worknet.dto;
 
+import java.util.List;
+
 public class UserDTO {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
+    private List<CustomFileDTO> files;
 
 
     public UserDTO() {}
@@ -48,5 +51,13 @@ public class UserDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public List<CustomFileDTO> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<CustomFileDTO> files) {
+        this.files = files;
     }
 }

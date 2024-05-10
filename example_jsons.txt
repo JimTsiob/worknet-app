@@ -1,0 +1,31 @@
+{
+        "id": 1,
+        "firstName": "Sokrates",
+        "lastName": "Papadopoulos",
+        "email": "sokpap@nkua.com",
+        "phoneNumber": "6985547823",
+        "files": [
+            {
+                "id": 27,
+                "fileName": "notes.txt",
+                "contentType": "text/plain",
+                "size": 401
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "firstName": "John",
+        "lastName": "Cena",
+        "email": "ucantcmenow@wwe.com",
+        "phoneNumber": "69855472323",
+        "files": []
+    },
+    {
+        "id": 3,
+        "firstName": "Michael",
+        "lastName": "Jackson",
+        "email": "yeehee@gmail.com",
+        "phoneNumber": "6985542223",
+        "files": []
+    }
