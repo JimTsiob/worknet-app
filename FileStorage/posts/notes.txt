@@ -1,0 +1,10 @@
+1. To model mapper to exoume gia na kanoume update tis klaseis xwris na prepei na kanoume update OLA ta pedia kathe fora.
+2. Egine custom model mapper class wste na einai to configuration Strict se kathe service / controller etc.
+
+_____________ Build notes __________________
+
+Go to settings -> build, execution, deployment -> build tools -> Gradle and change Gradle JVM to Amazon Correto 17.0.11
+
+------ DB NOTES ------
+
+DDL AUTO UPDATE DOES NOT CHANGE SCHEMA IF THERE IS DATA IN THE DATABASE!!!!
