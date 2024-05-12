@@ -50,6 +50,15 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<CustomFile> files;
 
+    @OneToMany(mappedBy = "user")
+    private List<Message> messages;
+
+    @OneToMany(mappedBy = "user")
+    private List<Like> likes;
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments;
+
     public User() {}
 
     public Long getId() {
@@ -154,5 +163,29 @@ public class User {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
