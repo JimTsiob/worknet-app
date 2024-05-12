@@ -3,11 +3,11 @@ package com.example.worknet.services;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.UserRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.modelmapper.convention.MatchingStrategies;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +17,16 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private final StrictModelMapper strictModelMapper = new StrictModelMapper();
+
     public User getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
+
+        return user.orElse(null);
+    }
+
+    public User getUserByEmail(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
 
         return user.orElse(null);
     }
@@ -36,9 +44,7 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isPresent()) {
             User existingUser = userOptional.get();
 
-            StrictModelMapper modelMapper = new StrictModelMapper();
-
-            modelMapper.map(user, existingUser);
+            strictModelMapper.map(user, existingUser);
 
             return userRepository.save(existingUser);
         }
@@ -49,4 +55,19 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) {
+        User user = getUserByEmail(email);
+        if (user == null) {
+            return null;
+        }
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                Collections.emptyList()
+        );
+    }
+
 }
