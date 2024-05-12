@@ -1,13 +1,21 @@
 package com.example.worknet.controllers;
 
 
+import com.example.worknet.dto.LoginUserDTO;
+import com.example.worknet.dto.RegisterUserDTO;
 import com.example.worknet.dto.UserDTO;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
+import com.example.worknet.security.JwtGenerator;
 import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +27,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private final StrictModelMapper modelMapper = new StrictModelMapper();
+
+    @Autowired
+    private final JwtGenerator jwtGenerator;
+
+    public UserController(JwtGenerator jwtGenerator) {
+        this.jwtGenerator = jwtGenerator;
+    }
 
 
     @GetMapping("/")
@@ -58,6 +76,36 @@ public class UserController {
             String errorMessage = "Failed to add user: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
+        User user = userService.getUserByEmail(loginUserDTO.getEmail());
+        if (user == null){
+            return new ResponseEntity<>("User not found. Try other credentials.", HttpStatus.NOT_FOUND);
+        }
+
+        String token = jwtGenerator.generateToken(loginUserDTO);
+
+        return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
+        User user = userService.getUserByEmail(registerUserDTO.getEmail());
+        if (user != null) {
+            return new ResponseEntity<>("user with email: " + user.getEmail() + " already exists.", HttpStatus.BAD_REQUEST);
+        }
+
+        User newUser = new User();
+        newUser.setPassword(passwordEncoder.encode(registerUserDTO.getPassword()));
+        newUser.setEmail(registerUserDTO.getEmail());
+        newUser.setFirstName(registerUserDTO.getFirstName());
+        newUser.setLastName(registerUserDTO.getLastName());
+        newUser.setPhoneNumber(registerUserDTO.getPhoneNumber());
+
+        userService.addUser(newUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
     }
 
     @PutMapping("/{id}")

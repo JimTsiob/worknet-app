@@ -2,6 +2,7 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.CustomFileDTO;
 import com.example.worknet.entities.CustomFile;
+import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.CustomFileService;
@@ -83,7 +84,7 @@ public class CustomFileController {
         try {
             List<CustomFile> filesToBeAdded = new ArrayList<>();
             User user = userService.getUserById(userId);
-
+            Post post = postService.getPostById(postId);
 
             for (MultipartFile file : files) {
                 // Process and save the file
@@ -97,7 +98,7 @@ public class CustomFileController {
 
                 // Set the associated User and Post
                 customFile.setUser(user);
-                customFile.setPost(postService.getPostById(postId));
+                customFile.setPost(post);
 
                 // save files to the user's list, so they can be related to the user
                 filesToBeAdded.add(customFile);
@@ -106,8 +107,12 @@ public class CustomFileController {
                 customFileService.addCustomFile(customFile);
             }
 
+            // Relate the newly added files to the user and post.
             user.setFiles(filesToBeAdded);
             userService.updateUser(userId, user);
+
+            post.setCustomFiles(filesToBeAdded);
+            postService.updatePost(postId, post);
 
             return "Files uploaded successfully.";
         } catch (IOException e) {
@@ -133,17 +138,6 @@ public class CustomFileController {
                 customFileService.deleteCustomFile(existingCustomFile.getId());
             }
 
-            String fileName = customFileService.saveProfilePicture(file, userId);
-
-
-
-            CustomFile customFile = new CustomFile();
-            customFile.setFileName(fileName);
-            customFile.setContentType(file.getContentType());
-            customFile.setSize(file.getSize());
-            customFile.setUser(userService.getUserById(userId));
-            customFileService.addCustomFile(customFile);
-
             // Update the user's profile picture reference
             User user = userService.getUserById(userId);
             if (user != null) {
@@ -151,6 +145,18 @@ public class CustomFileController {
                 if (user.getProfilePicture() != null) {
                     customFileService.deleteProfilePicture(user.getProfilePicture());
                 }
+
+                String fileName = customFileService.saveProfilePicture(file, userId);
+
+
+
+                CustomFile customFile = new CustomFile();
+                customFile.setFileName(fileName);
+                customFile.setContentType(file.getContentType());
+                customFile.setSize(file.getSize());
+                customFile.setUser(userService.getUserById(userId));
+                customFileService.addCustomFile(customFile);
+
                 // Set the new profile picture
                 user.setProfilePicture(fileName);
                 userService.updateUser(userId, user);
