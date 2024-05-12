@@ -20,6 +20,12 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<CustomFile> customFiles;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "post")
+    private List<Like> likes;
+
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
@@ -57,5 +63,21 @@ public class Post {
 
     public void setCustomFiles(List<CustomFile> customFiles) {
         this.customFiles = customFiles;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 }
