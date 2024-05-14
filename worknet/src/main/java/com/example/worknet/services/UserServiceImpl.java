@@ -1,7 +1,9 @@
 package com.example.worknet.services;
 
+import com.example.worknet.entities.Job;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
+import com.example.worknet.repositories.JobRepository;
 import com.example.worknet.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JobRepository jobRepository;
 
     private final StrictModelMapper strictModelMapper = new StrictModelMapper();
 
@@ -53,6 +58,18 @@ public class UserServiceImpl implements UserService {
     }
 
     public void deleteUser(Long id){
+
+        // Remove the user from the connections list of all other users
+        // and then delete user from the DB as well.
+        for (User user : userRepository.findAll()) {
+            removeConnection(user.getId(), id);
+        }
+
+        // also remove from the job post
+        for (User user : userRepository.findAll()) {
+            removeConnection(user.getId(), id);
+        }
+
         userRepository.deleteById(id);
     }
 
@@ -70,4 +87,47 @@ public class UserServiceImpl implements UserService {
         );
     }
 
+    public void addConnection(Long userId, Long connectionId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User connection = userRepository.findById(connectionId).orElseThrow(() -> new RuntimeException("Connection not found"));
+
+        user.getConnections().add(connection);
+        connection.getConnections().add(user);
+
+        userRepository.save(user);
+        userRepository.save(connection);
+    }
+
+    public void removeConnection(Long userId, Long connectionId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User connection = userRepository.findById(connectionId).orElseThrow(() -> new RuntimeException("Connection not found"));
+
+        user.getConnections().remove(connection);
+        connection.getConnections().remove(user);
+
+        userRepository.save(user);
+        userRepository.save(connection);
+    }
+
+    public void applyToJob(Long userId, Long jobId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+
+        user.getAppliedJobs().add(job);
+        job.getInterestedUsers().add(user);
+
+        userRepository.save(user);
+        jobRepository.save(job);
+    }
+
+    public void removeApplicationFromJob(Long userId, Long jobId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+
+        user.getAppliedJobs().remove(job);
+        job.getInterestedUsers().remove(user);
+
+        userRepository.save(user);
+        jobRepository.save(job);
+    }
 }

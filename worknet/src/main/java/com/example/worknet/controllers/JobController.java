@@ -2,13 +2,16 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.JobDTO;
 import com.example.worknet.entities.Job;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.JobService;
+import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -17,6 +20,9 @@ public class JobController {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -87,6 +93,15 @@ public class JobController {
             if (existingJob == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Job with ID " + id + " does not exist.");
             }
+
+            // remove job applications first to satisfy constraint.
+
+            for (User user : existingJob.getInterestedUsers()) {
+                user.getAppliedJobs().removeIf(job -> job.getId().equals(id));
+            }
+
+            existingJob.getInterestedUsers().clear();
+            jobService.updateJob(id, existingJob);
 
             jobService.deleteJob(id);
 

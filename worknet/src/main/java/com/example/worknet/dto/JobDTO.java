@@ -4,6 +4,8 @@ import com.example.worknet.dto.UserDTO;
 import com.example.worknet.enums.EmploymentType;
 import com.example.worknet.enums.WorkplaceType;
 
+import java.util.List;
+
 public class JobDTO {
 
     private String jobTitle;
@@ -11,7 +13,8 @@ public class JobDTO {
     private WorkplaceType workplaceType;
     private String jobLocation;
     private EmploymentType employmentType;
-    private UserDTO user;
+    private SmallUserDTO jobPoster;
+    private List<SmallUserDTO> interestedUsers;
 
 
     public String getJobTitle() {
@@ -54,11 +57,19 @@ public class JobDTO {
         this.employmentType = employmentType;
     }
 
-    public UserDTO getUser() {
-        return user;
+    public SmallUserDTO getJobPoster() {
+        return jobPoster;
     }
 
-    public void setUser(UserDTO user) {
-        this.user = user;
+    public void setJobPoster(SmallUserDTO jobPoster) {
+        this.jobPoster = jobPoster;
+    }
+
+    public List<SmallUserDTO> getInterestedUsers() {
+        return interestedUsers;
+    }
+
+    public void setInterestedUsers(List<SmallUserDTO> interestedUsers) {
+        this.interestedUsers = interestedUsers;
     }
 }
