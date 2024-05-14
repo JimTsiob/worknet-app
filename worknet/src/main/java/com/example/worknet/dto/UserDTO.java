@@ -9,6 +9,8 @@ public class UserDTO {
     private String email;
     private String phoneNumber;
     private List<CustomFileDTO> files;
+    private List<SmallUserDTO> connections;
+    private List<SmallJobDTO> appliedJobs;
 
 
     public UserDTO() {}
@@ -59,5 +61,21 @@ public class UserDTO {
 
     public void setFiles(List<CustomFileDTO> files) {
         this.files = files;
+    }
+
+    public List<SmallUserDTO> getConnections() {
+        return connections;
+    }
+
+    public void setConnections(List<SmallUserDTO> connections) {
+        this.connections = connections;
+    }
+
+    public List<SmallJobDTO> getAppliedJobs() {
+        return appliedJobs;
+    }
+
+    public void setAppliedJobs(List<SmallJobDTO> appliedJobs) {
+        this.appliedJobs = appliedJobs;
     }
 }

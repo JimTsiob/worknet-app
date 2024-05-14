@@ -5,6 +5,8 @@ import com.example.worknet.enums.EmploymentType;
 import com.example.worknet.enums.WorkplaceType;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "jobs")
 public class Job {
@@ -29,10 +31,13 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
 
+    @ManyToMany(mappedBy = "appliedJobs")
+    private List<User> interestedUsers; // field for users who are interested in the job post
+
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
-    private User user;
+    private User jobPoster; // field for user who posted the job
 
     public Job() {
     }
@@ -85,11 +90,19 @@ public class Job {
         this.employmentType = employmentType;
     }
 
-    public User getUser() {
-        return user;
+    public User getJobPoster() {
+        return jobPoster;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setJobPoster(User jobPoster) {
+        this.jobPoster = jobPoster;
+    }
+
+    public List<User> getInterestedUsers() {
+        return interestedUsers;
+    }
+
+    public void setInterestedUsers(List<User> interestedUsers) {
+        this.interestedUsers = interestedUsers;
     }
 }

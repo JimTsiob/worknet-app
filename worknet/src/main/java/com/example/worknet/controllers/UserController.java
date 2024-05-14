@@ -78,6 +78,30 @@ public class UserController {
         }
     }
 
+    @PostMapping("/addConnection")
+    public ResponseEntity<?> addConnection(@RequestParam Long userId,
+                                           @RequestParam Long connectionId) {
+        try {
+            userService.addConnection(userId, connectionId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Connection added successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to add connection: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @PostMapping("/applyToJob")
+    public ResponseEntity<?> applyToJob(@RequestParam Long userId,
+                                           @RequestParam Long jobId) {
+        try {
+            userService.applyToJob(userId, jobId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Applied to job successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to apply to job: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
     @GetMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
         User user = userService.getUserByEmail(loginUserDTO.getEmail());
@@ -144,6 +168,30 @@ public class UserController {
             return ResponseEntity.ok("User deleted successfully");
         } catch (Exception e) {
             String errorMessage = "Failed to delete user: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @DeleteMapping("/removeConnection")
+    public ResponseEntity<?> removeConnection(@RequestParam Long userId,
+                                              @RequestParam Long connectionId) {
+        try {
+            userService.removeConnection(userId, connectionId);
+            return ResponseEntity.status(HttpStatus.OK).body("Connection removed successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to remove connection: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @DeleteMapping("/removeApplicationFromJob")
+    public ResponseEntity<?> removeApplicationFromJob(@RequestParam Long userId,
+                                              @RequestParam Long jobId) {
+        try {
+            userService.removeApplicationFromJob(userId, jobId);
+            return ResponseEntity.status(HttpStatus.OK).body("Job application removed successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to remove job application: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
