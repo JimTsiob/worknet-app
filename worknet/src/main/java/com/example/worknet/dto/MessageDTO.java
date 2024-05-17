@@ -1,9 +1,11 @@
 package com.example.worknet.dto;
 
+import java.util.List;
+
 public class MessageDTO {
     private Long id;
     private String text;
-    private SmallUserDTO user;
+    private List<SmallUserDTO> users;
 
     public Long getId() {
         return id;
@@ -21,11 +23,11 @@ public class MessageDTO {
         this.text = text;
     }
 
-    public SmallUserDTO getUser() {
-        return user;
+    public List<SmallUserDTO> getUsers() {
+        return users;
     }
 
-    public void setUser(SmallUserDTO user) {
-        this.user = user;
+    public void setUsers(List<SmallUserDTO> users) {
+        this.users = users;
     }
 }

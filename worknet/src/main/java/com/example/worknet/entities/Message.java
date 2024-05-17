@@ -3,6 +3,8 @@ package com.example.worknet.entities;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "messages")
 public class Message {
@@ -15,9 +17,8 @@ public class Message {
     @Column(name = "text")
     private String text;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @ManyToMany(mappedBy = "messages")
+    private List<User> users;
 
     public Message() {}
 
@@ -37,11 +38,11 @@ public class Message {
         this.text = text;
     }
 
-    public User getUser() {
-        return user;
+    public List<User> getUsers() {
+        return users;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 }
