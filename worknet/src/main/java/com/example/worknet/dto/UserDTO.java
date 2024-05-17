@@ -8,9 +8,12 @@ public class UserDTO {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String jwtToken;
     private List<CustomFileDTO> files;
     private List<SmallUserDTO> connections;
     private List<SmallJobDTO> appliedJobs;
+    private List<UserLikeDTO> likes;
+    private List<MessageDTO> messages;
 
 
     public UserDTO() {}
@@ -55,6 +58,14 @@ public class UserDTO {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getJwtToken() {
+        return jwtToken;
+    }
+
+    public void setJwtToken(String jwtToken) {
+        this.jwtToken = jwtToken;
+    }
+
     public List<CustomFileDTO> getFiles() {
         return files;
     }
@@ -77,5 +88,21 @@ public class UserDTO {
 
     public void setAppliedJobs(List<SmallJobDTO> appliedJobs) {
         this.appliedJobs = appliedJobs;
+    }
+
+    public List<UserLikeDTO> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<UserLikeDTO> likes) {
+        this.likes = likes;
+    }
+
+    public List<MessageDTO> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<MessageDTO> messages) {
+        this.messages = messages;
     }
 }

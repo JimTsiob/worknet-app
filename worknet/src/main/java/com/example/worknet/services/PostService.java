@@ -1,6 +1,5 @@
 package com.example.worknet.services;
 
-import com.example.worknet.entities.CustomFile;
 import com.example.worknet.entities.Post;
 
 import java.util.List;

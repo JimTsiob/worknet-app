@@ -1,7 +1,6 @@
 package com.example.worknet.services;
 
 import com.example.worknet.entities.Job;
-import com.example.worknet.entities.Skill;
 
 import java.util.List;
 

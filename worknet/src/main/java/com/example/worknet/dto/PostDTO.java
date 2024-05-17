@@ -6,8 +6,9 @@ public class PostDTO {
 
     private Long id;
     private String description;
-    private UserDTO user;
+    private SmallUserDTO user;
     private List<CustomFileDTO> customFiles;
+    private List<PostLikeDTO> likes;
 
     public PostDTO() {
     }
@@ -28,11 +29,11 @@ public class PostDTO {
         this.description = description;
     }
 
-    public UserDTO getUser() {
+    public SmallUserDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(SmallUserDTO user) {
         this.user = user;
     }
 
@@ -42,5 +43,13 @@ public class PostDTO {
 
     public void setCustomFiles(List<CustomFileDTO> customFiles) {
         this.customFiles = customFiles;
+    }
+
+    public List<PostLikeDTO> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<PostLikeDTO> likes) {
+        this.likes = likes;
     }
 }
