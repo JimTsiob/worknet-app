@@ -1,9 +1,14 @@
 package com.example.worknet.services;
 
 import com.example.worknet.entities.Job;
+import com.example.worknet.entities.Like;
+import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
+import com.example.worknet.entities.Message;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.JobRepository;
+import com.example.worknet.repositories.LikeRepository;
+import com.example.worknet.repositories.PostRepository;
 import com.example.worknet.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +26,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JobRepository jobRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     private final StrictModelMapper strictModelMapper = new StrictModelMapper();
 
@@ -129,5 +140,39 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         jobRepository.save(job);
+    }
+    
+    public void addLike(Long userId, Long postId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+
+        Like like = new Like();
+        like.setPost(post);
+        like.setUser(user);
+
+        user.getLikes().add(like);
+        post.getLikes().add(like);
+
+        userRepository.save(user);
+        postRepository.save(post);
+    }
+
+    public void removeLike(Long userId, Long postId, Long likeId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not found"));
+        Like like = likeRepository.findById(likeId).orElseThrow(() -> new RuntimeException("Like not found"));
+        
+        user.getLikes().remove(like);
+        post.getLikes().remove(like);
+
+        userRepository.save(user);
+        postRepository.save(post);
+    }
+
+    public void addMessage(Long recipientId, Message message) {
+        User recipient = userRepository.findById(recipientId).orElseThrow(() -> new RuntimeException("Recipient not found"));
+
+        recipient.getMessages().add(message);
+        userRepository.save(recipient);
     }
 }

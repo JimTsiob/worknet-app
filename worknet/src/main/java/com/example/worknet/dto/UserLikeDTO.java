@@ -1,8 +1,7 @@
 package com.example.worknet.dto;
 
-public class LikeDTO {
+public class UserLikeDTO {
     private Long id;
-    private SmallUserDTO user;
     private PostDTO post;
 
     public Long getId() {
@@ -11,14 +10,6 @@ public class LikeDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public SmallUserDTO getUser() {
-        return user;
-    }
-
-    public void setUser(SmallUserDTO user) {
-        this.user = user;
     }
 
     public PostDTO getPost() {

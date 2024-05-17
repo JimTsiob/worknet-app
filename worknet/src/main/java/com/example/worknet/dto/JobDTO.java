@@ -1,6 +1,5 @@
 package com.example.worknet.dto;
 
-import com.example.worknet.dto.UserDTO;
 import com.example.worknet.enums.EmploymentType;
 import com.example.worknet.enums.WorkplaceType;
 

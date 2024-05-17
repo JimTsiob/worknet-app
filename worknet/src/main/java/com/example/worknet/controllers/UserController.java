@@ -2,23 +2,30 @@ package com.example.worknet.controllers;
 
 
 import com.example.worknet.dto.LoginUserDTO;
+import com.example.worknet.dto.MessageDTO;
 import com.example.worknet.dto.RegisterUserDTO;
 import com.example.worknet.dto.UserDTO;
+import com.example.worknet.entities.Like;
+import com.example.worknet.entities.Message;
+import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.security.JwtGenerator;
+import com.example.worknet.services.PostService;
 import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
 
 @RestController
 @RequestMapping("/users")
@@ -102,6 +109,34 @@ public class UserController {
         }
     }
 
+    @PostMapping("/addLike")
+    public ResponseEntity<?> addLike(@RequestParam Long userId,
+                                 @RequestParam Long postId) {
+        try {
+            userService.addLike(userId, postId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Post liked successfully.");
+        } catch (Exception e) {
+            String errorMessage = "Failed to like post: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    @PostMapping("/addMessage")
+    public ResponseEntity<?> addMessage(@RequestBody MessageDTO messageDTO,
+                                        @RequestParam Long recipientId) {
+
+        try {
+            Message message = modelMapper.map(messageDTO, Message.class);
+            userService.addMessage(recipientId, message);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Message sent successfully.");
+        } catch (Exception e) {
+            String errorMessage = "Failed to send message: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+    
+    
+
     @GetMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
         User user = userService.getUserByEmail(loginUserDTO.getEmail());
@@ -111,7 +146,10 @@ public class UserController {
 
         String token = jwtGenerator.generateToken(loginUserDTO);
 
-        return new ResponseEntity<>("Bearer " + token, HttpStatus.OK);
+        user.setJwtToken(token);
+        userService.updateUser(user.getId(), user);
+
+        return new ResponseEntity<>("User logged in successfully. Bearer " + token, HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -131,6 +169,20 @@ public class UserController {
         userService.addUser(newUser);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
     }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logoutUser(@RequestBody LoginUserDTO loginUserDTO) {
+        User user = userService.getUserByEmail(loginUserDTO.getEmail());
+        if (user == null) {
+            return new ResponseEntity<>("User does not exist.", HttpStatus.BAD_REQUEST);
+        }
+
+        user.setJwtToken(null);
+        userService.updateUser(user.getId(), user);
+
+        return new ResponseEntity<>("User logged out successfully.", HttpStatus.OK);
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
@@ -161,10 +213,8 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
             }
 
-            // Assuming userService.deleteUser(id) deletes the user from the database
             userService.deleteUser(id);
 
-            // Optionally, you can return a success message
             return ResponseEntity.ok("User deleted successfully");
         } catch (Exception e) {
             String errorMessage = "Failed to delete user: " + e.getMessage();
@@ -172,6 +222,8 @@ public class UserController {
         }
     }
 
+    // endpoint for removing connection for user deletion
+    // and if user wants to remove a connection.
     @DeleteMapping("/removeConnection")
     public ResponseEntity<?> removeConnection(@RequestParam Long userId,
                                               @RequestParam Long connectionId) {
@@ -184,6 +236,7 @@ public class UserController {
         }
     }
 
+    // endpoint for job deletion and in case a user wants to remove their job application.
     @DeleteMapping("/removeApplicationFromJob")
     public ResponseEntity<?> removeApplicationFromJob(@RequestParam Long userId,
                                               @RequestParam Long jobId) {
@@ -192,6 +245,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body("Job application removed successfully");
         } catch (Exception e) {
             String errorMessage = "Failed to remove job application: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+
+    // endpoint to remove likes in case user wants to remove the like from the post.
+    @DeleteMapping("/removeLike")
+    public ResponseEntity<?> removeLike(@RequestParam Long userId,
+                                        @RequestParam Long postId,
+                                        @RequestParam Long likeId) {
+        try {
+            userService.removeLike(userId, postId, likeId);
+            return ResponseEntity.status(HttpStatus.OK).body("Like removed successfully.");
+        } catch (Exception e) {
+            String errorMessage = "Failed to remove like: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }

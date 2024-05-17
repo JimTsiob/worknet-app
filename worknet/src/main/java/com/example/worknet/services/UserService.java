@@ -1,5 +1,6 @@
 package com.example.worknet.services;
 
+import com.example.worknet.entities.Message;
 import com.example.worknet.entities.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,4 +19,7 @@ public interface UserService extends UserDetailsService {
     void removeConnection(Long userId, Long connectionId);
     void applyToJob(Long userId, Long jobId);
     void removeApplicationFromJob(Long userId, Long jobId);
+    void addLike(Long userId, Long postId);
+    void removeLike(Long userId, Long postId, Long likeId);
+    void addMessage(Long recipientId, Message message);
 }
