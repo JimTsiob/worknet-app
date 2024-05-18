@@ -21,5 +21,5 @@ public interface UserService extends UserDetailsService {
     void removeApplicationFromJob(Long userId, Long jobId);
     void addLike(Long userId, Long postId);
     void removeLike(Long userId, Long postId, Long likeId);
-    void addMessage(Long recipientId, Message message);
+    void sendMessage(Message message);
 }

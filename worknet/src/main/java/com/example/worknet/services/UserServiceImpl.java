@@ -6,10 +6,7 @@ import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
 import com.example.worknet.entities.Message;
 import com.example.worknet.modelMapper.StrictModelMapper;
-import com.example.worknet.repositories.JobRepository;
-import com.example.worknet.repositories.LikeRepository;
-import com.example.worknet.repositories.PostRepository;
-import com.example.worknet.repositories.UserRepository;
+import com.example.worknet.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -34,6 +31,8 @@ public class UserServiceImpl implements UserService {
     private LikeRepository likeRepository;
 
     private final StrictModelMapper strictModelMapper = new StrictModelMapper();
+    @Autowired
+    private MessageRepository messageRepository;
 
     public User getUserById(Long id) {
         Optional<User> user = userRepository.findById(id);
@@ -169,10 +168,14 @@ public class UserServiceImpl implements UserService {
         postRepository.save(post);
     }
 
-    public void addMessage(Long recipientId, Message message) {
-        User recipient = userRepository.findById(recipientId).orElseThrow(() -> new RuntimeException("Recipient not found"));
+    public void sendMessage(Message message) {
 
-        recipient.getMessages().add(message);
-        userRepository.save(recipient);
+        messageRepository.save(message);
+
+        for (User user: message.getUsers()){
+            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+            messageUser.getMessages().add(message);
+            userRepository.save(messageUser);
+        }
     }
 }

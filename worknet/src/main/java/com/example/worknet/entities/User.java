@@ -4,6 +4,7 @@ package com.example.worknet.entities;
 import jakarta.persistence.*;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,7 +54,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomFile> files;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "sender_recipient",
+            joinColumns = @JoinColumn(name = "sender_id"),
+            inverseJoinColumns = @JoinColumn(name = "recipient_id")
+    )
     private List<Message> messages;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -81,7 +87,9 @@ public class User {
     )
     private List<Job> appliedJobs; // field that contains job postings that the user expressed interest in.
 
-    public User() {}
+    public User() {
+        this.messages = new ArrayList<>();
+    }
 
     public Long getId() {
         return id;
