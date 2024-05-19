@@ -75,9 +75,11 @@ public class UserServiceImpl implements UserService {
             removeConnection(user.getId(), id);
         }
 
-        // also remove from the job post
-        for (User user : userRepository.findAll()) {
-            removeConnection(user.getId(), id);
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        // remove messages too
+        for (Message message : user.getMessages()){
+            removeMessage(id, message.getId());
         }
 
         userRepository.deleteById(id);
@@ -173,9 +175,25 @@ public class UserServiceImpl implements UserService {
         messageRepository.save(message);
 
         for (User user: message.getUsers()){
-            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
             messageUser.getMessages().add(message);
             userRepository.save(messageUser);
         }
+    }
+
+    public void removeMessage(Long userId, Long messageId) {
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new RuntimeException("Message not found"));
+
+        // completely delete messages to maintain best practice
+        // and save space in the database.
+
+        for (User messageuser : message.getUsers()) {
+            messageuser.getMessages().remove(message);
+            userRepository.save(messageuser);
+        }
+
+        message.getUsers().clear();
+
+        messageRepository.delete(message);
     }
 }

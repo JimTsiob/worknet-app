@@ -22,4 +22,5 @@ public interface UserService extends UserDetailsService {
     void addLike(Long userId, Long postId);
     void removeLike(Long userId, Long postId, Long likeId);
     void sendMessage(Message message);
+    void removeMessage(Long userId, Long messageId);
 }
