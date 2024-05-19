@@ -175,14 +175,13 @@ public class UserServiceImpl implements UserService {
         messageRepository.save(message);
 
         for (User user: message.getUsers()){
-            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("Sender not found"));
+            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
             messageUser.getMessages().add(message);
             userRepository.save(messageUser);
         }
     }
 
     public void removeMessage(Long userId, Long messageId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new RuntimeException("Message not found"));
 
         // completely delete messages to maintain best practice
@@ -194,6 +193,7 @@ public class UserServiceImpl implements UserService {
         }
 
         message.getUsers().clear();
+
         messageRepository.delete(message);
     }
 }
