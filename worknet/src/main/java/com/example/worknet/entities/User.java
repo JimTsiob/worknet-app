@@ -87,6 +87,9 @@ public class User {
     )
     private List<Job> appliedJobs; // field that contains job postings that the user expressed interest in.
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<View> views; // views on job postings, used for recommendation system.
+
     public User() {
         this.messages = new ArrayList<>();
     }
@@ -249,5 +252,13 @@ public class User {
 
     public void setAppliedJobs(List<Job> appliedJobs) {
         this.appliedJobs = appliedJobs;
+    }
+
+    public List<View> getViews() {
+        return views;
+    }
+
+    public void setViews(List<View> views) {
+        this.views = views;
     }
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class JobDTO {
 
+    private Long id;
     private String jobTitle;
     private String company;
     private WorkplaceType workplaceType;
@@ -14,7 +15,16 @@ public class JobDTO {
     private EmploymentType employmentType;
     private SmallUserDTO jobPoster;
     private List<SmallUserDTO> interestedUsers;
+    private List<ViewDTO> views;
 
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getJobTitle() {
         return jobTitle;
@@ -70,5 +80,13 @@ public class JobDTO {
 
     public void setInterestedUsers(List<SmallUserDTO> interestedUsers) {
         this.interestedUsers = interestedUsers;
+    }
+
+    public List<ViewDTO> getViews() {
+        return views;
+    }
+
+    public void setViews(List<ViewDTO> views) {
+        this.views = views;
     }
 }

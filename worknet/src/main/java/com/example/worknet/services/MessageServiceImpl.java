@@ -2,14 +2,11 @@ package com.example.worknet.services;
 
 
 import com.example.worknet.entities.Message;
-import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.MessageRepository;
-import com.example.worknet.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +15,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private MessageRepository messageRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     public Message getMessageById(Long id) {
         Optional<Message> message = messageRepository.findById(id);

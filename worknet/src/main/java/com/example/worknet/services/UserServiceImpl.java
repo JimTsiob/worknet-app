@@ -4,6 +4,7 @@ import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Like;
 import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
+import com.example.worknet.entities.View;
 import com.example.worknet.entities.Message;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.*;
@@ -152,7 +153,6 @@ public class UserServiceImpl implements UserService {
         like.setUser(user);
 
         user.getLikes().add(like);
-        post.getLikes().add(like);
 
         userRepository.save(user);
         postRepository.save(post);
@@ -168,6 +168,8 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         postRepository.save(post);
+
+        likeRepository.delete(like);
     }
 
     public void sendMessage(Message message) {
@@ -195,5 +197,19 @@ public class UserServiceImpl implements UserService {
         message.getUsers().clear();
 
         messageRepository.delete(message);
+    }
+
+    public void addView(Long userId, Long jobId){
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Job job = jobRepository.findById(jobId).orElseThrow(() -> new RuntimeException("Job not found"));
+
+        View view = new View();
+        view.setUser(user);
+        view.setJob(job);
+
+        user.getViews().add(view);
+
+        userRepository.save(user);
+        jobRepository.save(job);
     }
 }

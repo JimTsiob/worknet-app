@@ -5,13 +5,10 @@ import com.example.worknet.dto.LoginUserDTO;
 import com.example.worknet.dto.MessageDTO;
 import com.example.worknet.dto.RegisterUserDTO;
 import com.example.worknet.dto.UserDTO;
-import com.example.worknet.entities.Like;
 import com.example.worknet.entities.Message;
-import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.security.JwtGenerator;
-import com.example.worknet.services.PostService;
 import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -133,8 +130,21 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
+
+    @PostMapping("/addView")
+    public ResponseEntity<?> addView(@RequestParam Long userId,
+                                     @RequestParam Long jobId) {
+        try {
+            userService.addView(userId, jobId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Viewed job successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to view job: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
     
     
+    // ---------------------------------------------- AUTHENTICATION ----------------------------------------------
 
     @GetMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
@@ -181,6 +191,8 @@ public class UserController {
 
         return new ResponseEntity<>("User logged out successfully.", HttpStatus.OK);
     }
+
+    // ---------------------------------------------- END OF AUTHENTICATION ----------------------------------------------
     
 
     @PutMapping("/{id}")
