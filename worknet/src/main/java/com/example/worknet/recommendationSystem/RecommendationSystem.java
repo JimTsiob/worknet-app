@@ -1,7 +1,6 @@
 package com.example.worknet.recommendationSystem;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import com.example.worknet.entities.Job;
 import com.example.worknet.entities.User;
@@ -12,45 +11,85 @@ public class RecommendationSystem {
     private double[][] Q;
     private int[][] userJobMatrix;
 
-    public void createInteractionMatrix(List<User> users, List<Job> jobs) {
 
+//    public void createInteractionMatrix(List<User> users, List<Job> jobs) {
+//
+//        int numUsers = users.size();
+//        int numJobs = jobs.size();
+//
+//        this.userJobMatrix = new int[numUsers][numJobs];
+//
+//        // Populate user job interaction matrix.
+//        for (User user: users){
+//            for (Job job: jobs){
+//                Long userId = user.getId();
+//                Long jobId = job.getId();
+//                int viewCount = user.countViewsForJob(job.getId());
+//                // Convert Long to int
+//                int intUserId = userId.intValue();
+//                int intJobId = jobId.intValue();
+//
+//                this.userJobMatrix[intUserId][intJobId] = viewCount;
+//            }
+//        }
+//    }
+
+    public void createInteractionMatrix(List<User> users, List<Job> jobs) {
         int numUsers = users.size();
         int numJobs = jobs.size();
 
         this.userJobMatrix = new int[numUsers][numJobs];
 
-        // Populate user job interaction matrix.
-        for (User user: users){
-            for (Job job: jobs){
+        // Create mappings from IDs to indices
+        Map<Long, Integer> userIdToIndex = new HashMap<>();
+        Map<Long, Integer> jobIdToIndex = new HashMap<>();
+
+        // Populate the userIdToIndex map
+        for (int i = 0; i < numUsers; i++) {
+            userIdToIndex.put(users.get(i).getId(), i);
+        }
+
+        // Populate the jobIdToIndex map
+        for (int i = 0; i < numJobs; i++) {
+            jobIdToIndex.put(jobs.get(i).getId(), i);
+        }
+
+        // Populate user job interaction matrix
+        for (User user : users) {
+            for (Job job : jobs) {
                 Long userId = user.getId();
                 Long jobId = job.getId();
                 int viewCount = user.countViewsForJob(job.getId());
-                // Convert Long to int
-                int intUserId = userId.intValue();
-                int intJobId = jobId.intValue();
 
-                this.userJobMatrix[intUserId][intJobId] = viewCount;
+                // Get the mapped indices
+                int userIndex = userIdToIndex.get(userId);
+                int jobIndex = jobIdToIndex.get(jobId);
+
+                this.userJobMatrix[userIndex][jobIndex] = viewCount;
             }
         }
     }
 
-    private void matrixFactorization(int numUsers, int numJobs, int numFactors) {
+    public void matrixFactorization(int numUsers, int numJobs, int numFactors) {
+        this.P = new double[numUsers][numFactors];
+        this.Q = new double[numJobs][numFactors];
+
         initializeMatrix(this.P);
         initializeMatrix(this.Q);
 
         double learningRate = 0.01;
         double lambda = 0.1;
-        int numIterations = 10;
+        int numIterations = 100;
 
         for (int iter = 0; iter < numIterations; iter++) {
-            for (int u = 0; u < numUsers; u++) {
+            for (int u = 0; u < numUsers - 1; u++) {
                 for (int j = 0; j < numJobs; j++) {
-                    if (userJobMatrix[u][j] > 0) {
-                        double predictedRating = dotProduct(P[u], Q[j]);
-                        double error = userJobMatrix[u][j] - predictedRating;
-                        for (int k = 0; k < numFactors; k++) {
-                            this.P[u][k] += learningRate * (error * Q[j][k] - lambda * P[u][k]);
-                            this.Q[j][k] += learningRate * (error * P[u][k] - lambda * Q[j][k]);
+                    if (this.userJobMatrix[u][j] > 0) {
+                        double predictedRating = dotProduct(this.P[u], this.Q[j]);
+                        double error = this.userJobMatrix[u][j] - predictedRating;
+                        for (int k = 0; k < numFactors; k++) { // implemented gradient descent to improve results
+                            this.P[u][k] += learningRate * (error * this.Q[j][k] - lambda * this.P[u][k]);
+                            this.Q[j][k] += learningRate * (error * this.P[u][k] - lambda * this.Q[j][k]);
                         }
                     }
                 }
@@ -58,6 +97,43 @@ public class RecommendationSystem {
         }
     }
 
+    public List<Job> getRecommendedJobs(User user, List<Job> jobs) {
+
+        Long userId = user.getId();
+        int intUserId = userId.intValue();
+        int numJobs = Q.length;
+
+        double[] userPredictions = new double[numJobs];
+        for (int j = 0; j < numJobs; j++) {
+            userPredictions[j] = dotProduct(this.P[this.P.length - 1], this.Q[j]); // get last element of array, which is wanted user, to get results back.
+        }
+
+        // Get top-N recommendations
+        int N = 5; // Number of recommendations
+        List<Integer> recommendedJobIndexes = getTopNRecommendations(userPredictions, N);
+        List<Job> recommendedJobs = new ArrayList<>();
+        for (int index: recommendedJobIndexes) {
+            recommendedJobs.add(jobs.get(index));
+        }
+
+        return recommendedJobs;
+
+    }
+
+    private static List<Integer> getTopNRecommendations(double[] scores, int N) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>((a, b) -> Double.compare(scores[b], scores[a]));
+        for (int i = 0; i < scores.length; i++) {
+            pq.offer(i);
+        }
+
+        List<Integer> recommendations = new ArrayList<>();
+        for (int i = 0; i < N; i++) {
+            if (!pq.isEmpty()) {
+                recommendations.add(pq.poll());
+            }
+        }
+        return recommendations;
+    }
 
 
     private static double dotProduct(double[] vec1, double[] vec2) {
