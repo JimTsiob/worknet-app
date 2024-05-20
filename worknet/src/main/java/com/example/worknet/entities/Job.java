@@ -34,6 +34,8 @@ public class Job {
     @ManyToMany(mappedBy = "appliedJobs")
     private List<User> interestedUsers; // field for users who are interested in the job post
 
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<View> views;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
@@ -104,5 +106,13 @@ public class Job {
 
     public void setInterestedUsers(List<User> interestedUsers) {
         this.interestedUsers = interestedUsers;
+    }
+
+    public List<View> getViews() {
+        return views;
+    }
+
+    public void setViews(List<View> views) {
+        this.views = views;
     }
 }

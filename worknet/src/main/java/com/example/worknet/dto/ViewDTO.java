@@ -1,10 +1,10 @@
 package com.example.worknet.dto;
 
-public class LikeDTO {
+public class ViewDTO {
     private Long id;
     private SmallUserDTO user;
-    private SmallPostDTO post;
-
+    private SmallJobDTO job;
+    
     public Long getId() {
         return id;
     }
@@ -17,15 +17,15 @@ public class LikeDTO {
         return user;
     }
 
-    public void setUser(SmallUserDTO user) {
+    public void setUser(SmallUserDTO user){
         this.user = user;
     }
 
-    public SmallPostDTO getPost() {
-        return post;
+    public SmallJobDTO getJob() {
+        return job;
     }
 
-    public void setPost(SmallPostDTO post) {
-        this.post = post;
+    public void setJob(SmallJobDTO job){
+        this.job = job;
     }
 }
