@@ -261,4 +261,15 @@ public class User {
     public void setViews(List<View> views) {
         this.views = views;
     }
+
+    public int countViewsForJob(Long jobId) {
+        int count = 0;
+        for (View view : views) {
+            if (view.getUser().getId() == this.id && view.getJob().getId() == jobId) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }
