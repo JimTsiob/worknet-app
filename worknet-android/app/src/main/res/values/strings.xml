@@ -10,4 +10,9 @@
     <string name="repeat_password">Repeat Password</string>
     <string name="name">Name</string>
     <string name="surname">Surname</string>
+    <string name="home">Home</string>
+    <string name="network">Network</string>
+    <string name="post">Post</string>
+    <string name="job_postings">Job Postings</string>
+    <string name="notifications">Notifications</string>
 </resources>
