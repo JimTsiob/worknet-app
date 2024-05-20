@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.worknet.dto.SkillDTO;
 import com.example.worknet.dto.ViewDTO;
-import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.View;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.ViewService;
