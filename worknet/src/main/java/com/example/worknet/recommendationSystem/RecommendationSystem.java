@@ -11,29 +11,6 @@ public class RecommendationSystem {
     private double[][] Q;
     private int[][] userJobMatrix;
 
-
-//    public void createInteractionMatrix(List<User> users, List<Job> jobs) {
-//
-//        int numUsers = users.size();
-//        int numJobs = jobs.size();
-//
-//        this.userJobMatrix = new int[numUsers][numJobs];
-//
-//        // Populate user job interaction matrix.
-//        for (User user: users){
-//            for (Job job: jobs){
-//                Long userId = user.getId();
-//                Long jobId = job.getId();
-//                int viewCount = user.countViewsForJob(job.getId());
-//                // Convert Long to int
-//                int intUserId = userId.intValue();
-//                int intJobId = jobId.intValue();
-//
-//                this.userJobMatrix[intUserId][intJobId] = viewCount;
-//            }
-//        }
-//    }
-
     public void createInteractionMatrix(List<User> users, List<Job> jobs) {
         int numUsers = users.size();
         int numJobs = jobs.size();
