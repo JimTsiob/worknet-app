@@ -1,14 +1,16 @@
 package com.example.worknet.controllers;
 
 
-import com.example.worknet.dto.LoginUserDTO;
-import com.example.worknet.dto.MessageDTO;
-import com.example.worknet.dto.RegisterUserDTO;
-import com.example.worknet.dto.UserDTO;
+import com.example.worknet.dto.*;
+import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Message;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
+import com.example.worknet.entities.View;
 import com.example.worknet.modelMapper.StrictModelMapper;
+import com.example.worknet.recommendationSystem.RecommendationSystem;
 import com.example.worknet.security.JwtGenerator;
+import com.example.worknet.services.JobService;
 import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +34,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JobService jobService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -68,6 +75,72 @@ public class UserController {
         }
     }
 
+    @GetMapping("/recommendation")
+    public ResponseEntity<?> recommendJobs(@RequestParam Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with ID " + userId + " not found.");
+        }
+
+        List<User> connections = user.getConnections();
+        List<Skill> userSkills = user.getSkills();
+        List<Job> jobs = jobService.getAllJobs();
+
+        // recommendation by matrix factorization on user's connections
+        if (!connections.isEmpty()) {
+            List<View> connectionViews = new ArrayList<>();
+            for (User connection : connections) {
+                connectionViews.addAll(connection.getViews());
+            }
+
+            HashSet<Job> noDupesJobs = new HashSet<>(); // remove duplicates
+            for (View connectionView : connectionViews) {
+                noDupesJobs.add(jobService.getJobById(connectionView.getJob().getId()));
+
+            }
+
+            List<Job> connectionJobs = new ArrayList<>(noDupesJobs);
+
+            RecommendationSystem recommendationSystem = new RecommendationSystem();
+
+            recommendationSystem.createInteractionMatrix(connections, connectionJobs);
+
+            connections.add(user); // add this to get results later on.
+
+            recommendationSystem.matrixFactorization(connections.size(), connectionJobs.size(), 10);
+
+            List<Job> recommendedJobs = recommendationSystem.getRecommendedJobs(user, connectionJobs);
+
+            // turn them to DTOs and return
+            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
+            for (Job recommendedJob : recommendedJobs) {
+                SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
+                recommendedJobDTOs.add(recommendedJobDTO);
+            }
+
+            return ResponseEntity.ok(recommendedJobDTOs);
+        }
+
+        // recommendation by user skills 
+        if (!userSkills.isEmpty()) {
+
+            RecommendationSystem recommendationSystem = new RecommendationSystem();
+
+            HashSet<Job> recommendedJobs = recommendationSystem.recommendJobsBySkill(user, jobs);
+            
+            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
+
+            for (Job recommendedJob : recommendedJobs) {
+                SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
+                recommendedJobDTOs.add(recommendedJobDTO);
+            }
+
+            return ResponseEntity.ok(recommendedJobDTOs);
+        }
+
+        return new ResponseEntity<>("Add connections or skills to get recommendations for job posts!", HttpStatus.NOT_FOUND);
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDTO) {
         try {
@@ -93,6 +166,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
+
+    @PostMapping("/addSkill")
+    public ResponseEntity<?> addSkill(@RequestParam Long userId,
+                                @RequestParam String skillName) {
+        try {
+            userService.addSkill(userId, skillName);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Skill added successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to add skill: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+    
 
     @PostMapping("/applyToJob")
     public ResponseEntity<?> applyToJob(@RequestParam Long userId,

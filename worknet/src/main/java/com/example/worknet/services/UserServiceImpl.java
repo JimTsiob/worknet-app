@@ -3,6 +3,7 @@ package com.example.worknet.services;
 import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Like;
 import com.example.worknet.entities.Post;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.entities.View;
 import com.example.worknet.entities.Message;
@@ -211,5 +212,17 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
         jobRepository.save(job);
+    }
+
+    public void addSkill(Long userId, String skillName){
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        Skill skill = new Skill();
+        skill.setName(skillName);
+        skill.setUser(user);
+
+        user.getSkills().add(skill);
+
+        userRepository.save(user);
     }
 }

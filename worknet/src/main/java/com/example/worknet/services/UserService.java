@@ -24,4 +24,5 @@ public interface UserService extends UserDetailsService {
     void sendMessage(Message message);
     void removeMessage(Long userId, Long messageId);
     void addView(Long userId, Long jobId);
+    void addSkill(Long userId, String skillName);
 }

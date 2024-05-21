@@ -10,4 +10,5 @@ public interface JobService {
     Job addJob(Job job);
     Job updateJob(Long id,Job job);
     void deleteJob(Long id);
+    void addSkill(Long id, String skillName);
 }

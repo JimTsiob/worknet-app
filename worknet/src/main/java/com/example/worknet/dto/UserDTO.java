@@ -14,6 +14,7 @@ public class UserDTO {
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
     private List<MessageDTO> messages;
+    private List<SkillDTO> skills;
 
 
     public UserDTO() {}
@@ -104,5 +105,13 @@ public class UserDTO {
 
     public void setMessages(List<MessageDTO> messages) {
         this.messages = messages;
+    }
+
+    public List<SkillDTO> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<SkillDTO> skills) {
+        this.skills = skills;
     }
 }

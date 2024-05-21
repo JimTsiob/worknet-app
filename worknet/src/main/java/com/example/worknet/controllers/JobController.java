@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/jobs")
 public class JobController {
@@ -59,6 +60,19 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
+
+    @PostMapping("/addSkill")
+    public ResponseEntity<?> addSkill(@RequestParam Long jobId,
+                                @RequestParam String skillName) {
+        try {
+            jobService.addSkill(jobId, skillName);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Skill added successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to add skill: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody JobDTO jobDTO) {
