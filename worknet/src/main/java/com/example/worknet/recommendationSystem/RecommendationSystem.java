@@ -3,6 +3,7 @@ package com.example.worknet.recommendationSystem;
 import java.util.*;
 
 import com.example.worknet.entities.Job;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 
 public class RecommendationSystem {
@@ -75,9 +76,6 @@ public class RecommendationSystem {
     }
 
     public List<Job> getRecommendedJobs(User user, List<Job> jobs) {
-
-        Long userId = user.getId();
-        int intUserId = userId.intValue();
         int numJobs = Q.length;
 
         double[] userPredictions = new double[numJobs];
@@ -110,6 +108,27 @@ public class RecommendationSystem {
             }
         }
         return recommendations;
+    }
+
+    public HashSet<Job> recommendJobsBySkill(User user, List<Job> jobs) {
+        List<Skill> userSkills = user.getSkills();
+        HashSet<Job> recommendedJobs = new HashSet<Job>(); // hash set to remove duplicates.
+
+        Set<String> userSkillNames = new HashSet<>();
+        for (Skill userSkill : userSkills) {
+            userSkillNames.add(userSkill.getName().toLowerCase()); // case insensitive skill search.
+        }
+
+        for (Job job : jobs){
+            List<Skill> individualJobSkills = job.getSkills();
+            for (Skill skill : individualJobSkills){
+                if (userSkillNames.contains(skill.getName().toLowerCase())) {
+                    recommendedJobs.add(job);
+                }
+            }
+        }
+
+        return recommendedJobs;
     }
 
 

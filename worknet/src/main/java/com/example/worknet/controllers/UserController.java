@@ -4,6 +4,7 @@ package com.example.worknet.controllers;
 import com.example.worknet.dto.*;
 import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Message;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.entities.View;
 import com.example.worknet.modelMapper.StrictModelMapper;
@@ -82,6 +83,10 @@ public class UserController {
         }
 
         List<User> connections = user.getConnections();
+        List<Skill> userSkills = user.getSkills();
+        List<Job> jobs = jobService.getAllJobs();
+
+        // recommendation by matrix factorization on user's connections
         if (!connections.isEmpty()) {
             List<View> connectionViews = new ArrayList<>();
             for (User connection : connections) {
@@ -116,7 +121,24 @@ public class UserController {
             return ResponseEntity.ok(recommendedJobDTOs);
         }
 
-        return new ResponseEntity<>("We fucked up.", HttpStatus.NOT_FOUND);
+        // recommendation by user skills 
+        if (!userSkills.isEmpty()) {
+
+            RecommendationSystem recommendationSystem = new RecommendationSystem();
+
+            HashSet<Job> recommendedJobs = recommendationSystem.recommendJobsBySkill(user, jobs);
+            
+            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
+
+            for (Job recommendedJob : recommendedJobs) {
+                SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
+                recommendedJobDTOs.add(recommendedJobDTO);
+            }
+
+            return ResponseEntity.ok(recommendedJobDTOs);
+        }
+
+        return new ResponseEntity<>("Add connections or skills to get recommendations for job posts!", HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/")
@@ -144,6 +166,19 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }
+
+    @PostMapping("/addSkill")
+    public ResponseEntity<?> addSkill(@RequestParam Long userId,
+                                @RequestParam String skillName) {
+        try {
+            userService.addSkill(userId, skillName);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Skill added successfully");
+        } catch (Exception e) {
+            String errorMessage = "Failed to add skill: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+    
 
     @PostMapping("/applyToJob")
     public ResponseEntity<?> applyToJob(@RequestParam Long userId,

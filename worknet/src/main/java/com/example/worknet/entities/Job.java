@@ -37,6 +37,9 @@ public class Job {
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<View> views;
 
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Skill> skills;
+
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User jobPoster; // field for user who posted the job
@@ -114,5 +117,13 @@ public class Job {
 
     public void setViews(List<View> views) {
         this.views = views;
+    }
+
+    public List<Skill> getSkills() {
+        return skills;
+    }
+
+    public void setSKills(List<Skill> skills) {
+        this.skills = skills;
     }
 }

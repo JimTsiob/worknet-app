@@ -15,8 +15,12 @@ public class Skill {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name="user_id")
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name="job_id")
+    private Job job;
 
     public Skill() {
     }
@@ -43,5 +47,13 @@ public class Skill {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.worknet.services;
 
 import com.example.worknet.entities.Job;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,19 @@ public class JobServiceImpl implements JobService {
 
     public void deleteJob(Long id){
         jobRepository.deleteById(id);
+    }
+
+    
+    public void addSkill(Long id, String skillName) {
+        Job job = jobRepository.findById(id).orElseThrow(() -> new RuntimeException("Job not found"));
+        
+        Skill skill = new Skill();
+        skill.setName(skillName);
+        skill.setJob(job);
+
+        job.getSkills().add(skill);
+
+        jobRepository.save(job);
+        
     }
 }

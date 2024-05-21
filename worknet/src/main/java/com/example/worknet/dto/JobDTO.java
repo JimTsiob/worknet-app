@@ -1,5 +1,6 @@
 package com.example.worknet.dto;
 
+import com.example.worknet.entities.Skill;
 import com.example.worknet.enums.EmploymentType;
 import com.example.worknet.enums.WorkplaceType;
 
@@ -16,6 +17,7 @@ public class JobDTO {
     private SmallUserDTO jobPoster;
     private List<SmallUserDTO> interestedUsers;
     private List<ViewDTO> views;
+    private List<SkillDTO> skills;
 
 
     public Long getId() {
@@ -88,5 +90,13 @@ public class JobDTO {
 
     public void setViews(List<ViewDTO> views) {
         this.views = views;
+    }
+
+    public List<SkillDTO> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<SkillDTO> skills) {
+        this.skills = skills;
     }
 }
