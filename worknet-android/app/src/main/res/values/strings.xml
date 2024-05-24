@@ -19,4 +19,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="authentication_fail_msg">Authentication failed! Please try again!</string>
     <string name="repeat_pass_validation_error">The passwords are not the same!</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="messages">Messages</string>
+    <string name="search">Search...</string>
+    <string name="my_profile">My Profile</string>
+    <string name="settings">Settings</string>
 </resources>
