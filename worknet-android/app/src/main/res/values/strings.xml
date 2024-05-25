@@ -24,4 +24,10 @@
     <string name="search">Search...</string>
     <string name="my_profile">My Profile</string>
     <string name="settings">Settings</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec venenatis mollis tincidunt. Nunc tortor ligula, malesuada non imperdiet a, rhoncus sit amet turpis. Aliquam auctor magna eu metus maximus, semper egestas dui vestibulum. In hac habitasse platea dictumst. Curabitur pulvinar sagittis mauris, sed facilisis ex suscipit sit amet.</string>
+    <string name="lorem_ipsum_short">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="like">Like</string>
+    <string name="comments">Comments</string>
+    <string name="like_counter_placeholder_value">100</string>
+    <string name="leave_your_comment">Leave your comment...</string>
 </resources>
