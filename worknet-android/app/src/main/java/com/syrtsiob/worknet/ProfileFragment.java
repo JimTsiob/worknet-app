@@ -46,6 +46,10 @@ public class ProfileFragment extends Fragment {
         return fragment;
     }
 
+    public static ProfileFragment newInstance() {
+        return new ProfileFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -46,6 +46,10 @@ public class JobPostingsFragment extends Fragment {
         return fragment;
     }
 
+    public static JobPostingsFragment newInstance() {
+        return new JobPostingsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

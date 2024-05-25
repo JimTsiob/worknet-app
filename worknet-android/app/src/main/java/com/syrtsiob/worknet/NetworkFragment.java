@@ -46,6 +46,10 @@ public class NetworkFragment extends Fragment {
         return fragment;
     }
 
+    public static NetworkFragment newInstance() {
+        return new NetworkFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

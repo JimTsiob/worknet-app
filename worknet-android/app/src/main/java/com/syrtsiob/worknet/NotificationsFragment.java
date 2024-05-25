@@ -46,6 +46,10 @@ public class NotificationsFragment extends Fragment {
         return fragment;
     }
 
+    public static NotificationsFragment newInstance() {
+        return new NotificationsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

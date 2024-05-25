@@ -46,6 +46,10 @@ public class SettingsFragment extends Fragment {
         return fragment;
     }
 
+    public static SettingsFragment newInstance() {
+        return new SettingsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

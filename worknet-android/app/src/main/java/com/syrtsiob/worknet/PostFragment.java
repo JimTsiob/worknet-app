@@ -46,6 +46,10 @@ public class PostFragment extends Fragment {
         return fragment;
     }
 
+    public static PostFragment newInstance() {
+        return new PostFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

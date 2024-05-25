@@ -46,6 +46,10 @@ public class MessagesFragment extends Fragment {
         return fragment;
     }
 
+    public static MessagesFragment newInstance() {
+        return new MessagesFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

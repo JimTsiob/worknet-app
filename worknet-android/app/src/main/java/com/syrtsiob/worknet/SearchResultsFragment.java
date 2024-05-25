@@ -46,6 +46,10 @@ public class SearchResultsFragment extends Fragment {
         return fragment;
     }
 
+    public static SearchResultsFragment newInstance() {
+        return new SearchResultsFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

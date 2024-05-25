@@ -30,20 +30,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new HomeFragment());
+        replaceFragment(HomeFragment.newInstance());
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemID = item.getItemId();
             if(itemID == R.id.menuHome)
-                replaceFragment(new HomeFragment());
+                replaceFragment(HomeFragment.newInstance());
             else if(itemID == R.id.menuPost)
-                replaceFragment(new PostFragment());
+                replaceFragment(PostFragment.newInstance());
             else if(itemID == R.id.menuJobPostings)
-                replaceFragment(new JobPostingsFragment());
+                replaceFragment(JobPostingsFragment.newInstance());
             else if(itemID == R.id.menuNetwork)
-                replaceFragment(new NetworkFragment());
+                replaceFragment(NetworkFragment.newInstance());
             else if(itemID == R.id.menuNotifications)
-                replaceFragment(new NotificationsFragment());
+                replaceFragment(NotificationsFragment.newInstance());
 
             return true;
         });
@@ -57,22 +57,21 @@ public class MainActivity extends AppCompatActivity {
         binding.navigationView.setNavigationItemSelectedListener(item->{
             int itemID = item.getItemId();
             if(itemID == R.id.profile)
-                replaceFragment(new ProfileFragment());
+                replaceFragment(ProfileFragment.newInstance());
             else if(itemID == R.id.settings)
-                replaceFragment(new SettingsFragment());
+                replaceFragment(SettingsFragment.newInstance());
             drawerLayout.close();
             return true;
         });
 
         findViewById(R.id.messages).setOnClickListener(listener -> {
-            replaceFragment(new MessagesFragment());
-            clearBottomMenuSelection();
+            replaceFragment(MessagesFragment.newInstance());
         });
 
         EditText searchBar = findViewById(R.id.searchBar);
         searchBar.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                replaceFragment(new SearchResultsFragment());
+                replaceFragment(SearchResultsFragment.newInstance());
                 searchBar.clearFocus();
             }
             return false;
@@ -84,12 +83,5 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.mainFrame, fragment);
         fragmentTransaction.commit();
-    }
-
-    private void clearBottomMenuSelection(){
-        Menu menu = binding.bottomNavigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            menu.getItem(i).setChecked(false);
-        }
     }
 }
