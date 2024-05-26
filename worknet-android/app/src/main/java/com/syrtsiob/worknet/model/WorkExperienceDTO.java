@@ -1,9 +1,11 @@
-package com.example.worknet.dto;
+package com.syrtsiob.worknet.model;
 
-import com.example.worknet.enums.EmploymentType;
+import com.syrtsiob.worknet.enums.EmploymentType;
+
 import java.time.LocalDate;
 
 public class WorkExperienceDTO {
+
     private String title;
     private EmploymentType employmentType;
     private String companyName;
