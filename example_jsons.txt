@@ -29,3 +29,22 @@
         "phoneNumber": "6985542223",
         "files": []
     }
+
+---------------------------- REGISTER ENDPOINT BELOW ----------------------------
+
+{
+    "firstName": "Sokrates",
+    "lastName": "Papadopoulos",
+    "email": "sopap@gmail.com",
+    "phoneNumber": "6985542223",
+    "password": "sopap4"
+}
+
+{
+    "firstName": "Michael",
+    "lastName": "Jackson",
+    "email": "mijack@gmail.com",
+    "phoneNumber": "6985542223",
+    "password": "mijak2"
+}
+

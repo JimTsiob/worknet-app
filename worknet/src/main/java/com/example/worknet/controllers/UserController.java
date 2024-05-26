@@ -232,7 +232,7 @@ public class UserController {
     
     // ---------------------------------------------- AUTHENTICATION ----------------------------------------------
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginUserDTO loginUserDTO) {
         User user = userService.getUserByEmail(loginUserDTO.getEmail());
         if (user == null){
