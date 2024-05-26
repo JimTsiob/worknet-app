@@ -10,4 +10,5 @@ public interface PostService {
     Post addPost(Post post);
     Post updatePost(Long id, Post post);
     void deletePost(Long id);
+    List<Post> searchPostByDescription(String description);
 }

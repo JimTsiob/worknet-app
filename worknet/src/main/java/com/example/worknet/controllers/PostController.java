@@ -46,6 +46,17 @@ public class PostController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchPosts(@RequestParam String description) {
+        List<Post> posts = postService.searchPostByDescription(description);
+
+        List<PostDTO> postDTOList =  posts.stream()
+                .map(post -> modelMapper.map(post, PostDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(postDTOList);
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> addPost(@RequestBody PostDTO postDTO) {
         try {
