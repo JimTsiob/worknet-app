@@ -8,3 +8,5 @@ Go to settings -> build, execution, deployment -> build tools -> Gradle and chan
 ------ DB NOTES ------
 
 DDL AUTO UPDATE DOES NOT CHANGE SCHEMA IF THERE IS DATA IN THE DATABASE!!!!
+
+useful command: keytool -v -list -keystore worknet.jks (shows all required info of the jks file).

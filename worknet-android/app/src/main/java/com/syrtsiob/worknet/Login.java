@@ -2,16 +2,22 @@ package com.syrtsiob.worknet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import com.syrtsiob.worknet.LiveData.AuthResultLiveData;
+import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.model.LoginUserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class Login extends AppCompatActivity {
 
@@ -37,19 +43,46 @@ public class Login extends AppCompatActivity {
       String email = inputEmail.getText().toString();
       String password = inputPassword.getText().toString();
 
-      if(AuthenticateUser(email, password)) {
-        finishAffinity();
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(getResources().getString(R.string.e_mail), email); // TODO add any other extras
-        startActivity(intent);
-      }
-      else {
-          Toast.makeText(this, R.string.authentication_fail_msg, Toast.LENGTH_LONG).show();
-      }
+      authenticateUser(email,password);
+
+      AuthResultLiveData.getInstance().observe(this, isAuthenticated -> {
+          if (isAuthenticated) {
+              // Handle authentication success
+              finishAffinity();
+              Intent intent = new Intent(this, MainActivity.class);
+              intent.putExtra(getResources().getString(R.string.e_mail), email); // TODO add any other extras
+              startActivity(intent);
+          } else {
+              // Handle authentication failure
+              Toast.makeText(Login.this, "Authentication failed. Please try again.", Toast.LENGTH_LONG).show();
+          }
+      });
     }
 
-    private boolean AuthenticateUser(String email, String password) {
-        // TODO implement user authentication
-        return true;
+    private void authenticateUser(String email, String password) {
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        UserService userService = retrofit.create(UserService.class);
+
+        LoginUserDTO loginUserDTO = new LoginUserDTO();
+        loginUserDTO.setEmail(email);
+        loginUserDTO.setPassword(password);
+
+        userService.loginUser(loginUserDTO).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    AuthResultLiveData.getInstance().setValue(true);
+                } else {
+                    AuthResultLiveData.getInstance().setValue(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("fail: ", t.getLocalizedMessage());
+                // Handle the error
+                AuthResultLiveData.getInstance().setValue(false);
+            }
+        });
     }
 }
