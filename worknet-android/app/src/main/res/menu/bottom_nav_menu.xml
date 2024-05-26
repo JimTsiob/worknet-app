@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/home"
+        android:icon="@drawable/home"
+        android:id="@+id/menuHome"/>
+    <item android:title="@string/network"
+        android:icon="@drawable/network"
+        android:id="@+id/menuNetwork"/>
+    <item android:title="@string/post"
+        android:icon="@drawable/new_post"
+        android:id="@+id/menuPost"/>
+    <item android:title="@string/job_postings"
+        android:icon="@drawable/job_postings"
+        android:id="@+id/menuJobPostings"/>
+    <item android:title="@string/notifications"
+        android:icon="@drawable/notifications"
+        android:id="@+id/menuNotifications"/>
+</menu>

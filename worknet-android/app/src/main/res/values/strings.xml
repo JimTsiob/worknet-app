@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">Worknet</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="e_mail">E-Mail</string>
+    <string name="password">Password</string>
+    <string name="click_to_login">Click to login</string>
+    <string name="fill_with_password">Password</string>
+    <string name="fill_with_email">Email</string>
+    <string name="repeat_password">Repeat Password</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="home">Home</string>
+    <string name="network">Network</string>
+    <string name="post">Post</string>
+    <string name="job_postings">Job Postings</string>
+    <string name="notifications">Notifications</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="authentication_fail_msg">Authentication failed! Please try again!</string>
+    <string name="repeat_pass_validation_error">The passwords are not the same!</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="messages">Messages</string>
+    <string name="search">Search...</string>
+    <string name="my_profile">My Profile</string>
+    <string name="settings">Settings</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec venenatis mollis tincidunt. Nunc tortor ligula, malesuada non imperdiet a, rhoncus sit amet turpis. Aliquam auctor magna eu metus maximus, semper egestas dui vestibulum. In hac habitasse platea dictumst. Curabitur pulvinar sagittis mauris, sed facilisis ex suscipit sit amet.</string>
+    <string name="lorem_ipsum_short">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="like">Like</string>
+    <string name="comments">Comments</string>
+    <string name="like_counter_placeholder_value">100</string>
+    <string name="leave_your_comment">Leave your comment...</string>
+</resources>
