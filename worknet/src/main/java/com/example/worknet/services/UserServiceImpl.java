@@ -225,4 +225,21 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    public List<User> searchUser(String name) {
+        String[] names = name.split(" ");
+        if (names.length == 2) {
+            List<User> firstLastName =  userRepository.findByFirstNameContainingIgnoreCaseAndLastNameContainingIgnoreCase(names[0], names[1]);
+            List<User> lastFirstName = userRepository.findByLastNameContainingIgnoreCaseAndFirstNameContainingIgnoreCase(names[0],names[1]);
+
+            if (!firstLastName.isEmpty()){
+                return firstLastName;
+            }else{
+                return lastFirstName;
+            }
+        } else {
+            // Handle cases where the fullName doesn't split into exactly two parts
+            return userRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
+        }
+    }
 }
