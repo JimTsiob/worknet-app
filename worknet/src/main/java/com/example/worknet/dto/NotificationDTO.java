@@ -1,9 +1,5 @@
 package com.example.worknet.dto;
 
-import com.example.worknet.entities.Post;
-import com.example.worknet.entities.User;
-import jakarta.persistence.*;
-
 public class NotificationDTO {
 
     private Long id;

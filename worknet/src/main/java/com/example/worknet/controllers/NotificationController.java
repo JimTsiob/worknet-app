@@ -2,9 +2,7 @@ package com.example.worknet.controllers;
 
 
 import com.example.worknet.dto.NotificationDTO;
-import com.example.worknet.dto.PostDTO;
 import com.example.worknet.entities.Notification;
-import com.example.worknet.entities.Post;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;

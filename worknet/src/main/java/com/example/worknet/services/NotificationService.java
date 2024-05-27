@@ -2,7 +2,6 @@ package com.example.worknet.services;
 
 
 import com.example.worknet.entities.Notification;
-import com.example.worknet.entities.Post;
 
 import java.util.List;
 
