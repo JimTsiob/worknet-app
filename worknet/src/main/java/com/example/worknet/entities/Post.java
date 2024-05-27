@@ -3,6 +3,7 @@ package com.example.worknet.entities;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,12 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes;
 
+    @Column(name = "post_creation_date")
+    private LocalDate postCreationDate;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
+
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
@@ -47,6 +54,14 @@ public class Post {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public LocalDate getPostCreationDate() {
+        return postCreationDate;
+    }
+
+    public void setPostCreationDate(LocalDate postCreationDate) {
+        this.postCreationDate = postCreationDate;
     }
 
     public User getUser() {
@@ -79,5 +94,13 @@ public class Post {
 
     public void setLikes(List<Like> likes) {
         this.likes = likes;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 }

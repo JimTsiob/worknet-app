@@ -90,6 +90,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<View> views; // views on job postings, used for recommendation system.
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
+
     public User() {
         this.messages = new ArrayList<>();
     }
@@ -260,6 +263,14 @@ public class User {
 
     public void setViews(List<View> views) {
         this.views = views;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 
     public int countViewsForJob(Long jobId) {

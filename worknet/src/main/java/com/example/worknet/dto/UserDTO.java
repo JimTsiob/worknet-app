@@ -15,6 +15,7 @@ public class UserDTO {
     private List<UserLikeDTO> likes;
     private List<MessageDTO> messages;
     private List<SkillDTO> skills;
+    private List<NotificationDTO> notifications;
 
 
     public UserDTO() {}
@@ -113,5 +114,13 @@ public class UserDTO {
 
     public void setSkills(List<SkillDTO> skills) {
         this.skills = skills;
+    }
+
+    public List<NotificationDTO> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<NotificationDTO> notifications) {
+        this.notifications = notifications;
     }
 }
