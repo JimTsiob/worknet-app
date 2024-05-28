@@ -13,6 +13,7 @@ public class UserDTO {
     private List<SmallUserDTO> connections;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
+    private List<SmallPostDTO> posts;
     private List<MessageDTO> messages;
     private List<SkillDTO> skills;
     private List<NotificationDTO> notifications;
@@ -122,5 +123,13 @@ public class UserDTO {
 
     public void setNotifications(List<NotificationDTO> notifications) {
         this.notifications = notifications;
+    }
+
+    public List<SmallPostDTO> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<SmallPostDTO> posts) {
+        this.posts = posts;
     }
 }
