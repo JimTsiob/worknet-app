@@ -1,8 +1,9 @@
-package com.example.worknet.dto;
+package com.syrtsiob.worknet.model;
 
 import java.util.List;
 
 public class UserDTO {
+
     private Long id;
     private String firstName;
     private String lastName;

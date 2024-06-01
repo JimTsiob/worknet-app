@@ -1,10 +1,8 @@
-package com.example.worknet.dto;
+package com.syrtsiob.worknet.model;
 
 import java.time.LocalDate;
 
-
 public class CertificationDTO {
-
     private String name;
     private String issuingOrganization;
     private LocalDate issueDate;
