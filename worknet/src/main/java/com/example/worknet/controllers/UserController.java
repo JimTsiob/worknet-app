@@ -75,6 +75,19 @@ public class UserController {
         }
     }
 
+    @GetMapping("/email")
+    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
+
+        UserDTO userDTO =  modelMapper.map(user, UserDTO.class);
+        if (userDTO != null){
+            return ResponseEntity.ok(userDTO);
+        }else{
+            String errorMessage = "User with email " + email + " not found.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+    }
+
     // user has 4 options, they can input the full name (eg. Makis Papadopoulos) ,
     // full name in reverse (Papadopoulos Makis),
     // the first name only (Makis) or the last name only (Papadopoulos)

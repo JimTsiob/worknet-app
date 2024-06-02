@@ -3,7 +3,6 @@ package com.syrtsiob.worknet;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,31 +12,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.content.ContentResolver;
+import android.database.Cursor;
 
-import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.syrtsiob.worknet.LiveData.AuthResultLiveData;
 import com.syrtsiob.worknet.LiveData.RegisterResultLiveData;
+import com.syrtsiob.worknet.LiveData.UserEmailResultLiveData;
+import com.syrtsiob.worknet.interfaces.CustomFileService;
 import com.syrtsiob.worknet.interfaces.UserService;
 import com.syrtsiob.worknet.model.RegisterUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
-import java.util.Stack;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,6 +48,8 @@ public class Register extends AppCompatActivity {
     ImageView selectedImage;
     Bitmap selectedImageBitmap;
 
+    Uri imageUri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +57,11 @@ public class Register extends AppCompatActivity {
 
         buttonRegister = findViewById(R.id.buttonRegister);
         buttonRegister.setOnClickListener(listener -> {
-            AttemptRegister();
+            if (this.imageUri != null){
+                AttemptRegister();
+            }else{
+                Toast.makeText(this, "Please select an image.", Toast.LENGTH_LONG).show();
+            }
         });
 
         selectedImage = findViewById(R.id.selectedImage);
@@ -78,7 +82,9 @@ public class Register extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         Uri selectedImageURI = Objects.requireNonNull(data).getData();
+                        this.imageUri = selectedImageURI; // used for method
                         selectedImage.setImageURI(selectedImageURI);
+
                         try {
                             ImageDecoder.Source source = ImageDecoder
                                     .createSource(this.getContentResolver(), selectedImageURI);
@@ -104,11 +110,58 @@ public class Register extends AppCompatActivity {
         String name = inputName.getText().toString();
         String surname = inputSurname.getText().toString();
 
+
+//        ContentResolver contentResolver = this.getContentResolver();
+//        String[] projection = {MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.SIZE};
+//        Cursor cursor = contentResolver.query(imageUri, projection, null, null, null);
+//
+//        if (cursor != null && cursor.moveToFirst()) {
+//            // Get the file name
+//            String fileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
+//            // Get the file size
+//            long fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
+//
+//            // Get the content type
+//            String contentType = contentResolver.getType(imageUri);
+//
+//            // Print or log the file name, size, and content type
+//            Log.d("ImageDetails", "File Name: " + fileName);
+//            Log.d("ImageDetails", "File Size: " + fileSize + " bytes");
+//            Log.d("ImageDetails", "Content Type: " + contentType);
+//
+//            cursor.close();
+//        }
+
         if(!ValidatePasswordRepeat(password, repeatPassword))
             return;
 
         if(!ValidatePasswordRequirements(password))
             return;
+
+        if(!ValidateEmail(email))
+            return;
+
+        if (password.isEmpty()){
+            Toast.makeText(Register.this, "password cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (phone.isEmpty()){
+            Toast.makeText(Register.this, "phone cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (name.isEmpty()){
+            Toast.makeText(Register.this, "name cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (surname.isEmpty()){
+            Toast.makeText(Register.this, "surname cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+
 
         RegisterUserDTO user = new RegisterUserDTO();
         user.setEmail(email);
@@ -144,6 +197,18 @@ public class Register extends AppCompatActivity {
         RegisterResultLiveData.getInstance().observe(this, isRegistered -> {
             if (isRegistered) {
                 // Handle register success
+                getUserByEmailForImageUpload(email);
+
+                UserEmailResultLiveData.getInstance().observe(this, userId -> {
+                    // Convert image to MultipartBody.Part and upload
+                    try {
+                        File file = createTempFileFromUri(this.imageUri);
+                        uploadImage(file, userId);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
                 Intent intent = new Intent(this, Login.class);
                 intent.putExtra(getResources().getString(R.string.e_mail), email); // TODO add any other extras
                 startActivity(intent);
@@ -154,6 +219,32 @@ public class Register extends AppCompatActivity {
         });
     }
 
+    private void getUserByEmailForImageUpload(String email){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        UserService userService = retrofit.create(UserService.class);
+
+        userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()) {
+                    UserEmailResultLiveData.getInstance().setValue(response.body().getId());
+                } else {
+                    Toast.makeText(Register.this, "user by email failed!", Toast.LENGTH_LONG).show();
+                    UserEmailResultLiveData.getInstance().setValue(0L);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.e("fail: ", t.getLocalizedMessage());
+                // Handle the error
+                Toast.makeText(Register.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
+                UserEmailResultLiveData.getInstance().setValue(0L);
+            }
+        });
+
+    }
+
     private boolean ValidatePasswordRepeat(String password, String repeatPassword) {
         if (!password.equals(repeatPassword)){
             Toast.makeText(this, R.string.repeat_pass_validation_error,
@@ -161,6 +252,62 @@ public class Register extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    private boolean ValidateEmail(String email){
+        String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+
+        if (email.matches(emailPattern)){
+            return true;
+        }
+
+        Toast.makeText(this, "email format is wrong.", Toast.LENGTH_LONG).show();
+        return false;
+    }
+
+    private File createTempFileFromUri(Uri uri) throws IOException {
+        File file = new File(getCacheDir(), "temp_image.jpg");
+        try (InputStream inputStream = getContentResolver().openInputStream(uri);
+             FileOutputStream outputStream = new FileOutputStream(file)) {
+            if (inputStream != null) {
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+            }
+        }
+        return file;
+    }
+
+    private void uploadImage(File file, Long userId) {
+
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        CustomFileService customFileService = retrofit.create(CustomFileService.class);
+
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+//        RequestBody description = RequestBody.create(MediaType.parse("text/plain"), "image-type");
+
+        customFileService.uploadImage(body, userId).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    Log.d("Image success", "image uploaded successfully.");
+                } else {
+                    Toast.makeText(Register.this, "Image upload failed!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("fail: ", t.getLocalizedMessage());
+                // Handle the error
+                Toast.makeText(Register.this, "Image upload failed! Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private boolean ValidatePasswordRequirements(String password){
