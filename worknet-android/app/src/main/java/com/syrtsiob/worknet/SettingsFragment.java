@@ -103,6 +103,8 @@ public class SettingsFragment extends Fragment {
             emailEdit.setText("");
             passwordEdit.clearFocus();
             passwordEdit.setText("");
+
+            // TODO return to home fragment
         });
 
         submitButton = requireView().findViewById(R.id.buttonSubmit);
