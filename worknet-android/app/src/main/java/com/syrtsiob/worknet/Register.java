@@ -58,7 +58,7 @@ public class Register extends AppCompatActivity {
 
         // =========================================================================================
         // Image picker
-        ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+        ActivityResultLauncher<Intent> pickImageActivity = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -78,7 +78,7 @@ public class Register extends AppCompatActivity {
         pickImage.setOnClickListener(listener ->{
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,"image/*");
-            someActivityResultLauncher.launch(photoPickerIntent);
+            pickImageActivity.launch(photoPickerIntent);
         });
     }
 

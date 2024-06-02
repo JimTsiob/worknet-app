@@ -2,11 +2,20 @@ package com.syrtsiob.worknet;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.syrtsiob.worknet.model.EducationDTO;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +23,10 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
+
+    Button addEducationButton;
+    LinearLayout educationList;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,5 +77,62 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        addEducationButton = requireView().findViewById(R.id.add_education_button);
+        educationList = requireView().findViewById(R.id.education_list);
+
+        AddEducationListEntry();
+        AddEducationListEntry();
+        AddEducationListEntry();
+    }
+
+    private void AddEducationListEntry(EducationDTO educationDTO) {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View educationListEntry = inflater
+                .inflate(R.layout.education_entry_template, educationList, false);
+
+        TextView school = educationListEntry.findViewById(R.id.school);
+        TextView degree = educationListEntry.findViewById(R.id.degree);
+        TextView fieldOfStudy = educationListEntry.findViewById(R.id.fieldOfStudy);
+        TextView startDate = educationListEntry.findViewById(R.id.startDate);
+        TextView endDate = educationListEntry.findViewById(R.id.endDate);
+        TextView grade = educationListEntry.findViewById(R.id.grade);
+        TextView description = educationListEntry.findViewById(R.id.description);
+        TextView privacy_label = educationListEntry.findViewById(R.id.privacy_label);
+
+        school.setText(educationDTO.getSchool());
+        degree.setText(educationDTO.getDegree());
+        fieldOfStudy.setText(educationDTO.getFieldOfStudy());
+        startDate.setText(educationDTO.getStartDate().toString());
+        endDate.setText(educationDTO.getEndDate().toString());
+        grade.setText(educationDTO.getGrade().toString());
+        description.setText(educationDTO.getDescription());
+        // TODO update grade and privacy label
+        //privacy_label.setText(educationDTO.get());
+
+        Button editButton = educationList.findViewById(R.id.edit_education_button);
+        Button deleteButton = educationList.findViewById(R.id.delete_education_button);
+
+        editButton.setOnClickListener(listener -> {
+            // TODO implement functionality
+        });
+
+        deleteButton.setOnClickListener(listener -> {
+            // TODO implement functionality
+        });
+
+        educationList.addView(educationListEntry);
+    }
+
+    private void AddEducationListEntry() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View educationListEntry = inflater
+                .inflate(R.layout.education_entry_template, educationList, false);
+        educationList.addView(educationListEntry);
     }
 }

@@ -30,20 +30,18 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
         <LinearLayout
+            android:id="@+id/education_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
             <Button
+                android:id="@+id/add_education_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_education"
                 android:layout_gravity="center">
 
             </Button>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="asdsad"/>
         </LinearLayout>
 
     </ScrollView>

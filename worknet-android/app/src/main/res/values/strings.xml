@@ -35,4 +35,9 @@
     <string name="submit">Submit</string>
     <string name="go_to_profile">Go to profile</string>
     <string name="add_education">Add Education</string>
+    <string name="lorem">Lorem</string>
+    <string name="is_private_label">This information is set to private.</string>
+    <string name="is_public_label">This information is set to public.</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>
