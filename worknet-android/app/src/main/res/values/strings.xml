@@ -31,4 +31,6 @@
     <string name="like_counter_placeholder_value">100</string>
     <string name="leave_your_comment">Leave your comment...</string>
     <string name="pick_profile_image">Pick Profile Image</string>
+    <string name="cancel">Cancel</string>
+    <string name="submit">Submit</string>
 </resources>

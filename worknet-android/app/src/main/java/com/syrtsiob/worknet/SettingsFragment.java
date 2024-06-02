@@ -7,6 +7,11 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +19,12 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends Fragment {
+
+    Button cancelButton;
+    Button submitButton;
+
+    EditText emailEdit;
+    EditText passwordEdit;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,6 +68,23 @@ public class SettingsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
+        passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
+
+        cancelButton = requireView().findViewById(R.id.buttonCancel);
+        cancelButton.setOnClickListener(listener -> {
+            emailEdit.clearFocus();
+            emailEdit.setText("");
+            passwordEdit.clearFocus();
+            passwordEdit.setText("");
+        });
+
+        submitButton.setOnClickListener(listener -> {
+            AttemptDataChange();
+        });
+
+        submitButton = requireView().findViewById(R.id.buttonSubmit);
     }
 
     @Override
@@ -64,5 +92,16 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_settings, container, false);
+    }
+
+    private void AttemptDataChange() {
+        String newEmail = emailEdit.getText().toString();
+        String newPassword = passwordEdit.getText().toString();
+
+        // TODO validate mail
+        // TODO check DB for same mail
+        // TODO validate password requirements
+        // TODO change data
+        // TODO make toasts depending on result of attempt
     }
 }
