@@ -10,13 +10,14 @@ public class EducationDTO {
     private String school;
     private String degree;
     private String fieldOfStudy;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
     private Float grade;
     private String description;
     private SmallUserDTO user;
+    private Boolean isPublic;
 
 
     public String getSchool() {
@@ -81,5 +82,13 @@ public class EducationDTO {
 
     public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

@@ -75,6 +75,25 @@ public class UserController {
         }
     }
 
+    // user has 4 options, they can input the full name (eg. Makis Papadopoulos) ,
+    // full name in reverse (Papadopoulos Makis),
+    // the first name only (Makis) or the last name only (Papadopoulos)
+    // this method searches both for first and last name. Anything else will fail.
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUser(@RequestParam String name) {
+        List<User> users = userService.searchUser(name);
+
+        if (users.isEmpty()){
+            return new ResponseEntity<>("No users were found.", HttpStatus.NOT_FOUND);
+        }
+
+        List<UserDTO> userDTOList =  users.stream()
+                .map(user -> modelMapper.map(user, UserDTO.class))
+                .toList();
+
+        return ResponseEntity.ok(userDTOList);
+    }
+
     @GetMapping("/recommendation")
     public ResponseEntity<?> recommendJobs(@RequestParam Long userId) {
         User user = userService.getUserById(userId);

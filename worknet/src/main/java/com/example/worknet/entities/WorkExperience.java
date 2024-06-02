@@ -38,6 +38,9 @@ public class WorkExperience {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "is_public")
+    private boolean isPublic;
+
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
     private User user;
@@ -123,5 +126,13 @@ public class WorkExperience {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }

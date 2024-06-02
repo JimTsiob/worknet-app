@@ -6,6 +6,7 @@ public class SkillDTO {
     private String name;
     private SmallUserDTO user;
     private SmallJobDTO job;
+    private Boolean isPublic;
 
     public Long getId() {
         return id;
@@ -37,6 +38,14 @@ public class SkillDTO {
 
     public void setJob(SmallJobDTO job) {
         this.job = job;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }
 
