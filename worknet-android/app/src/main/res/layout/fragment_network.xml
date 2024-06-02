@@ -5,10 +5,16 @@
     android:layout_height="match_parent"
     tools:context=".NetworkFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Network Fragment" />
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/network_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
+
 
 </FrameLayout>

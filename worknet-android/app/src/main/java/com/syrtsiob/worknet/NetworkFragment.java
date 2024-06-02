@@ -2,11 +2,16 @@ package com.syrtsiob.worknet;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +19,8 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class NetworkFragment extends Fragment {
+
+    LinearLayout networkList;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,5 +71,35 @@ public class NetworkFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_network, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        networkList = requireView().findViewById(R.id.network_list);
+
+        for (int i = 0; i < 15; i++) {
+            addEntryToList();
+        }
+    }
+
+    private void addEntryToList() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View networkListEntry = inflater
+                .inflate(R.layout.network_list_entry_template, networkList, false);
+
+        TextView fullName = networkListEntry.findViewById(R.id.full_name);
+        TextView position = networkListEntry.findViewById(R.id.position);
+        TextView employer = networkListEntry.findViewById(R.id.employer);
+
+
+        Button goToProfileButton = networkListEntry.findViewById(R.id.goToProfileButton);
+
+        goToProfileButton.setOnClickListener(listener -> {
+            // TODO implement functionality
+        });
+
+        networkList.addView(networkListEntry);
     }
 }
