@@ -16,7 +16,8 @@ public class EducationDTO {
     private LocalDate endDate;
     private Float grade;
     private String description;
-    private UserDTO user;
+    private SmallUserDTO user;
+    private Boolean isPublic;
 
 
     public String getSchool() {
@@ -75,11 +76,19 @@ public class EducationDTO {
         this.description = description;
     }
 
-    public UserDTO getUser() {
+    public SmallUserDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

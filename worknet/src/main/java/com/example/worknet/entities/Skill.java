@@ -22,6 +22,9 @@ public class Skill {
     @JoinColumn(name="job_id")
     private Job job;
 
+    @Column(name = "is_public")
+    private boolean isPublic;
+
     public Skill() {
     }
 
@@ -55,5 +58,13 @@ public class Skill {
 
     public void setJob(Job job) {
         this.job = job;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 }

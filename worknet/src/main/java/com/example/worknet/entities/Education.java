@@ -35,6 +35,9 @@ public class Education {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "is_public")
+    private Boolean isPublic;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -112,5 +115,13 @@ public class Education {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

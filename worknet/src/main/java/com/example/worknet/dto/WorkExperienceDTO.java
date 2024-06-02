@@ -12,7 +12,8 @@ public class WorkExperienceDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private String description;
-    private UserDTO user;
+    private SmallUserDTO user;
+    private Boolean isPublic;
 
     public String getTitle() {
         return title;
@@ -78,11 +79,19 @@ public class WorkExperienceDTO {
         this.description = description;
     }
 
-    public UserDTO getUser() {
+    public SmallUserDTO getUser() {
         return user;
     }
 
-    public void setUser(UserDTO user) {
+    public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }
