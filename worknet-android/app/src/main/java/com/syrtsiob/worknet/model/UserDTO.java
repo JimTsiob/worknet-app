@@ -1,8 +1,9 @@
-package com.example.worknet.dto;
+package com.syrtsiob.worknet.model;
 
 import java.util.List;
 
 public class UserDTO {
+
     private Long id;
     private String firstName;
     private String lastName;
@@ -13,11 +14,9 @@ public class UserDTO {
     private List<SmallUserDTO> connections;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
-    private List<SmallPostDTO> posts;
     private List<MessageDTO> messages;
     private List<SkillDTO> skills;
     private List<EducationDTO> educations;
-    private List<NotificationDTO> notifications;
 
 
     public UserDTO() {}
@@ -124,21 +123,5 @@ public class UserDTO {
 
     public void setEducations(List<EducationDTO> educations) {
         this.educations = educations;
-    }
-
-    public List<NotificationDTO> getNotifications() {
-        return notifications;
-    }
-
-    public void setNotifications(List<NotificationDTO> notifications) {
-        this.notifications = notifications;
-    }
-
-    public List<SmallPostDTO> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<SmallPostDTO> posts) {
-        this.posts = posts;
     }
 }

@@ -1,11 +1,10 @@
-package com.example.worknet.dto;
-
+package com.syrtsiob.worknet.model;
 
 public class CommentDTO {
     private Long id;
     private String text;
     private SmallUserDTO user;
-    private SmallPostDTO post;
+    private PostDTO post;
 
     public Long getId() {
         return id;
@@ -31,11 +30,11 @@ public class CommentDTO {
         this.user = user;
     }
 
-    public SmallPostDTO getPost() {
+    public PostDTO getPost() {
         return post;
     }
 
-    public void setPost(SmallPostDTO post) {
+    public void setPost(PostDTO post) {
         this.post = post;
     }
 }
