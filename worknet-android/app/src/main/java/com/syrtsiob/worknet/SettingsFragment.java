@@ -2,6 +2,8 @@ package com.syrtsiob.worknet;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -68,23 +70,6 @@ public class SettingsFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-        emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
-        passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
-
-        cancelButton = requireView().findViewById(R.id.buttonCancel);
-        cancelButton.setOnClickListener(listener -> {
-            emailEdit.clearFocus();
-            emailEdit.setText("");
-            passwordEdit.clearFocus();
-            passwordEdit.setText("");
-        });
-
-        submitButton.setOnClickListener(listener -> {
-            AttemptDataChange();
-        });
-
-        submitButton = requireView().findViewById(R.id.buttonSubmit);
     }
 
     @Override
@@ -103,5 +88,26 @@ public class SettingsFragment extends Fragment {
         // TODO validate password requirements
         // TODO change data
         // TODO make toasts depending on result of attempt
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
+        passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
+
+        cancelButton = requireView().findViewById(R.id.buttonCancel);
+        cancelButton.setOnClickListener(listener -> {
+            emailEdit.clearFocus();
+            emailEdit.setText("");
+            passwordEdit.clearFocus();
+            passwordEdit.setText("");
+        });
+
+        submitButton = requireView().findViewById(R.id.buttonSubmit);
+        submitButton.setOnClickListener(listener -> {
+            AttemptDataChange();
+        });
     }
 }
