@@ -14,7 +14,7 @@ public class EducationDTO {
     private LocalDate startDate;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
-    private Float grade;
+    private String grade;
     private String description;
     private SmallUserDTO user;
     private Boolean isPublic;
@@ -60,11 +60,11 @@ public class EducationDTO {
         this.endDate = endDate;
     }
 
-    public Float getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(Float grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 

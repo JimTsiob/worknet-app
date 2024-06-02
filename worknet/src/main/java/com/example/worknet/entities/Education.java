@@ -30,7 +30,7 @@ public class Education {
     private LocalDate endDate;
 
     @Column(name = "grade")
-    private Float grade;
+    private String grade;
 
     @Column(name = "description")
     private String description;
@@ -93,11 +93,11 @@ public class Education {
         this.endDate = endDate;
     }
 
-    public Float getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(Float grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 
