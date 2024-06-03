@@ -1,17 +1,32 @@
 package com.syrtsiob.worknet;
 
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.model.WorkExperienceDTO;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,12 +94,47 @@ public class NetworkFragment extends Fragment {
 
         networkList = requireView().findViewById(R.id.network_list);
 
-        for (int i = 0; i < 15; i++) {
-            addEntryToList();
-        }
+        UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+            List<ConnectionDTO> connections = userDTO.getConnections();
+            if (connections.isEmpty()){
+                TextView noConnectionsTextView = new TextView(getActivity());
+                noConnectionsTextView.setText("You have no connections. \n");
+                noConnectionsTextView.setTextSize(20); // Set desired text size
+                noConnectionsTextView.setTextColor(Color.BLACK);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(300, 300, 16, 16);
+                noConnectionsTextView.setLayoutParams(params);
+
+                networkList.addView(noConnectionsTextView);
+
+                TextView addConnectionsTextView = new TextView(getActivity());
+                addConnectionsTextView.setText("Add some through the search bar!");
+                addConnectionsTextView.setTextSize(20);
+                noConnectionsTextView.setTextColor(Color.BLACK);
+
+                LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params2.setMargins(200, 5, 16, 16);
+                addConnectionsTextView.setLayoutParams(params2);
+
+                networkList.addView(addConnectionsTextView);
+            }
+
+            for (ConnectionDTO connection : connections){
+                addEntryToList(connection);
+            }
+        });
+
+
     }
 
-    private void addEntryToList() {
+    private void addEntryToList(ConnectionDTO connection) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View networkListEntry = inflater
                 .inflate(R.layout.network_list_entry_template, networkList, false);
@@ -93,6 +143,24 @@ public class NetworkFragment extends Fragment {
         TextView position = networkListEntry.findViewById(R.id.position);
         TextView employer = networkListEntry.findViewById(R.id.employer);
 
+        fullName.setText(connection.getFirstName() + " " + connection.getLastName());
+        List<WorkExperienceDTO> workExperiences = connection.getWorkExperiences();
+
+        String positionText =  workExperiences.stream()
+                .filter(WorkExperienceDTO::isCurrentlyWorking)
+                .map(WorkExperienceDTO::getTitle)
+                .findFirst()
+                .orElse(null);
+
+        position.setText(positionText);
+
+        String employerText =  workExperiences.stream()
+                .filter(WorkExperienceDTO::isCurrentlyWorking)
+                .map(WorkExperienceDTO::getCompanyName)
+                .findFirst()
+                .orElse(null);
+
+        employer.setText(employerText);
 
         Button goToProfileButton = networkListEntry.findViewById(R.id.goToProfileButton);
 

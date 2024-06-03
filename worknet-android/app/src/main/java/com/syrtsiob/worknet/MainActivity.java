@@ -58,11 +58,6 @@ public class MainActivity extends AppCompatActivity {
                     editor.apply();
                 } else {
                     Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
-                    SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.remove("jwt_token");
-                    editor.remove("email");
-                    editor.apply();
                     UserDtoResultLiveData.getInstance().setValue(null);
                 }
             }

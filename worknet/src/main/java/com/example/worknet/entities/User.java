@@ -49,9 +49,6 @@ public class User {
     private List<Job> jobs; // field for jobs that the user has posted.
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Certification> certifications;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomFile> files;
 
     @ManyToMany
@@ -175,14 +172,6 @@ public class User {
 
     public void setJobs(List<Job> jobs) {
         this.jobs = jobs;
-    }
-
-    public List<Certification> getCertifications() {
-        return certifications;
-    }
-
-    public void setCertifications(List<Certification> certifications) {
-        this.certifications = certifications;
     }
 
     public List<CustomFile> getFiles() {

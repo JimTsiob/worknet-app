@@ -1,8 +1,6 @@
 package com.example.worknet.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDate;
 
 public class EducationDTO {
@@ -10,9 +8,7 @@ public class EducationDTO {
     private String school;
     private String degree;
     private String fieldOfStudy;
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate startDate;
-    @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate endDate;
     private String grade;
     private String description;

@@ -2,8 +2,6 @@ package com.syrtsiob.worknet.model;
 
 import com.syrtsiob.worknet.enums.EmploymentType;
 
-import java.time.LocalDate;
-
 public class WorkExperienceDTO {
 
     private String title;
@@ -11,8 +9,8 @@ public class WorkExperienceDTO {
     private String companyName;
     private String location;
     private boolean currentlyWorking;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private String description;
     private SmallUserDTO user;
 
@@ -56,19 +54,19 @@ public class WorkExperienceDTO {
         this.currentlyWorking = currentlyWorking;
     }
 
-    public LocalDate getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 

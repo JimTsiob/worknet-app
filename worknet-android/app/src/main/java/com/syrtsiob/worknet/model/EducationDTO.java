@@ -1,16 +1,12 @@
 package com.syrtsiob.worknet.model;
 
-import java.time.LocalDate;
-
 public class EducationDTO {
 
     private String school;
     private String degree;
     private String fieldOfStudy;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private Float grade;
     private String description;
     private SmallUserDTO user;
@@ -40,19 +36,19 @@ public class EducationDTO {
         this.fieldOfStudy = fieldOfStudy;
     }
 
-    public LocalDate getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
