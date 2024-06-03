@@ -59,29 +59,45 @@ public class EducationFragment extends Fragment {
         fieldOfStudy.setText(educationDTO.getFieldOfStudy());
         startDate.setText(educationDTO.getStartDate().toString());
         endDate.setText(educationDTO.getEndDate().toString());
-        grade.setText(educationDTO.getGrade().toString());
         description.setText(educationDTO.getDescription());
-        // TODO update grade and privacy label
-        //privacy_label.setText(educationDTO.get());
 
-        Button editButton = educationList.findViewById(R.id.edit_education_button);
-        Button deleteButton = educationList.findViewById(R.id.delete_education_button);
+        // TODO update grade and privacy label
+        // grade.setText(educationDTO.getGrade().toString());
+        // privacy_label.setText(educationDTO.get());
+
+        Button editButton = educationListEntry.findViewById(R.id.edit_education_button);
+        Button deleteButton = educationListEntry.findViewById(R.id.delete_education_button);
 
         editButton.setOnClickListener(listener -> {
             // TODO implement functionality
         });
 
         deleteButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            // TODO add call to database
+            educationList.removeView(educationListEntry);
         });
 
         educationList.addView(educationListEntry);
     }
 
+    // TODO this is for testing purposes -- remove
     private void AddEducationListEntry() {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View educationListEntry = inflater
                 .inflate(R.layout.education_entry_template, educationList, false);
+
+        Button editButton = educationListEntry.findViewById(R.id.edit_education_button);
+        Button deleteButton = educationListEntry.findViewById(R.id.delete_education_button);
+
+        editButton.setOnClickListener(listener -> {
+            // TODO implement functionality
+        });
+
+        deleteButton.setOnClickListener(listener -> {
+            // TODO add call to database
+            educationList.removeView(educationListEntry);
+        });
+
         educationList.addView(educationListEntry);
     }
 }

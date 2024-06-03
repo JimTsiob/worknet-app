@@ -43,4 +43,6 @@
     <string name="education">Education</string>
     <string name="skills">Skills</string>
     <string name="work_experience">Work Experience</string>
+    <string name="add_skill">Add Skill</string>
+    <string name="add_work_experience">Add Work Experience</string>
 </resources>
