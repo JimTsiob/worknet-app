@@ -40,4 +40,7 @@
     <string name="is_public_label">This information is set to public.</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="education">Education</string>
+    <string name="skills">Skills</string>
+    <string name="work_experience">Work Experience</string>
 </resources>

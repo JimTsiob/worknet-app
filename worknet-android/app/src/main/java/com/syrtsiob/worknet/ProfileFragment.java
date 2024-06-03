@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.syrtsiob.worknet.model.EducationDTO;
 
 import java.util.Objects;
@@ -24,8 +26,9 @@ import java.util.Objects;
  */
 public class ProfileFragment extends Fragment {
 
-    Button addEducationButton;
-    LinearLayout educationList;
+    TabLayout tabLayout;
+    ViewPager2 profileViewPager;
+    ProfileViewPagerAdapter profileViewPagerAdapter;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -83,56 +86,31 @@ public class ProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        addEducationButton = requireView().findViewById(R.id.add_education_button);
-        educationList = requireView().findViewById(R.id.education_list);
+        tabLayout = requireView().findViewById(R.id.profileTabLayout);
+        profileViewPager = requireView().findViewById(R.id.profileViewPager);
+        profileViewPagerAdapter = new ProfileViewPagerAdapter(this);
 
-        AddEducationListEntry();
-        AddEducationListEntry();
-        AddEducationListEntry();
-    }
+        profileViewPager.setAdapter(profileViewPagerAdapter);
 
-    private void AddEducationListEntry(EducationDTO educationDTO) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View educationListEntry = inflater
-                .inflate(R.layout.education_entry_template, educationList, false);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                profileViewPager.setCurrentItem(tab.getPosition());
+            }
 
-        TextView school = educationListEntry.findViewById(R.id.school);
-        TextView degree = educationListEntry.findViewById(R.id.degree);
-        TextView fieldOfStudy = educationListEntry.findViewById(R.id.fieldOfStudy);
-        TextView startDate = educationListEntry.findViewById(R.id.startDate);
-        TextView endDate = educationListEntry.findViewById(R.id.endDate);
-        TextView grade = educationListEntry.findViewById(R.id.grade);
-        TextView description = educationListEntry.findViewById(R.id.description);
-        TextView privacy_label = educationListEntry.findViewById(R.id.privacy_label);
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
-        school.setText(educationDTO.getSchool());
-        degree.setText(educationDTO.getDegree());
-        fieldOfStudy.setText(educationDTO.getFieldOfStudy());
-        startDate.setText(educationDTO.getStartDate().toString());
-        endDate.setText(educationDTO.getEndDate().toString());
-        grade.setText(educationDTO.getGrade().toString());
-        description.setText(educationDTO.getDescription());
-        // TODO update grade and privacy label
-        //privacy_label.setText(educationDTO.get());
-
-        Button editButton = educationList.findViewById(R.id.edit_education_button);
-        Button deleteButton = educationList.findViewById(R.id.delete_education_button);
-
-        editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        deleteButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+        profileViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                tabLayout.getTabAt(position).select();
+            }
         });
-
-        educationList.addView(educationListEntry);
-    }
-
-    private void AddEducationListEntry() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View educationListEntry = inflater
-                .inflate(R.layout.education_entry_template, educationList, false);
-        educationList.addView(educationListEntry);
     }
 }
