@@ -1,15 +1,12 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -17,8 +14,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.navigation.NavigationBarView;
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
+import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +36,32 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         replaceFragment(HomeFragment.newInstance());
+
+        Intent intent = getIntent();
+        String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
+
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        UserService userService = retrofit.create(UserService.class);
+
+        userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()) {
+                    UserDtoResultLiveData.getInstance().setValue(response.body());
+                } else {
+                    Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
+                    UserDtoResultLiveData.getInstance().setValue(null);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.e("fail: ", t.getLocalizedMessage());
+                // Handle the error
+                Toast.makeText(MainActivity.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
+                UserDtoResultLiveData.getInstance().setValue(null);
+            }
+        });
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemID = item.getItemId();

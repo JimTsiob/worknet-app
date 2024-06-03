@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -322,7 +318,18 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
             }
 
+            List<User> users = userService.getAllUsers(); 
+            
+            User checkForEmail = modelMapper.map(userDTO, User.class);
+
+            boolean emailFound = users.stream()
+                                .anyMatch(user -> user.getEmail().equals(checkForEmail.getEmail()));
+
             modelMapper.map(userDTO, existingUser);
+
+            if (emailFound){
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("This email already exists in the database.");
+            }
 
             userService.updateUser(id, existingUser);
 

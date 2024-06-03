@@ -9,6 +9,7 @@ public class UserDTO {
     private String email;
     private String phoneNumber;
     private String jwtToken;
+    private String password;
     private List<CustomFileDTO> files;
     private List<SmallUserDTO> connections;
     private List<SmallJobDTO> appliedJobs;
@@ -68,6 +69,14 @@ public class UserDTO {
 
     public void setJwtToken(String jwtToken) {
         this.jwtToken = jwtToken;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
     }
 
     public List<CustomFileDTO> getFiles() {

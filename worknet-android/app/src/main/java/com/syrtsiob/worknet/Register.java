@@ -110,28 +110,6 @@ public class Register extends AppCompatActivity {
         String name = inputName.getText().toString();
         String surname = inputSurname.getText().toString();
 
-
-//        ContentResolver contentResolver = this.getContentResolver();
-//        String[] projection = {MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.SIZE};
-//        Cursor cursor = contentResolver.query(imageUri, projection, null, null, null);
-//
-//        if (cursor != null && cursor.moveToFirst()) {
-//            // Get the file name
-//            String fileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME));
-//            // Get the file size
-//            long fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE));
-//
-//            // Get the content type
-//            String contentType = contentResolver.getType(imageUri);
-//
-//            // Print or log the file name, size, and content type
-//            Log.d("ImageDetails", "File Name: " + fileName);
-//            Log.d("ImageDetails", "File Size: " + fileSize + " bytes");
-//            Log.d("ImageDetails", "Content Type: " + contentType);
-//
-//            cursor.close();
-//        }
-
         if(!ValidatePasswordRepeat(password, repeatPassword))
             return;
 
@@ -288,7 +266,6 @@ public class Register extends AppCompatActivity {
 
         RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
         MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-//        RequestBody description = RequestBody.create(MediaType.parse("text/plain"), "image-type");
 
         customFileService.uploadImage(body, userId).enqueue(new Callback<String>() {
             @Override
