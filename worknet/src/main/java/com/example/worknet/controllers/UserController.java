@@ -327,6 +327,8 @@ public class UserController {
 
             modelMapper.map(userDTO, existingUser);
 
+            existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword()));
+
             if (emailFound){
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("This email already exists in the database.");
             }

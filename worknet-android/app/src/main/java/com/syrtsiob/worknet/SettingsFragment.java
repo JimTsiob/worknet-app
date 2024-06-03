@@ -100,64 +100,18 @@ public class SettingsFragment extends Fragment {
         String newEmail = emailEdit.getText().toString();
         String newPassword = passwordEdit.getText().toString();
 
-        if (newEmail.isEmpty()){
-            user.setEmail(newPassword);
-
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            UserService userService = retrofit.create(UserService.class);
-
-            userService.updateUser(user.getId(), user).enqueue(new Callback<String>() {
-                @Override
-                public void onResponse(Call<String> call, Response<String> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(getActivity(), "update successful.", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getActivity(), "update failed. Check the format.", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<String> call, Throwable t) {
-                    Log.e("fail: ", t.getLocalizedMessage());
-                    // Handle the error
-                    Toast.makeText(getActivity(), "update failed. Server failure.", Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }
-
-        // enter only email for update.
-        if (newPassword.isEmpty()){
-            if(!ValidateEmail(newEmail))
-                return;
-
-            user.setEmail(newEmail);
-
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            UserService userService = retrofit.create(UserService.class);
-
-            userService.updateUser(user.getId(), user).enqueue(new Callback<String>() {
-                @Override
-                public void onResponse(Call<String> call, Response<String> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(getActivity(), "update successful.", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getActivity(), "update failed. Check the format.", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<String> call, Throwable t) {
-                    Log.e("fail: ", t.getLocalizedMessage());
-                    // Handle the error
-                    Toast.makeText(getActivity(), "update failed. Server failure.", Toast.LENGTH_LONG).show();
-                }
-            });
-            return;
-        }
-
         if(!ValidateEmail(newEmail))
             return;
+
+        if(newEmail.isEmpty()){
+            Toast.makeText(getActivity(), "email cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if(newPassword.isEmpty()){
+            Toast.makeText(getActivity(), "password cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         user.setEmail(newEmail);
         user.setPassword(newPassword);
@@ -196,26 +150,30 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
-        passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
+        UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+            emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
+            passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
 
-        cancelButton = requireView().findViewById(R.id.buttonCancel);
-        cancelButton.setOnClickListener(listener -> {
-            emailEdit.clearFocus();
-            emailEdit.setText("");
-            passwordEdit.clearFocus();
-            passwordEdit.setText("");
+            emailEdit.setText(userDTO.getEmail());
+            passwordEdit.setText(userDTO.getPassword());
 
-            // TODO return to home fragment
-        });
+            cancelButton = requireView().findViewById(R.id.buttonCancel);
+            cancelButton.setOnClickListener(listener -> {
+                emailEdit.clearFocus();
+                emailEdit.setText("");
+                passwordEdit.clearFocus();
+                passwordEdit.setText("");
 
-        submitButton = requireView().findViewById(R.id.buttonSubmit);
-        submitButton.setOnClickListener(listener -> {
-            UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+                // TODO return to home fragment
+            });
+
+            submitButton = requireView().findViewById(R.id.buttonSubmit);
+            submitButton.setOnClickListener(listener -> {
                 if (userDTO != null) {
                     // Handle user success
                     AttemptDataChange(userDTO);
                     Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
                     startActivity(intent);
                 } else {
                     // Handle user failure

@@ -1,6 +1,7 @@
 package com.syrtsiob.worknet;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.inputmethod.EditorInfo;
@@ -48,8 +49,20 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()) {
                     UserDtoResultLiveData.getInstance().setValue(response.body());
+
+                    // Logic for logged in user to always go to the main activity instead of login screen
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("jwt_token", response.body().getJwtToken());
+                    editor.putString("email", response.body().getEmail());
+                    editor.apply();
                 } else {
                     Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
+                    SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove("jwt_token");
+                    editor.remove("email");
+                    editor.apply();
                     UserDtoResultLiveData.getInstance().setValue(null);
                 }
             }
@@ -114,5 +127,19 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.mainFrame, fragment);
         fragmentTransaction.commit();
+    }
+
+    // TODO: create Logout functionality
+    public void logout() {
+        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("jwt_token");
+        editor.remove("email");
+        editor.apply();
+
+        // Navigate back to the login screen
+        Intent intent = new Intent(this, Login.class);
+        startActivity(intent);
+        finish();
     }
 }
