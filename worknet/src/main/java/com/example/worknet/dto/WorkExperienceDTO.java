@@ -1,7 +1,6 @@
 package com.example.worknet.dto;
 
 import com.example.worknet.enums.EmploymentType;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 

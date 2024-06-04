@@ -10,6 +10,7 @@ public class UserDTO {
     private String phoneNumber;
     private String jwtToken;
     private String password;
+    private String profilePicture;
     private List<CustomFileDTO> files;
     private List<ConnectionUserDTO> connections;
     private List<SmallJobDTO> appliedJobs;
@@ -78,6 +79,14 @@ public class UserDTO {
 
     public void setPassword(String password){
         this.password = password;
+    }
+
+    public String getProfilePicture(){
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture){
+        this.profilePicture = profilePicture;
     }
 
     public List<CustomFileDTO> getFiles() {

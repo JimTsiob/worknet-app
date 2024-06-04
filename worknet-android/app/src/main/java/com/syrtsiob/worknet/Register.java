@@ -84,7 +84,6 @@ public class Register extends AppCompatActivity {
                         Uri selectedImageURI = Objects.requireNonNull(data).getData();
                         this.imageUri = selectedImageURI; // used for method
                         selectedImage.setImageURI(selectedImageURI);
-
                         try {
                             ImageDecoder.Source source = ImageDecoder
                                     .createSource(this.getContentResolver(), selectedImageURI);
@@ -181,7 +180,17 @@ public class Register extends AppCompatActivity {
                     // Convert image to MultipartBody.Part and upload
                     try {
                         File file = createTempFileFromUri(this.imageUri);
-                        uploadImage(file, userId);
+
+                        try {
+                            ImageDecoder.Source source = ImageDecoder
+                                    .createSource(this.getContentResolver(), this.imageUri);
+                            selectedImageBitmap = ImageDecoder.decodeBitmap(source);
+                            // save image to android folder so we can show it on profile page and home.
+                            saveImageToInternalStorage(selectedImageBitmap, userId + "_profile_picture.jpg");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        uploadImage(file, userId); // upload to PC folder.
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -290,5 +299,22 @@ public class Register extends AppCompatActivity {
     private boolean ValidatePasswordRequirements(String password){
         // TODO implement possible requirements including Toast for failure
         return true;
+    }
+
+    private void saveImageToInternalStorage(Bitmap bitmap, String fileName) {
+        File directory = new File(getFilesDir(), "FileStorage/images");
+        if (!directory.exists()) {
+            directory.mkdirs(); // Create directory if it does not exist
+        }
+        File imageFile = new File(directory, fileName);
+
+        try (FileOutputStream out = new FileOutputStream(imageFile)) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            Log.d("SaveImage", "Image saved to internal storage: " + imageFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("SaveImage", "Failed to save image", e);
+        }
     }
 }

@@ -2,10 +2,13 @@ package com.syrtsiob.worknet;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +21,13 @@ import androidx.fragment.app.FragmentTransaction;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
 import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+
+import java.io.File;
+import java.util.List;
+import java.util.Optional;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     DrawerLayout drawerLayout;
+
+    ImageView profileImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +63,12 @@ public class MainActivity extends AppCompatActivity {
                     // Logic for logged in user to always go to the main activity instead of login screen
                     SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("jwt_token", response.body().getJwtToken());
-                    editor.putString("email", response.body().getEmail());
+//                    editor.putString("jwt_token", response.body().getJwtToken());
+//                    editor.putString("email", response.body().getEmail());
+//                    editor.apply();
+// TODO: just in case, remove logged in user, testing purpose, will remove after logout button is added
+                    editor.remove("jwt_token");
+                    editor.remove("email");
                     editor.apply();
                 } else {
                     Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
@@ -89,8 +103,32 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawerLayout);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        findViewById(R.id.profileImage).setOnClickListener(listener -> {
-            drawerLayout.openDrawer(GravityCompat.START);
+
+        UserDtoResultLiveData.getInstance().observe(this, userDto -> {
+            profileImage = findViewById(R.id.profileImage);
+            // TODO: add image bitmap here
+            if (userDto != null){
+                String profilePicName = userDto.getProfilePicture();
+                List<CustomFileDTO> files = userDto.getFiles();
+                Optional<CustomFileDTO> profilePicture = files.stream()
+                        .filter(file -> file.getFileName().equals(profilePicName))
+                        .findFirst();
+                if (profilePicture.isPresent()){
+                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                    profileImage.setImageBitmap(bitmap);
+                    profileImage.setOnClickListener(listener -> {
+                        drawerLayout.openDrawer(GravityCompat.START);
+                    });
+                }else{
+                    findViewById(R.id.profileImage).setOnClickListener(listener -> {
+                        drawerLayout.openDrawer(GravityCompat.START);
+                    });
+                }
+            }else{
+                findViewById(R.id.profileImage).setOnClickListener(listener -> {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                });
+            }
         });
 
         binding.navigationView.setNavigationItemSelectedListener(item->{
@@ -136,5 +174,15 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, Login.class);
         startActivity(intent);
         finish();
+    }
+
+    private Bitmap loadImageFromFile(String fileName) {
+        File imgFile = new File(getFilesDir(), "FileStorage/images/" + fileName);
+        String test = "";
+        if (imgFile.exists()) {
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        return null;
     }
 }
