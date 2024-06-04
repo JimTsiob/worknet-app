@@ -22,6 +22,10 @@ public class UserDTO {
     private List<SkillDTO> skills;
     private List<EducationDTO> educations;
 
+    private List<NotificationDTO> notifications;
+
+    private List<WorkExperienceDTO> workExperiences;
+
 
     public UserDTO() {}
 
@@ -143,5 +147,21 @@ public class UserDTO {
 
     public void setEducations(List<EducationDTO> educations) {
         this.educations = educations;
+    }
+
+    public List<NotificationDTO> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<NotificationDTO> notifications) {
+        this.notifications = notifications;
+    }
+
+    public List<WorkExperienceDTO> getWorkExperiences() {
+        return workExperiences;
+    }
+
+    public void setWorkExperiences(List<WorkExperienceDTO> workExperiences) {
+        this.workExperiences = workExperiences;
     }
 }
