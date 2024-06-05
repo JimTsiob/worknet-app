@@ -1,8 +1,9 @@
 package com.syrtsiob.worknet.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class EducationDTO {
+public class EducationDTO implements Serializable {
 
     private String school;
     private String degree;

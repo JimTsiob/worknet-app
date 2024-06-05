@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,12 @@ public class EducationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         addEducationButton = requireView().findViewById(R.id.add_education_button);
+        addEducationButton.setOnClickListener(listener -> {
+            Intent intent = new Intent(getActivity(), AddEditEducation.class);
+            intent.putExtra(AddEditEducation.ACTIVITY_MODE, AddEditEducation.ADD_MODE);
+            startActivity(intent);
+        });
+
         educationList = requireView().findViewById(R.id.education_list);
 
         AddEducationListEntry();
@@ -69,7 +76,10 @@ public class EducationFragment extends Fragment {
         Button deleteButton = educationListEntry.findViewById(R.id.delete_education_button);
 
         editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            Intent intent = new Intent(getActivity(), AddEditEducation.class);
+            intent.putExtra(AddEditEducation.ACTIVITY_MODE, AddEditEducation.EDIT_MODE);
+            intent.putExtra(AddEditEducation.SERIALIZABLE, educationDTO);
+            startActivity(intent);
         });
 
         deleteButton.setOnClickListener(listener -> {
