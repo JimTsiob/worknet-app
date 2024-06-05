@@ -55,4 +55,11 @@
     <string name="is_private_information">Is private information</string>
     <string name="add_education_title">Add a new Education entry</string>
     <string name="edit_education_title">Edit your Education entry</string>
+    <string name="add_work_experience_title">Add your Work Experience</string>
+    <string name="edit_work_experience_title">Edit your Work Experience</string>
+    <string name="title">Title</string>
+    <string name="company_name">Company Name</string>
+    <string name="location">Location</string>
+    <string name="current_position">Current Position</string>
+    <string name="employment_type">Employment Type</string>
 </resources>

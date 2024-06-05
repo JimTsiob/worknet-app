@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,12 @@ public class WorkExperienceFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         addWorkExperienceButton = requireView().findViewById(R.id.add_work_experience_button);
+        addWorkExperienceButton.setOnClickListener(listener -> {
+            Intent intent = new Intent(getActivity(), AddEditWorkExperience.class);
+            intent.putExtra(AddEditWorkExperience.ACTIVITY_MODE, AddEditWorkExperience.ADD_MODE);
+            startActivity(intent);
+        });
+
         workExperienceList = requireView().findViewById(R.id.work_experience_list);
 
         AddWorkExperienceListEntry();
@@ -50,11 +57,10 @@ public class WorkExperienceFragment extends Fragment {
         Button deleteButton = workExperienceListEntry.findViewById(R.id.delete_work_experience_button);
 
         editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+
         });
 
         deleteButton.setOnClickListener(listener -> {
-            // TODO add call to database
             workExperienceList.removeView(workExperienceListEntry);
         });
 
@@ -92,7 +98,10 @@ public class WorkExperienceFragment extends Fragment {
         Button deleteButton = workExperienceListEntry.findViewById(R.id.delete_work_experience_button);
 
         editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            Intent intent = new Intent(getActivity(), AddEditWorkExperience.class);
+            intent.putExtra(AddEditWorkExperience.ACTIVITY_MODE, AddEditWorkExperience.EDIT_MODE);
+            intent.putExtra(AddEditWorkExperience.SERIALIZABLE, workExperienceDTO);
+            startActivity(intent);
         });
 
         deleteButton.setOnClickListener(listener -> {

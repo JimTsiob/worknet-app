@@ -86,6 +86,6 @@ public class AddEditEducation extends AppCompatActivity {
 
         // TODO update these
         // grade.setText(educationDTO.getGrade().toString());
-        // isPrivate.setText(educationDTO.getIsPrivate());
+        // isPrivate.setChecked(educationDTO.getIsPrivate());
     }
 }
