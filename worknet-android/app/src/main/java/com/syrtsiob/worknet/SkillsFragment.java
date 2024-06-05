@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,12 @@ public class SkillsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         addSkillButton = requireView().findViewById(R.id.add_skills_button);
+        addSkillButton.setOnClickListener(listener -> {
+            Intent intent = new Intent(getActivity(), AddEditSkill.class);
+            intent.putExtra(AddEditSkill.ACTIVITY_MODE, AddEditSkill.ADD_MODE);
+            startActivity(intent);
+        });
+
         skillList = requireView().findViewById(R.id.skills_list);
 
         AddSkillListEntry();
@@ -77,7 +84,10 @@ public class SkillsFragment extends Fragment {
         Button deleteButton = skillList.findViewById(R.id.delete_skill_button);
 
         editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            Intent intent = new Intent(getActivity(), AddEditSkill.class);
+            intent.putExtra(AddEditSkill.ACTIVITY_MODE, AddEditSkill.EDIT_MODE);
+            intent.putExtra(AddEditSkill.SERIALIZABLE, skillDTO);
+            startActivity(intent);
         });
 
         deleteButton.setOnClickListener(listener -> {

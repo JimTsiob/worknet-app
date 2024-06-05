@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class SkillDTO {
+import java.io.Serializable;
+
+public class SkillDTO implements Serializable {
 
     private Long id;
     private String name;

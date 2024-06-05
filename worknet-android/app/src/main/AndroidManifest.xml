@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Worknet"
         tools:targetApi="31">
         <activity
+            android:name=".AddEditSkill"
+            android:exported="false" />
+        <activity
             android:name=".AddEditWorkExperience"
             android:exported="false" />
         <activity
