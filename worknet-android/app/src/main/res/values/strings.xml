@@ -65,4 +65,5 @@
     <string name="add_skill_title">Add a new skill</string>
     <string name="edit_skill_title">Edit your skill</string>
     <string name="your_skill">Your Skill</string>
+    <string name="logout">Logout</string>
 </resources>

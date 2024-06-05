@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(ProfileFragment.newInstance());
             else if(itemID == R.id.settings)
                 replaceFragment(SettingsFragment.newInstance());
+            else if (itemID == R.id.logout)
+                LogoutUser();
             drawerLayout.close();
             return true;
         });
@@ -83,5 +85,9 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.mainFrame, fragment);
         fragmentTransaction.commit();
+    }
+
+    private void LogoutUser(){
+        // TODO Implement functionality
     }
 }
