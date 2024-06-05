@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
 
         UserDtoResultLiveData.getInstance().observe(this, userDto -> {
             profileImage = findViewById(R.id.profileImage);
-            // TODO: add image bitmap here
             if (userDto != null){
                 String profilePicName = userDto.getProfilePicture();
                 List<CustomFileDTO> files = userDto.getFiles();
@@ -178,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Bitmap loadImageFromFile(String fileName) {
         File imgFile = new File(getFilesDir(), "FileStorage/images/" + fileName);
-        String test = "";
+
         if (imgFile.exists()) {
             return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
         }

@@ -7,6 +7,8 @@ public class ConnectionDTO {
     private String firstName;
     private String lastName;
     private String email;
+
+    private String profilePicture;
     private List<WorkExperienceDTO> workExperiences;
 
     public Long getId() {
@@ -39,6 +41,14 @@ public class ConnectionDTO {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public List<WorkExperienceDTO> getWorkExperiences() {
