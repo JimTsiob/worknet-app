@@ -2,7 +2,9 @@ package com.syrtsiob.worknet.model;
 
 import com.syrtsiob.worknet.enums.EmploymentType;
 
-public class WorkExperienceDTO {
+import java.io.Serializable;
+
+public class WorkExperienceDTO implements Serializable {
 
     private String title;
     private EmploymentType employmentType;

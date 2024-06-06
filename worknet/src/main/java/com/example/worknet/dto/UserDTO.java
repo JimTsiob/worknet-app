@@ -12,7 +12,7 @@ public class UserDTO {
     private String password;
     private String profilePicture;
     private List<CustomFileDTO> files;
-    private List<ConnectionUserDTO> connections;
+    private List<ConnectionDTO> connections;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
     private List<SmallPostDTO> posts;
@@ -97,11 +97,11 @@ public class UserDTO {
         this.files = files;
     }
 
-    public List<ConnectionUserDTO> getConnections() {
+    public List<ConnectionDTO> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<ConnectionUserDTO> connections) {
+    public void setConnections(List<ConnectionDTO> connections) {
         this.connections = connections;
     }
 

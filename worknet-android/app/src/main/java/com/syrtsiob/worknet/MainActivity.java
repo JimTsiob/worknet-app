@@ -63,12 +63,8 @@ public class MainActivity extends AppCompatActivity {
                     // Logic for logged in user to always go to the main activity instead of login screen
                     SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString("jwt_token", response.body().getJwtToken());
-//                    editor.putString("email", response.body().getEmail());
-//                    editor.apply();
-// TODO: just in case, remove logged in user, testing purpose, will remove after logout button is added
-                    editor.remove("jwt_token");
-                    editor.remove("email");
+                    editor.putString("jwt_token", response.body().getJwtToken());
+                    editor.putString("email", response.body().getEmail());
                     editor.apply();
                 } else {
                     Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
@@ -137,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             else if(itemID == R.id.settings)
                 replaceFragment(SettingsFragment.newInstance());
             else if (itemID == R.id.logout)
-                LogoutUser();
+                logout();
             drawerLayout.close();
             return true;
         });
@@ -163,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    // TODO: create Logout functionality
     public void logout() {
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

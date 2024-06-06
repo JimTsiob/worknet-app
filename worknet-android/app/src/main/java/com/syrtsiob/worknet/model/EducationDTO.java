@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class EducationDTO {
+import java.io.Serializable;
+
+public class EducationDTO implements Serializable {
 
     private String school;
     private String degree;
