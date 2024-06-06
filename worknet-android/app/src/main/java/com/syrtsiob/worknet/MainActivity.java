@@ -136,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
                 replaceFragment(ProfileFragment.newInstance());
             else if(itemID == R.id.settings)
                 replaceFragment(SettingsFragment.newInstance());
+            else if (itemID == R.id.logout)
+                LogoutUser();
             drawerLayout.close();
             return true;
         });
