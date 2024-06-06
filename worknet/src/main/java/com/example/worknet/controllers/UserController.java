@@ -294,8 +294,8 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestBody LoginUserDTO loginUserDTO) {
-        User user = userService.getUserByEmail(loginUserDTO.getEmail());
+    public ResponseEntity<?> logoutUser(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
         if (user == null) {
             return new ResponseEntity<>("User does not exist.", HttpStatus.BAD_REQUEST);
         }
