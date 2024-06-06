@@ -97,11 +97,11 @@ public class WorkExperienceDTO {
         this.user = user;
     }
 
-    public Boolean getPublic() {
+    public Boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

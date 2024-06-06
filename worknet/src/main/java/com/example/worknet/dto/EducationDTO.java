@@ -17,7 +17,7 @@ public class EducationDTO {
     private String grade;
     private String description;
     private SmallUserDTO user;
-    private Boolean isPublic;
+    private boolean isPublic;
 
 
     public String getSchool() {
@@ -84,11 +84,11 @@ public class EducationDTO {
         this.user = user;
     }
 
-    public Boolean getPublic() {
+    public Boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }
