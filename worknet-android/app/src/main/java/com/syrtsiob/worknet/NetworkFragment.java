@@ -121,7 +121,7 @@ public class NetworkFragment extends Fragment {
                 TextView addConnectionsTextView = new TextView(getActivity());
                 addConnectionsTextView.setText("Add some through the search bar!");
                 addConnectionsTextView.setTextSize(20);
-                noConnectionsTextView.setTextColor(Color.BLACK);
+                addConnectionsTextView.setTextColor(Color.BLACK);
 
                 LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,

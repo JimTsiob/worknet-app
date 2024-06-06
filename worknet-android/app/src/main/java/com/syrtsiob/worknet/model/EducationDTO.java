@@ -9,9 +9,11 @@ public class EducationDTO implements Serializable {
     private String fieldOfStudy;
     private String startDate;
     private String endDate;
-    private Float grade;
+    private String grade;
     private String description;
     private SmallUserDTO user;
+
+    private Boolean isPublic;
 
 
     public String getSchool() {
@@ -54,11 +56,11 @@ public class EducationDTO implements Serializable {
         this.endDate = endDate;
     }
 
-    public Float getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(Float grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 
@@ -76,5 +78,13 @@ public class EducationDTO implements Serializable {
 
     public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

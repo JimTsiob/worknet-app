@@ -136,14 +136,6 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText(getActivity(), "update failed. Server failure.", Toast.LENGTH_LONG).show();
             }
         });
-
-
-
-        // TODO validate mail - done
-        // TODO check DB for same mail - done
-        // TODO validate password requirements
-        // TODO change data
-        // TODO make toasts depending on result of attempt
     }
 
     @Override

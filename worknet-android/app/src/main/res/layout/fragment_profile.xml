@@ -11,18 +11,21 @@
         android:orientation="horizontal"
         android:background="@color/silver">
         <ImageView
+            android:id="@+id/profilePagePic"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             android:layout_marginStart="4dp"
             android:src="@drawable/profile"/>
+
         <TextView
+            android:id="@+id/fullNameProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Full Name"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="4dp"
-            android:layout_gravity="center_vertical"/>
+            android:text="Full Name" />
     </LinearLayout>
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/profileTabLayout"

@@ -1,5 +1,7 @@
 package com.syrtsiob.worknet;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,13 +13,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
 
+import java.io.File;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -92,6 +100,24 @@ public class ProfileFragment extends Fragment {
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
 
+        UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+            if (userDTO != null){
+                ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                String profilePicName = userDTO.getProfilePicture();
+                List<CustomFileDTO> files = userDTO.getFiles();
+                Optional<CustomFileDTO> profilePicture = files.stream()
+                        .filter(file -> file.getFileName().equals(profilePicName))
+                        .findFirst();
+                if (profilePicture.isPresent()) {
+                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                    profilePic.setImageBitmap(bitmap);
+                }
+
+                TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+            }
+        });
+
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -112,5 +138,16 @@ public class ProfileFragment extends Fragment {
                 tabLayout.getTabAt(position).select();
             }
         });
+    }
+
+    // method that returns images from the phone's sd card.
+    private Bitmap loadImageFromFile(String fileName) {
+        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
+
+        if (imgFile.exists()) {
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.syrtsiob.worknet;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.EducationDTO;
+
+import java.util.List;
 
 
 public class EducationFragment extends Fragment {
@@ -42,9 +46,44 @@ public class EducationFragment extends Fragment {
 
         educationList = requireView().findViewById(R.id.education_list);
 
-        AddEducationListEntry();
-        AddEducationListEntry();
-        AddEducationListEntry();
+        UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+            List<EducationDTO> educations = userDTO.getEducations();
+
+            if (educations.isEmpty()){
+                TextView noEducationsTextView = new TextView(getActivity());
+                noEducationsTextView.setText("You have no education added yet. \n");
+                noEducationsTextView.setTextSize(20); // Set desired text size
+                noEducationsTextView.setTextColor(Color.BLACK);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params.setMargins(200, 300, 16, 16);
+                noEducationsTextView.setLayoutParams(params);
+
+                educationList.addView(noEducationsTextView);
+
+                TextView addEducationsTextView = new TextView(getActivity());
+                addEducationsTextView.setText("Add some with the button above!");
+                addEducationsTextView.setTextSize(20);
+                addEducationsTextView.setTextColor(Color.BLACK);
+
+                LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                );
+                params2.setMargins(200, 5, 16, 16);
+                addEducationsTextView.setLayoutParams(params2);
+
+                educationList.addView(addEducationsTextView);
+            }else{
+                for (EducationDTO education: educations){
+                    AddEducationListEntry(education);
+                }
+            }
+
+        });
     }
 
     private void AddEducationListEntry(EducationDTO educationDTO) {
@@ -64,13 +103,16 @@ public class EducationFragment extends Fragment {
         school.setText(educationDTO.getSchool());
         degree.setText(educationDTO.getDegree());
         fieldOfStudy.setText(educationDTO.getFieldOfStudy());
-        startDate.setText(educationDTO.getStartDate().toString());
-        endDate.setText(educationDTO.getEndDate().toString());
+        startDate.setText(educationDTO.getStartDate());
+        endDate.setText(educationDTO.getEndDate());
         description.setText(educationDTO.getDescription());
 
-        // TODO update grade and privacy label
-        // grade.setText(educationDTO.getGrade().toString());
-        // privacy_label.setText(educationDTO.get());
+        grade.setText(educationDTO.getGrade());
+        if (educationDTO.getPublic()){
+            privacy_label.setText("Public information");
+        }else{
+            privacy_label.setText("This information is set to private.");
+        }
 
         Button editButton = educationListEntry.findViewById(R.id.edit_education_button);
         Button deleteButton = educationListEntry.findViewById(R.id.delete_education_button);
@@ -80,27 +122,6 @@ public class EducationFragment extends Fragment {
             intent.putExtra(AddEditEducation.ACTIVITY_MODE, AddEditEducation.EDIT_MODE);
             intent.putExtra(AddEditEducation.SERIALIZABLE, educationDTO);
             startActivity(intent);
-        });
-
-        deleteButton.setOnClickListener(listener -> {
-            // TODO add call to database
-            educationList.removeView(educationListEntry);
-        });
-
-        educationList.addView(educationListEntry);
-    }
-
-    // TODO this is for testing purposes -- remove
-    private void AddEducationListEntry() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View educationListEntry = inflater
-                .inflate(R.layout.education_entry_template, educationList, false);
-
-        Button editButton = educationListEntry.findViewById(R.id.edit_education_button);
-        Button deleteButton = educationListEntry.findViewById(R.id.delete_education_button);
-
-        editButton.setOnClickListener(listener -> {
-            // TODO implement functionality
         });
 
         deleteButton.setOnClickListener(listener -> {
