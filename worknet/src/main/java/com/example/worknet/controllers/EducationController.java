@@ -58,12 +58,9 @@ public class EducationController {
             Education education = modelMapper.map(educationDTO, Education.class);
             User user = userService.getUserByEmail(email);
 
-            user.getEducations().add(education);
-
             // this is to satisfy constraint
-            userService.updateUser(user.getId(), user);
 
-            educationService.addEducation(education);
+            educationService.addEducation(education, user);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Education added successfully");
         } catch (Exception e) {

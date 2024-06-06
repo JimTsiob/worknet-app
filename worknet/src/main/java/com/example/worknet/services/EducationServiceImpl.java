@@ -1,7 +1,9 @@
 package com.example.worknet.services;
 
 import com.example.worknet.entities.Education;
+import com.example.worknet.entities.User;
 import com.example.worknet.repositories.EducationRepository;
+import com.example.worknet.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +16,17 @@ public class EducationServiceImpl implements EducationService {
     @Autowired
     private EducationRepository educationRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<Education> getAllEducations() {
         return educationRepository.findAll();
     }
 
-    public Education addEducation(Education education) {
+    public Education addEducation(Education education, User user) {
+
+        user.getEducations().add(education);
+
         return educationRepository.save(education);
     }
 
