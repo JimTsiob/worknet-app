@@ -25,4 +25,7 @@ public interface UserService {
 
     @PUT("users/{id}")
     Call<String> updateUser(@Path("id") Long userId, @Body UserDTO userDTO);
+
+    @GET("users/logout")
+    Call<String> logoutUser(@Query("email") String email);
 }

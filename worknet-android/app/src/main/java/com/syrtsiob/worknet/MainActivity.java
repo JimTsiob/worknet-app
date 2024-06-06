@@ -1,5 +1,7 @@
 package com.syrtsiob.worknet;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -22,6 +24,7 @@ import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
 import com.syrtsiob.worknet.interfaces.UserService;
 import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.LoginUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
@@ -160,16 +163,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void logout() {
-        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("jwt_token");
-        editor.remove("email");
-        editor.apply();
 
-        // Navigate back to the login screen
-        Intent intent = new Intent(this, Login.class);
-        startActivity(intent);
-        finish();
+        UserDtoResultLiveData.getInstance().observe(this, userDTO -> {
+            if (userDTO != null){
+
+                Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+                UserService userService = retrofit.create(UserService.class);
+
+                userService.logoutUser(userDTO.getEmail()).enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        if (response.isSuccessful()) {
+                            SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.remove("jwt_token");
+                            editor.remove("email");
+                            editor.apply();
+
+
+                            // Navigate back to the login screen
+                            Intent intent = new Intent(MainActivity.this, Login.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Log.e("fail: ", t.getLocalizedMessage());
+                        // Handle the error
+                        Toast.makeText(MainActivity.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }else{
+                Toast.makeText(MainActivity.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     // method that returns images from the phone's sd card.
