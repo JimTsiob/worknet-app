@@ -18,7 +18,9 @@ public class StartActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        // jwt token is added for authorization purposes.
+        // email is added so that the app can "remember" the user's email if they close the app
+        // without logging out so their data can be persisted and re-shown on the app.
         SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String jwtToken = sharedPreferences.getString("jwt_token", null);
         String email = sharedPreferences.getString("email", null);

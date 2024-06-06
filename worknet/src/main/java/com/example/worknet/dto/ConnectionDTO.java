@@ -9,6 +9,7 @@ public class ConnectionDTO {
     private String email;
     private String profilePicture;
     private List<WorkExperienceDTO> workExperiences;
+    private List<CustomFileDTO> files;
 
     public Long getId() {
         return id;
@@ -56,5 +57,13 @@ public class ConnectionDTO {
 
     public void setWorkExperiences(List<WorkExperienceDTO> workExperiences) {
         this.workExperiences = workExperiences;
+    }
+
+    public List<CustomFileDTO> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<CustomFileDTO> files){
+        this.files = files;
     }
 }

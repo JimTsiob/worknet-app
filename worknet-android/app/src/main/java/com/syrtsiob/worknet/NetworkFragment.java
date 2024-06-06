@@ -1,11 +1,14 @@
 package com.syrtsiob.worknet;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -20,10 +23,13 @@ import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,8 +43,6 @@ import retrofit2.Response;
 public class NetworkFragment extends Fragment {
 
     LinearLayout networkList;
-
-    ImageView profilePic;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -146,6 +150,18 @@ public class NetworkFragment extends Fragment {
         TextView position = networkListEntry.findViewById(R.id.position);
         TextView employer = networkListEntry.findViewById(R.id.employer);
 
+        ImageView profilePic = networkListEntry.findViewById(R.id.user_profile_pic);
+        String profilePicName = connection.getProfilePicture();
+        List<CustomFileDTO> files = connection.getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get().getFileName());
+            profilePic.setImageBitmap(bitmap);
+        }
+
         fullName.setText(connection.getFirstName() + " " + connection.getLastName());
         List<WorkExperienceDTO> workExperiences = connection.getWorkExperiences();
 
@@ -172,5 +188,16 @@ public class NetworkFragment extends Fragment {
         });
 
         networkList.addView(networkListEntry);
+    }
+
+    // method that returns images from the phone's sd card.
+    private Bitmap loadImageFromConnectionFile(String fileName) {
+        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
+
+        if (imgFile.exists()) {
+            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+        }
+
+        return null;
     }
 }

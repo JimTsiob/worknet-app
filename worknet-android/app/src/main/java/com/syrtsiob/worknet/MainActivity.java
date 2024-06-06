@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    // method that returns images from the phone's sd card.
     private Bitmap loadImageFromFile(String fileName) {
         File imgFile = new File(getFilesDir(), "FileStorage/images/" + fileName);
 
