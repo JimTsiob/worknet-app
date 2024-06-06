@@ -298,6 +298,30 @@ public class Register extends AppCompatActivity {
 
     private boolean ValidatePasswordRequirements(String password){
         // TODO implement possible requirements including Toast for failure
+        // Rule 1: 6-14 characters long
+        if (password.length() < 6 || password.length() > 14){
+            Toast.makeText(Register.this, "Password length must be between 6 and 14 characters.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        // Rule 2: At least one number
+        if (!password.matches(".*\\d.*")){
+            Toast.makeText(Register.this, "Password must contain at least one number.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        // Rule 3: At least one uppercase letter
+        if (!password.matches(".*[A-Z].*")){
+            Toast.makeText(Register.this, "Password must contain at least one upper case letter.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        // Rule 4: At least one special character
+        if (!password.matches(".*[!@#$%^&*].*")){
+            Toast.makeText(Register.this, "Password must contain at least one special character.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         return true;
     }
 
