@@ -1,6 +1,7 @@
 package com.example.worknet.dto;
 
 import com.example.worknet.enums.EmploymentType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
@@ -11,7 +12,9 @@ public class WorkExperienceDTO {
     private String companyName;
     private String location;
     private boolean currentlyWorking;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate endDate;
     private String description;
     private SmallUserDTO user;

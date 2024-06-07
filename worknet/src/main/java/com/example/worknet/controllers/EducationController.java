@@ -2,7 +2,6 @@ package com.example.worknet.controllers;
 
 
 import com.example.worknet.dto.EducationDTO;
-import com.example.worknet.dto.UserDTO;
 import com.example.worknet.entities.Education;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
