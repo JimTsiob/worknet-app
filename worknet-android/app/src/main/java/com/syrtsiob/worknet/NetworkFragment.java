@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ConnectionDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
@@ -184,10 +187,19 @@ public class NetworkFragment extends Fragment {
         Button goToProfileButton = networkListEntry.findViewById(R.id.goToProfileButton);
 
         goToProfileButton.setOnClickListener(listener -> {
-            // TODO implement functionality
+            // add connection and once user leaves profile page reset to proper user.
+            ConnectionUserDtoResultLiveData.getInstance().setValue(connection);
+            replaceFragment(ProfileFragment.newInstance());
         });
 
         networkList.addView(networkListEntry);
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
     }
 
     // method that returns images from the phone's sd card.

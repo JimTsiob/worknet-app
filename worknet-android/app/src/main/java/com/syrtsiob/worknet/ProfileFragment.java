@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
@@ -87,7 +88,17 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        // and initialize connection data with null for proper functionality
+        ConnectionUserDtoResultLiveData.getInstance().setValue(null);
         return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Clear the ConnectionDTO when the fragment view is destroyed
+        // so we can see the logged in user's profile
+        ConnectionUserDtoResultLiveData.getInstance().setValue(null);
     }
 
     @Override
@@ -100,11 +111,11 @@ public class ProfileFragment extends Fragment {
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
 
-        UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
-            if (userDTO != null){
+        ConnectionUserDtoResultLiveData.getInstance().observe(getActivity(), connectionDTO -> {
+            if (connectionDTO != null){
                 ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
-                String profilePicName = userDTO.getProfilePicture();
-                List<CustomFileDTO> files = userDTO.getFiles();
+                String profilePicName = connectionDTO.getProfilePicture();
+                List<CustomFileDTO> files = connectionDTO.getFiles();
                 Optional<CustomFileDTO> profilePicture = files.stream()
                         .filter(file -> file.getFileName().equals(profilePicName))
                         .findFirst();
@@ -114,7 +125,25 @@ public class ProfileFragment extends Fragment {
                 }
 
                 TextView fullName = requireView().findViewById(R.id.fullNameProfile);
-                fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+                fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
+            }else{
+                UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+                    if (userDTO != null){
+                        ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                        String profilePicName = userDTO.getProfilePicture();
+                        List<CustomFileDTO> files = userDTO.getFiles();
+                        Optional<CustomFileDTO> profilePicture = files.stream()
+                                .filter(file -> file.getFileName().equals(profilePicName))
+                                .findFirst();
+                        if (profilePicture.isPresent()) {
+                            Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                            profilePic.setImageBitmap(bitmap);
+                        }
+
+                        TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                        fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+                    }
+                });
             }
         });
 
