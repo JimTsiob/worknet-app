@@ -1,5 +1,7 @@
 package com.example.worknet.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -10,6 +12,7 @@ public class PostDTO {
     private SmallUserDTO user;
     private List<CustomFileDTO> customFiles;
     private List<PostLikeDTO> likes;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate postCreationDate;
     private List<NotificationDTO> notifications;
 
