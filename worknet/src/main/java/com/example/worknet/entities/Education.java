@@ -36,7 +36,7 @@ public class Education {
     private String description;
 
     @Column(name = "is_public")
-    private Boolean isPublic;
+    private boolean isPublic;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -117,11 +117,11 @@ public class Education {
         this.user = user;
     }
 
-    public Boolean getPublic() {
+    public boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

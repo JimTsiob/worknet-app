@@ -1,7 +1,10 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -10,6 +13,9 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.interfaces.EducationService;
@@ -20,6 +26,8 @@ import com.syrtsiob.worknet.retrofit.RetrofitService;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -92,7 +100,7 @@ public class AddEditEducation extends AppCompatActivity {
 
                 EducationDTO educationDTO = new EducationDTO();
                 boolean isPublicChecked = isPublic.isChecked();
-                educationDTO.setPublic(isPublicChecked);
+                educationDTO.setIsPublic(isPublicChecked);
                 educationDTO.setGrade(grade.getText().toString());
                 educationDTO.setDegree(degree.getText().toString());
                 educationDTO.setDescription(description.getText().toString());
@@ -108,7 +116,6 @@ public class AddEditEducation extends AppCompatActivity {
                         public void onResponse(Call<String> call, Response<String> response) {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditEducation.this, "added education successfully.", Toast.LENGTH_LONG).show();
-                                UserDtoResultLiveData.getInstance().setValue(userDTO);
                             } else {
                                 Toast.makeText(AddEditEducation.this, "education addition failed. Check the format.", Toast.LENGTH_LONG).show();
                             }
@@ -121,23 +128,63 @@ public class AddEditEducation extends AppCompatActivity {
                             Toast.makeText(AddEditEducation.this, "education addition failed. Server failure.", Toast.LENGTH_LONG).show();
                         }
                     });
-                }else{
+                }else if (activityMode.equals(EDIT_MODE)){
+                    List<EducationDTO> educations = userDTO.getEducations();
+                    Long id = 0L;
 
+                    for (EducationDTO e: educations){
+                        if (educationEquals(educationDTO, e)){
+                            id = e.getId();
+                        }
+                    }
+
+                    Long finalId = id;
+                    educationService.updateEducation(id, educationDTO).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(AddEditEducation.this, "updated education successfully.", Toast.LENGTH_LONG).show();
+
+                                // Replace old education with new one in the userDTO list.
+                                ListIterator<EducationDTO> iterator = userDTO.getEducations().listIterator();
+                                while (iterator.hasNext()) {
+                                    EducationDTO next = iterator.next();
+                                    if (next.getId() == finalId) {
+                                        //Replace element
+                                        educationDTO.setId(finalId);
+                                        iterator.set(educationDTO);
+                                    }
+                                }
+
+                            } else {
+                                Toast.makeText(AddEditEducation.this, "education update failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            // Handle the error
+                            Log.e("fail: ", t.getLocalizedMessage());
+                        }
+                    });
                 }
-
-
             });
+
 
             finish();
         });
+    }
 
-        OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, finishWhenBackPressed);
+    public boolean educationEquals(EducationDTO education1, EducationDTO education2) {
+        if (education1.getSchool().trim().equals(education2.getSchool().trim()) ||
+                education1.getDegree().trim().equals(education2.getDegree().trim()) ||
+                education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) ||
+                education1.getStartDate().equals(education2.getStartDate()) ||
+                education1.getEndDate().equals(education2.getEndDate())) {
+            return true;
+        }
+
+        return false;
     }
 
     private boolean ValidateDate(String startDateStr, String endDateStr){
@@ -218,6 +265,6 @@ public class AddEditEducation extends AppCompatActivity {
         endDate.setText(educationDTO.getEndDate());
         description.setText(educationDTO.getDescription());
         grade.setText(educationDTO.getGrade());
-        isPublic.setChecked(educationDTO.getPublic());
+        isPublic.setChecked(educationDTO.getIsPublic());
     }
 }

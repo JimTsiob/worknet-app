@@ -11,4 +11,5 @@ public interface EducationService {
     Education getEducationById(Long id);
     Education updateEducation(Long id, Education education);
     void deleteEducation(Long id);
+    boolean educationEquals(Education education1, Education education2);
 }

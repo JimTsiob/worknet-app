@@ -92,7 +92,7 @@ public class EducationDTO {
         this.user = user;
     }
 
-    public Boolean getIsPublic() {
+    public boolean getIsPublic() {
         return isPublic;
     }
 
