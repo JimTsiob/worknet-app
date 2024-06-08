@@ -322,18 +322,30 @@ public class UserController {
             
             User checkForEmail = modelMapper.map(userDTO, User.class);
 
+            // examine all other users apart from the one we're updating.
             boolean emailFound = users.stream()
-                                .anyMatch(user -> user.getEmail().equals(checkForEmail.getEmail()));
+                    .anyMatch(user -> !user.getId().equals(checkForEmail.getId()) &&
+                            user.getEmail().equals(checkForEmail.getEmail()));
 
-            modelMapper.map(userDTO, existingUser);
+            boolean isPasswordMatch = existingUser.getPassword().equals(userDTO.getPassword());
 
-            existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword()));
+            // if password hasn't changed don't rehash it, instead just add the new email and update user.
+            if (isPasswordMatch) {
+                modelMapper.map(userDTO, existingUser);
 
-            if (emailFound){
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("This email already exists in the database.");
+                userService.updateUser(id, existingUser);
+
+            }else{// this else statement works both for only password changes and email changes.
+                modelMapper.map(userDTO, existingUser);
+
+                existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword()));
+
+                if (emailFound){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("This email already exists in the database.");
+                }
+
+                userService.updateUser(id, existingUser);
             }
-
-            userService.updateUser(id, existingUser);
 
             return ResponseEntity.ok("User updated successfully");
         } catch (Exception e) {
