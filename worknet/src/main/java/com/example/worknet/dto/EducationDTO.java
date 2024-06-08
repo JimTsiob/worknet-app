@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 public class EducationDTO {
 
+    private Long id;
     private String school;
     private String degree;
     private String fieldOfStudy;
@@ -19,6 +20,13 @@ public class EducationDTO {
     private SmallUserDTO user;
     private boolean isPublic;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getSchool() {
         return school;
