@@ -103,22 +103,6 @@ public class SettingsFragment extends Fragment {
         String newEmail = emailEdit.getText().toString();
         String newPassword = passwordEdit.getText().toString();
 
-        if(!ValidateEmail(newEmail))
-            return;
-
-        if (!ValidatePasswordRequirements(newPassword))
-            return;
-
-        if(newEmail.isEmpty()){
-            Toast.makeText(getActivity(), "email cannot be empty.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if(newPassword.isEmpty()){
-            Toast.makeText(getActivity(), "password cannot be empty.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
         user.setEmail(newEmail);
         user.setPassword(newPassword);
 
@@ -149,6 +133,7 @@ public class SettingsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+
             emailEdit = requireView().findViewById(R.id.editTextTextEmailAddress);
             passwordEdit = requireView().findViewById(R.id.editTextTextPassword);
 
@@ -157,14 +142,30 @@ public class SettingsFragment extends Fragment {
 
             cancelButton = requireView().findViewById(R.id.buttonCancel);
             cancelButton.setOnClickListener(listener -> {
-                emailEdit.clearFocus();
-                emailEdit.setText("");
-                passwordEdit.clearFocus();
-                passwordEdit.setText("");
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
+                startActivity(intent);
             });
 
             submitButton = requireView().findViewById(R.id.buttonSubmit);
             submitButton.setOnClickListener(listener -> {
+
+                if(emailEdit.getText().toString().isEmpty()){
+                    Toast.makeText(getActivity(), "email cannot be empty.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if(passwordEdit.getText().toString().isEmpty()){
+                    Toast.makeText(getActivity(), "password cannot be empty.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if(!ValidateEmail(emailEdit.getText().toString()))
+                    return;
+
+                if (!ValidatePasswordRequirements(passwordEdit.getText().toString()))
+                    return;
+
                 if (userDTO != null) {
                     // Handle user success
                     AttemptDataChange(userDTO);

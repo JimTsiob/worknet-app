@@ -99,7 +99,6 @@ public class AddEditWorkExperience extends AppCompatActivity {
 
         employmentType.setSelection(workExperienceDTO.getEmploymentType().ordinal());
 
-        // TODO update these
-//         isPublic.setChecked(workExperienceDTO.getIsPrivate());
+         isPublic.setChecked(workExperienceDTO.getIsPublic());
     }
 }

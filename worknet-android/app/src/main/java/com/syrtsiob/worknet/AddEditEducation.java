@@ -17,6 +17,10 @@ import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -70,7 +74,13 @@ public class AddEditEducation extends AppCompatActivity {
         });
 
         submitButton.setOnClickListener(listener -> {
-            // TODO upload to database
+
+            if (!isEmptyField())
+                return;
+
+            if (!ValidateDate(startDate.getText().toString(), endDate.getText().toString()))
+                return;
+
             UserDtoResultLiveData.getInstance().observe(this, userDTO -> {
                 Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
                 EducationService educationService = retrofit.create(EducationService.class);
@@ -92,29 +102,30 @@ public class AddEditEducation extends AppCompatActivity {
                 educationDTO.setStartDate(startDate.getText().toString());
                 educationDTO.setEndDate(endDate.getText().toString());
 
-                if (!ValidateDate(startDate.getText().toString()))
-                    return;
-
-                if (!ValidateDate(endDate.getText().toString()))
-                    return;
-
-                educationService.addEducation(educationDTO, userDTO.getEmail()).enqueue(new Callback<String>() {
-                    @Override
-                    public void onResponse(Call<String> call, Response<String> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(AddEditEducation.this, "added education successfully.", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(AddEditEducation.this, "education addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                if (activityMode.equals(ADD_MODE)){
+                    educationService.addEducation(educationDTO, userDTO.getEmail()).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(AddEditEducation.this, "added education successfully.", Toast.LENGTH_LONG).show();
+                                UserDtoResultLiveData.getInstance().setValue(userDTO);
+                            } else {
+                                Toast.makeText(AddEditEducation.this, "education addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<String> call, Throwable t) {
-                        Log.e("fail: ", t.getLocalizedMessage());
-                        // Handle the error
-                        Toast.makeText(AddEditEducation.this, "education addition failed. Server failure.", Toast.LENGTH_LONG).show();
-                    }
-                });
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.e("fail: ", t.getLocalizedMessage());
+                            // Handle the error
+                            Toast.makeText(AddEditEducation.this, "education addition failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }else{
+
+                }
+
+
             });
 
             finish();
@@ -129,19 +140,77 @@ public class AddEditEducation extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, finishWhenBackPressed);
     }
 
-    private boolean ValidateDate(String date){
+    private boolean ValidateDate(String startDateStr, String endDateStr){
         // ensure all dates are dd-MM-yyyy format
-        String datePattern = "^\\\\d{2}-\\\\d{2}-\\\\d{4}$";
+        // and that start date is not greater than end date.
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
-        if (date.matches(datePattern)){
-            return true;
+        try {
+            Date startDate = sdf.parse(startDateStr);
+            Date endDate = sdf.parse(endDateStr);
+
+            if (startDate.compareTo(endDate) > 0) {
+                Toast.makeText(this, "Start date cannot be greater than end date.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+        } catch (ParseException e) {
+            Toast.makeText(this, "Date format must be dd-mm-yyyy.", Toast.LENGTH_LONG).show();
+            return false;
         }
 
-        Toast.makeText(this, "Date format must be dd-mm-yyyy.", Toast.LENGTH_LONG).show();
-        return false;
+        return true;
+    }
+
+    private boolean isEmptyField(){
+        // no empty fields allowed
+        if (school.getText().toString().isEmpty()){
+            Toast.makeText(this, "School cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (degree.getText().toString().isEmpty()){
+            Toast.makeText(this, "Degree cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (fieldOfStudy.getText().toString().isEmpty()){
+            Toast.makeText(this, "Field of study cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (startDate.getText().toString().isEmpty()){
+            Toast.makeText(this, "Start date cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (endDate.getText().toString().isEmpty()){
+            Toast.makeText(this, "End date cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (grade.getText().toString().isEmpty()){
+            Toast.makeText(this, "Grade cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (description.getText().toString().isEmpty()){
+            Toast.makeText(this, "Description cannot be empty.", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 
     private void PopulateInputs(EducationDTO educationDTO) {
+        school = findViewById(R.id.schoolInput);
+        degree = findViewById(R.id.degreeInput);
+        fieldOfStudy = findViewById(R.id.fieldOfStudyInput);
+        startDate = findViewById(R.id.startDateInput);
+        endDate = findViewById(R.id.endDateInput);
+        grade = findViewById(R.id.gradeInput);
+        description = findViewById(R.id.descriptionInput);
+        isPublic = findViewById(R.id.isPublicInput);
+
         school.setText(educationDTO.getSchool());
         degree.setText(educationDTO.getDegree());
         fieldOfStudy.setText(educationDTO.getFieldOfStudy());
