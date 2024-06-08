@@ -1,6 +1,9 @@
 package com.syrtsiob.worknet;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -155,8 +158,6 @@ public class SettingsFragment extends Fragment {
                 emailEdit.setText("");
                 passwordEdit.clearFocus();
                 passwordEdit.setText("");
-
-                // TODO return to home fragment
             });
 
             submitButton = requireView().findViewById(R.id.buttonSubmit);
@@ -164,6 +165,14 @@ public class SettingsFragment extends Fragment {
                 if (userDTO != null) {
                     // Handle user success
                     AttemptDataChange(userDTO);
+                    // update email in shared preferences too.
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("email", userDTO.getEmail());
+                    editor.apply();
+
+                    UserDtoResultLiveData.getInstance().setValue(userDTO);
+
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
                     startActivity(intent);

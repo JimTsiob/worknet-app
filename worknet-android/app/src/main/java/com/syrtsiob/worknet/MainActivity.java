@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.syrtsiob.worknet.LiveData.AuthResultLiveData;
+import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
 import com.syrtsiob.worknet.interfaces.UserService;
@@ -50,6 +52,19 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         replaceFragment(HomeFragment.newInstance());
+
+        // TESTING - in case of emergency
+//        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.remove("jwt_token");
+//        editor.remove("email");
+//        editor.apply();
+//        Intent intent = new Intent(MainActivity.this, Login.class);
+//        startActivity(intent);
+//        finish();
+
+        // do this to show user image on profile
+        ConnectionUserDtoResultLiveData.getInstance().setValue(null);
 
         Intent intent = getIntent();
         String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
@@ -170,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
                 UserService userService = retrofit.create(UserService.class);
 
+
                 userService.logoutUser(userDTO.getEmail()).enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
@@ -180,9 +196,8 @@ public class MainActivity extends AppCompatActivity {
                             editor.remove("email");
                             editor.apply();
 
-
                             // Navigate back to the login screen
-                            Intent intent = new Intent(MainActivity.this, Login.class);
+                            Intent intent = new Intent(MainActivity.this, StartActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

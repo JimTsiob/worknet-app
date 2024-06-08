@@ -89,7 +89,6 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         // and initialize connection data with null for proper functionality
-        ConnectionUserDtoResultLiveData.getInstance().setValue(null);
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -111,7 +110,9 @@ public class ProfileFragment extends Fragment {
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
 
-        ConnectionUserDtoResultLiveData.getInstance().observe(getActivity(), connectionDTO -> {
+        // if user clicks on connection profile show connection profile elements.
+        // Otherwise show own profile elements.
+        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
             if (connectionDTO != null){
                 ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
                 String profilePicName = connectionDTO.getProfilePicture();
@@ -127,7 +128,7 @@ public class ProfileFragment extends Fragment {
                 TextView fullName = requireView().findViewById(R.id.fullNameProfile);
                 fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
             }else{
-                UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
+                UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
                     if (userDTO != null){
                         ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
                         String profilePicName = userDTO.getProfilePicture();
