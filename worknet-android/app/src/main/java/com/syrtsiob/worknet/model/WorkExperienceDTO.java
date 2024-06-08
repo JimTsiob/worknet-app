@@ -16,6 +16,8 @@ public class WorkExperienceDTO implements Serializable {
     private String description;
     private SmallUserDTO user;
 
+    private boolean isPublic;
+
     public String getTitle() {
         return title;
     }
@@ -86,5 +88,13 @@ public class WorkExperienceDTO implements Serializable {
 
     public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

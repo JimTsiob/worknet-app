@@ -297,7 +297,6 @@ public class Register extends AppCompatActivity {
     }
 
     private boolean ValidatePasswordRequirements(String password){
-        // TODO implement possible requirements including Toast for failure
         // Rule 1: 6-14 characters long
         if (password.length() < 6 || password.length() > 14){
             Toast.makeText(Register.this, "Password length must be between 6 and 14 characters.", Toast.LENGTH_LONG).show();

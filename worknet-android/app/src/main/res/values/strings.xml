@@ -54,7 +54,7 @@
     <string name="end_date">End Date</string>
     <string name="grade">Grade</string>
     <string name="description">Description</string>
-    <string name="is_private_information">Is private information</string>
+    <string name="is_public_information">Is public information</string>
     <string name="add_education_title">Add a new Education entry</string>
     <string name="edit_education_title">Edit your Education entry</string>
     <string name="add_work_experience_title">Add your Work Experience</string>

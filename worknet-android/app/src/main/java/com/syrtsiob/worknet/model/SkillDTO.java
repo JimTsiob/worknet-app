@@ -9,6 +9,8 @@ public class SkillDTO implements Serializable {
     private SmallUserDTO user;
     private SmallJobDTO job;
 
+    private boolean isPublic;
+
     public Long getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class SkillDTO implements Serializable {
 
     public void setJob(SmallJobDTO job) {
         this.job = job;
+    }
+
+    public boolean getIsPublic() {
+        return isPublic;
+    }
+
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

@@ -30,7 +30,7 @@ public class AddEditSkill extends AppCompatActivity {
 
     TextView activityTitle;
     EditText skillDescription;
-    SwitchCompat isPrivate;
+    SwitchCompat isPublic;
     Button cancelButton, submitButton;
 
     @Override
@@ -51,7 +51,7 @@ public class AddEditSkill extends AppCompatActivity {
         }
 
         skillDescription = findViewById(R.id.skillDescriptionInput);
-        isPrivate = findViewById(R.id.isPrivateInput);
+        isPublic = findViewById(R.id.isPublicInput);
 
         cancelButton = findViewById(R.id.cancel_button);
         submitButton = findViewById(R.id.submit_button);

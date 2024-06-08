@@ -105,9 +105,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/is_private_information"/>
+            android:text="@string/is_public_information"/>
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/isPrivateInput"
+            android:id="@+id/isPublicInput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>

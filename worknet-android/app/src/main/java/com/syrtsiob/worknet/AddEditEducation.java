@@ -33,7 +33,7 @@ public class AddEditEducation extends AppCompatActivity {
 
     TextView activityTitle;
     EditText school, degree, fieldOfStudy, startDate, endDate, grade, description;
-    SwitchCompat isPrivate;
+    SwitchCompat isPublic;
     Button cancelButton, submitButton;
 
     @Override
@@ -60,7 +60,7 @@ public class AddEditEducation extends AppCompatActivity {
         endDate = findViewById(R.id.endDateInput);
         grade = findViewById(R.id.gradeInput);
         description = findViewById(R.id.descriptionInput);
-        isPrivate = findViewById(R.id.isPrivateInput);
+        isPublic = findViewById(R.id.isPublicInput);
 
         cancelButton = findViewById(R.id.cancel_button);
         submitButton = findViewById(R.id.submit_button);
@@ -81,8 +81,8 @@ public class AddEditEducation extends AppCompatActivity {
                 smallUserDTO.setId(userDTO.getId());
 
                 EducationDTO educationDTO = new EducationDTO();
-                boolean isPrivateChecked = isPrivate.isChecked();
-                educationDTO.setPublic(isPrivateChecked);
+                boolean isPublicChecked = isPublic.isChecked();
+                educationDTO.setPublic(isPublicChecked);
                 educationDTO.setGrade(grade.getText().toString());
                 educationDTO.setDegree(degree.getText().toString());
                 educationDTO.setDescription(description.getText().toString());
@@ -91,6 +91,12 @@ public class AddEditEducation extends AppCompatActivity {
                 educationDTO.setFieldOfStudy(fieldOfStudy.getText().toString());
                 educationDTO.setStartDate(startDate.getText().toString());
                 educationDTO.setEndDate(endDate.getText().toString());
+
+                if (!ValidateDate(startDate.getText().toString()))
+                    return;
+
+                if (!ValidateDate(endDate.getText().toString()))
+                    return;
 
                 educationService.addEducation(educationDTO, userDTO.getEmail()).enqueue(new Callback<String>() {
                     @Override
@@ -123,6 +129,18 @@ public class AddEditEducation extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, finishWhenBackPressed);
     }
 
+    private boolean ValidateDate(String date){
+        // ensure all dates are dd-MM-yyyy format
+        String datePattern = "^\\\\d{2}-\\\\d{2}-\\\\d{4}$";
+
+        if (date.matches(datePattern)){
+            return true;
+        }
+
+        Toast.makeText(this, "Date format must be dd-mm-yyyy.", Toast.LENGTH_LONG).show();
+        return false;
+    }
+
     private void PopulateInputs(EducationDTO educationDTO) {
         school.setText(educationDTO.getSchool());
         degree.setText(educationDTO.getDegree());
@@ -131,6 +149,6 @@ public class AddEditEducation extends AppCompatActivity {
         endDate.setText(educationDTO.getEndDate());
         description.setText(educationDTO.getDescription());
         grade.setText(educationDTO.getGrade());
-        isPrivate.setChecked(educationDTO.getPublic());
+        isPublic.setChecked(educationDTO.getPublic());
     }
 }
