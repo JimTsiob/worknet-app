@@ -3,8 +3,10 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.EducationDTO;
 import com.example.worknet.entities.Education;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.EducationService;
+import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class EducationController {
 
     @Autowired
     private EducationService educationService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -47,11 +52,14 @@ public class EducationController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addEducation(@RequestBody EducationDTO educationDTO) {
+    public ResponseEntity<?> addEducation(@RequestBody EducationDTO educationDTO, @RequestParam String email) {
         try {
             Education education = modelMapper.map(educationDTO, Education.class);
+            User user = userService.getUserByEmail(email);
 
-            educationService.addEducation(education);
+            // this is to satisfy constraint
+
+            educationService.addEducation(education, user);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Education added successfully");
         } catch (Exception e) {

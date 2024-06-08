@@ -62,9 +62,6 @@ public class RetrofitService {
                     })
                     .build();
 
-//            Gson gson = new GsonBuilder()
-//                    .setLenient()
-//                    .create();
 
             // Build Retrofit instance
             return new Retrofit.Builder()

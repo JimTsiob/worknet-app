@@ -28,7 +28,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
     TextView activityTitle;
     EditText title, companyName, location, startDate, endDate, description;
     Spinner employmentType;
-    SwitchCompat currentlyWorking, isPrivate;
+    SwitchCompat currentlyWorking, isPublic;
     Button cancelButton, submitButton;
 
     @Override
@@ -54,7 +54,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
         startDate = findViewById(R.id.startDateInput);
         endDate = findViewById(R.id.endDateInput);
         description = findViewById(R.id.descriptionInput);
-        isPrivate = findViewById(R.id.isPrivateInput);
+        isPublic = findViewById(R.id.isPublicInput);
 
         currentlyWorking = findViewById(R.id.currentlyWorkingInput);
         currentlyWorking.setOnCheckedChangeListener(
@@ -99,7 +99,6 @@ public class AddEditWorkExperience extends AppCompatActivity {
 
         employmentType.setSelection(workExperienceDTO.getEmploymentType().ordinal());
 
-        // TODO update these
-        // isPrivate.setChecked(workExperienceDTO.getIsPrivate());
+         isPublic.setChecked(workExperienceDTO.getIsPublic());
     }
 }

@@ -1,20 +1,19 @@
 package com.syrtsiob.worknet.model;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
 public class EducationDTO implements Serializable {
 
     private String school;
     private String degree;
     private String fieldOfStudy;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate startDate;
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endDate;
-    private Float grade;
+    private String startDate;
+    private String endDate;
+    private String grade;
     private String description;
     private SmallUserDTO user;
+
+    private Boolean isPublic;
 
 
     public String getSchool() {
@@ -41,27 +40,27 @@ public class EducationDTO implements Serializable {
         this.fieldOfStudy = fieldOfStudy;
     }
 
-    public LocalDate getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
-    public Float getGrade() {
+    public String getGrade() {
         return grade;
     }
 
-    public void setGrade(Float grade) {
+    public void setGrade(String grade) {
         this.grade = grade;
     }
 
@@ -79,5 +78,13 @@ public class EducationDTO implements Serializable {
 
     public void setUser(SmallUserDTO user) {
         this.user = user;
+    }
+
+    public Boolean getPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(Boolean aPublic) {
+        isPublic = aPublic;
     }
 }

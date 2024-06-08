@@ -9,8 +9,10 @@ public class UserDTO {
     private String email;
     private String phoneNumber;
     private String jwtToken;
+    private String password;
+    private String profilePicture;
     private List<CustomFileDTO> files;
-    private List<SmallUserDTO> connections;
+    private List<ConnectionDTO> connections;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
     private List<SmallPostDTO> posts;
@@ -18,6 +20,7 @@ public class UserDTO {
     private List<SkillDTO> skills;
     private List<EducationDTO> educations;
     private List<NotificationDTO> notifications;
+    private List<WorkExperienceDTO> workExperiences;
 
 
     public UserDTO() {}
@@ -70,6 +73,22 @@ public class UserDTO {
         this.jwtToken = jwtToken;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
+    }
+
+    public String getProfilePicture(){
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture){
+        this.profilePicture = profilePicture;
+    }
+
     public List<CustomFileDTO> getFiles() {
         return files;
     }
@@ -78,11 +97,11 @@ public class UserDTO {
         this.files = files;
     }
 
-    public List<SmallUserDTO> getConnections() {
+    public List<ConnectionDTO> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<SmallUserDTO> connections) {
+    public void setConnections(List<ConnectionDTO> connections) {
         this.connections = connections;
     }
 
@@ -140,5 +159,13 @@ public class UserDTO {
 
     public void setPosts(List<SmallPostDTO> posts) {
         this.posts = posts;
+    }
+
+    public List<WorkExperienceDTO> getWorkExperiences() {
+        return workExperiences;
+    }
+
+    public void setWorkExperiences(List<WorkExperienceDTO> workExperiences) {
+        this.workExperiences = workExperiences;
     }
 }

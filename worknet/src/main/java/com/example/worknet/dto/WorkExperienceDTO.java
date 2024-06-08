@@ -1,19 +1,32 @@
 package com.example.worknet.dto;
 
 import com.example.worknet.enums.EmploymentType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 
 public class WorkExperienceDTO {
+    private Long id;
     private String title;
     private EmploymentType employmentType;
     private String companyName;
     private String location;
     private boolean currentlyWorking;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate endDate;
     private String description;
     private SmallUserDTO user;
     private Boolean isPublic;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -87,11 +100,11 @@ public class WorkExperienceDTO {
         this.user = user;
     }
 
-    public Boolean getPublic() {
+    public Boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

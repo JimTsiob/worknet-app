@@ -22,16 +22,7 @@ public class SecurityConfig {
             auth.requestMatchers("/**").permitAll();
             auth.anyRequest().authenticated();
         }).csrf(AbstractHttpConfigurer::disable)
-//                .formLogin(formLogin -> formLogin
-//                        .loginPage("/users/login")
-//                        .defaultSuccessUrl("/users/") // Redirect to homepage on successful login
-//                )
-//                .logout(logout ->
-//                        logout.deleteCookies("remove")
-//                                .invalidateHttpSession(false)
-//                                .logoutUrl("/logout")
-//                                .logoutSuccessUrl("/login") // Redirect to login page with logout message
-                /*)*/.build();
+        .build();
     }
 
 

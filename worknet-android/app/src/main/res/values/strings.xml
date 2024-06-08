@@ -4,9 +4,11 @@
     <string name="login">Login</string>
     <string name="e_mail">E-Mail</string>
     <string name="password">Password</string>
+    <string name="phone">Phone number</string>
     <string name="click_to_login">Click to login</string>
     <string name="fill_with_password">Password</string>
     <string name="fill_with_email">Email</string>
+    <string name="fill_with_phone">Phone</string>
     <string name="repeat_password">Repeat Password</string>
     <string name="name">Name</string>
     <string name="surname">Surname</string>
@@ -52,7 +54,7 @@
     <string name="end_date">End Date</string>
     <string name="grade">Grade</string>
     <string name="description">Description</string>
-    <string name="is_private_information">Is private information</string>
+    <string name="is_public_information">Is public information</string>
     <string name="add_education_title">Add a new Education entry</string>
     <string name="edit_education_title">Edit your Education entry</string>
     <string name="add_work_experience_title">Add your Work Experience</string>

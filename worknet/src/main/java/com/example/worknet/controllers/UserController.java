@@ -21,10 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -71,6 +67,19 @@ public class UserController {
             return ResponseEntity.ok(userDTO);
         }else{
             String errorMessage = "User with ID " + id + " not found.";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
+
+        UserDTO userDTO =  modelMapper.map(user, UserDTO.class);
+        if (userDTO != null){
+            return ResponseEntity.ok(userDTO);
+        }else{
+            String errorMessage = "User with email " + email + " not found.";
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
         }
     }
@@ -285,8 +294,8 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestBody LoginUserDTO loginUserDTO) {
-        User user = userService.getUserByEmail(loginUserDTO.getEmail());
+    public ResponseEntity<?> logoutUser(@RequestParam String email) {
+        User user = userService.getUserByEmail(email);
         if (user == null) {
             return new ResponseEntity<>("User does not exist.", HttpStatus.BAD_REQUEST);
         }
@@ -309,9 +318,34 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User with ID " + id + " does not exist.");
             }
 
-            modelMapper.map(userDTO, existingUser);
+            List<User> users = userService.getAllUsers(); 
+            
+            User checkForEmail = modelMapper.map(userDTO, User.class);
 
-            userService.updateUser(id, existingUser);
+            // examine all other users apart from the one we're updating.
+            boolean emailFound = users.stream()
+                    .anyMatch(user -> !user.getId().equals(checkForEmail.getId()) &&
+                            user.getEmail().equals(checkForEmail.getEmail()));
+
+            boolean isPasswordMatch = existingUser.getPassword().equals(userDTO.getPassword());
+
+            // if password hasn't changed don't rehash it, instead just add the new email and update user.
+            if (isPasswordMatch) {
+                modelMapper.map(userDTO, existingUser);
+
+                userService.updateUser(id, existingUser);
+
+            }else{// this else statement works both for only password changes and email changes.
+                modelMapper.map(userDTO, existingUser);
+
+                existingUser.setPassword(passwordEncoder.encode(existingUser.getPassword()));
+
+                if (emailFound){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("This email already exists in the database.");
+                }
+
+                userService.updateUser(id, existingUser);
+            }
 
             return ResponseEntity.ok("User updated successfully");
         } catch (Exception e) {
