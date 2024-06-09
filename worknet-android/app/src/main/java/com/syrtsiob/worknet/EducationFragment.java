@@ -21,6 +21,7 @@ import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.interfaces.EducationService;
 import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.model.ConnectionDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
@@ -44,7 +45,7 @@ public class EducationFragment extends Fragment {
 
     private int itemsDisplayed = 0; // these two variables are used to prevent duplicate service calls.
 
-    private int educationListSize = 0; // used for showing empty text
+    private int educationListSize = 0; // used for showing empty text after all educations have been deleted.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -104,33 +105,12 @@ public class EducationFragment extends Fragment {
                         }
 
                         if (educations.isEmpty()){
-                            TextView noEducationsTextView = new TextView(getActivity());
-                            noEducationsTextView.setText("You have no education added yet. \n");
-                            noEducationsTextView.setTextSize(20); // Set desired text size
-                            noEducationsTextView.setTextColor(Color.BLACK);
 
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            params.setMargins(200, 300, 16, 16);
-                            noEducationsTextView.setLayoutParams(params);
+                            if (itemsDisplayed >= requiredItems){ // removes duplicates
+                                return;
+                            }
 
-                            educationList.addView(noEducationsTextView);
-
-                            TextView addEducationsTextView = new TextView(getActivity());
-                            addEducationsTextView.setText("Add some with the button above!");
-                            addEducationsTextView.setTextSize(20);
-                            addEducationsTextView.setTextColor(Color.BLACK);
-
-                            LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT
-                            );
-                            params2.setMargins(200, 5, 16, 16);
-                            addEducationsTextView.setLayoutParams(params2);
-
-                            educationList.addView(addEducationsTextView);
+                            showEmptyEducation();
                         }else{
                             for (EducationDTO education: educations){
                                 if (itemsDisplayed >= requiredItems){
@@ -168,8 +148,9 @@ public class EducationFragment extends Fragment {
                     if (response.isSuccessful()){
                         List<EducationDTO> educations = response.body().getEducations();
 
-                        if (educations.isEmpty()){
-                            showEmptyEducation();
+                        // if connection has no educations, or all educations are private show empty text
+                        if (educations.isEmpty() || isAllPrivateInfo(response.body())){
+                            showConnectionEmptyEducation();
                         }else{
                             for (EducationDTO education: educations){
                                 if (education.getIsPublic()){ // show only public educations
@@ -188,6 +169,25 @@ public class EducationFragment extends Fragment {
                 }
             });
         });
+    }
+
+    /*
+    * Method used for showing empty text on connections that have all their info private.
+    * */
+    public boolean isAllPrivateInfo(UserDTO connection){
+        int privateCounter = 0;
+
+        for (EducationDTO e: connection.getEducations()){
+            if (!e.getIsPublic()){
+                privateCounter += 1;
+            }
+        }
+
+        if (privateCounter == connection.getEducations().size()){
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -267,7 +267,25 @@ public class EducationFragment extends Fragment {
         params2.setMargins(200, 5, 16, 16);
         addEducationsTextView.setLayoutParams(params2);
 
+        itemsDisplayed += 1;
+
         educationList.addView(addEducationsTextView);
+    }
+
+    private void showConnectionEmptyEducation(){
+        TextView noEducationsTextView = new TextView(getActivity());
+        noEducationsTextView.setText("This connection has no educations added.");
+        noEducationsTextView.setTextSize(20); // Set desired text size
+        noEducationsTextView.setTextColor(Color.BLACK);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(100, 300, 16, 16);
+        noEducationsTextView.setLayoutParams(params);
+
+        educationList.addView(noEducationsTextView);
     }
 
     private void AddEducationListEntry(EducationDTO educationDTO) {
@@ -344,17 +362,5 @@ public class EducationFragment extends Fragment {
         });
 
         educationList.addView(educationListEntry);
-    }
-
-    public boolean educationEquals(EducationDTO education1, EducationDTO education2) {
-        if (education1.getSchool().trim().equals(education2.getSchool().trim()) ||
-                education1.getDegree().trim().equals(education2.getDegree().trim()) ||
-                education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) ||
-                education1.getStartDate().equals(education2.getStartDate()) ||
-                education1.getEndDate().equals(education2.getEndDate())) {
-            return true;
-        }
-
-        return false;
     }
 }

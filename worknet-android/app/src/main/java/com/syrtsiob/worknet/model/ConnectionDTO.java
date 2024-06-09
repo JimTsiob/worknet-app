@@ -11,6 +11,9 @@ public class ConnectionDTO {
     private String profilePicture;
     private List<WorkExperienceDTO> workExperiences;
 
+    private List<EducationDTO> educations;
+    private List<SkillDTO> skills;
+
     private List<CustomFileDTO> files;
 
     public Long getId() {
@@ -67,5 +70,21 @@ public class ConnectionDTO {
 
     public void setFiles(List<CustomFileDTO> files) {
         this.files = files;
+    }
+
+    public List<EducationDTO> getEducations() {
+        return educations;
+    }
+
+    public void setEducations(List<EducationDTO> educations) {
+        this.educations = educations;
+    }
+
+    public List<SkillDTO> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<SkillDTO> skills) {
+        this.skills = skills;
     }
 }
