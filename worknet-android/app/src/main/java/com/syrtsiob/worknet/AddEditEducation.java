@@ -162,18 +162,6 @@ public class AddEditEducation extends AppCompatActivity {
         });
     }
 
-    public boolean educationEquals(EducationDTO education1, EducationDTO education2) {
-        if (education1.getSchool().trim().equals(education2.getSchool().trim()) &&
-                education1.getDegree().trim().equals(education2.getDegree().trim()) &&
-                education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) &&
-                education1.getStartDate().equals(education2.getStartDate()) &&
-                education1.getEndDate().equals(education2.getEndDate())) {
-            return true;
-        }
-
-        return false;
-    }
-
     private boolean ValidateDate(String startDateStr, String endDateStr){
         // ensure all dates are dd-MM-yyyy format
         // and that start date is not greater than end date.
