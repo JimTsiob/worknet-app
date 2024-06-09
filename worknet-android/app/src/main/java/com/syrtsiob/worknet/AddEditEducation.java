@@ -1,21 +1,14 @@
 package com.syrtsiob.worknet;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.interfaces.EducationService;
@@ -26,7 +19,6 @@ import com.syrtsiob.worknet.retrofit.RetrofitService;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.ListIterator;
 
 import retrofit2.Call;
@@ -41,7 +33,11 @@ public class AddEditEducation extends AppCompatActivity {
     static final String ACTIVITY_MODE = "activity_mode";
     static final String SERIALIZABLE = "serializable";
 
+    static final Long EDUCATION_ID = 0L;
+
     String activityMode;
+
+    Long educationId;
 
     TextView activityTitle;
     EditText school, degree, fieldOfStudy, startDate, endDate, grade, description;
@@ -54,6 +50,7 @@ public class AddEditEducation extends AppCompatActivity {
         setContentView(R.layout.activity_add_edit_education);
 
         activityMode = getIntent().getStringExtra(ACTIVITY_MODE);
+        educationId = getIntent().getLongExtra(EDUCATION_ID.toString(), 0L);
 
         activityTitle = findViewById(R.id.activityTitle);
         if (activityMode.equals(ADD_MODE))
@@ -129,17 +126,7 @@ public class AddEditEducation extends AppCompatActivity {
                         }
                     });
                 }else if (activityMode.equals(EDIT_MODE)){
-                    List<EducationDTO> educations = userDTO.getEducations();
-                    Long id = 0L;
-
-                    for (EducationDTO e: educations){
-                        if (educationEquals(educationDTO, e)){
-                            id = e.getId();
-                        }
-                    }
-
-                    Long finalId = id;
-                    educationService.updateEducation(id, educationDTO).enqueue(new Callback<String>() {
+                    educationService.updateEducation(educationId, educationDTO).enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
                             if (response.isSuccessful()) {
@@ -149,9 +136,9 @@ public class AddEditEducation extends AppCompatActivity {
                                 ListIterator<EducationDTO> iterator = userDTO.getEducations().listIterator();
                                 while (iterator.hasNext()) {
                                     EducationDTO next = iterator.next();
-                                    if (next.getId() == finalId) {
+                                    if (next.getId() == educationId) {
                                         //Replace element
-                                        educationDTO.setId(finalId);
+                                        educationDTO.setId(educationId);
                                         iterator.set(educationDTO);
                                     }
                                 }
@@ -176,10 +163,10 @@ public class AddEditEducation extends AppCompatActivity {
     }
 
     public boolean educationEquals(EducationDTO education1, EducationDTO education2) {
-        if (education1.getSchool().trim().equals(education2.getSchool().trim()) ||
-                education1.getDegree().trim().equals(education2.getDegree().trim()) ||
-                education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) ||
-                education1.getStartDate().equals(education2.getStartDate()) ||
+        if (education1.getSchool().trim().equals(education2.getSchool().trim()) &&
+                education1.getDegree().trim().equals(education2.getDegree().trim()) &&
+                education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) &&
+                education1.getStartDate().equals(education2.getStartDate()) &&
                 education1.getEndDate().equals(education2.getEndDate())) {
             return true;
         }

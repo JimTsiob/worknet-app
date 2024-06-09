@@ -44,10 +44,10 @@ public class EducationServiceImpl implements EducationService {
     }
 
     public boolean educationEquals(Education education1, Education education2) {
-        if (education1.getSchool().trim().equals(education2.getSchool().trim()) ||
-            education1.getDegree().trim().equals(education2.getDegree().trim()) ||
-            education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) ||
-            education1.getStartDate().equals(education2.getStartDate()) ||
+        if (education1.getSchool().trim().equals(education2.getSchool().trim()) &&
+            education1.getDegree().trim().equals(education2.getDegree().trim()) &&
+            education1.getFieldOfStudy().trim().equals(education2.getFieldOfStudy().trim()) &&
+            education1.getStartDate().equals(education2.getStartDate()) &&
             education1.getEndDate().equals(education2.getEndDate())) {
             return true;
         }
