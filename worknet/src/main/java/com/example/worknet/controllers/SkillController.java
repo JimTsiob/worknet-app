@@ -58,7 +58,7 @@ public class SkillController {
             User user = userService.getUserByEmail(email);
             List<Skill> skills = user.getSkills();
 
-            // do not allow same education to be added twice
+            // do not allow same skill to be added twice
             for (Skill s: skills) {
                 if (skillService.equalsSkill(skill,s)){
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same skill twice.");

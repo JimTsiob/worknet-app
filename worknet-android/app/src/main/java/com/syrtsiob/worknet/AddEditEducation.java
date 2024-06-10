@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.interfaces.EducationService;
+import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;

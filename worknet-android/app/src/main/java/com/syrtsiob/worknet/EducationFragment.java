@@ -19,16 +19,13 @@ import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.interfaces.EducationService;
-import com.syrtsiob.worknet.interfaces.UserService;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.services.EducationService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import retrofit2.Call;
 import retrofit2.Callback;

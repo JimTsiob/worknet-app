@@ -1,5 +1,6 @@
 package com.example.worknet.services;
 
+import com.example.worknet.entities.User;
 import com.example.worknet.entities.WorkExperience;
 import com.example.worknet.repositories.WorkExperienceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,9 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
         return workExperienceRepository.findAll();
     }
 
-    public WorkExperience addWorkExperience(WorkExperience workExperience) {
+    public WorkExperience addWorkExperience(WorkExperience workExperience, User user) {
+        user.getWorkExperiences().add(workExperience);
+
         return workExperienceRepository.save(workExperience);
     }
 
@@ -37,5 +40,18 @@ public class WorkExperienceServiceImpl implements WorkExperienceService {
 
     public void deleteWorkExperience(Long id) {
         workExperienceRepository.deleteById(id);
+    }
+
+    public boolean equalsWorkExperience(WorkExperience workExperience1, WorkExperience workExperience2){
+        if (workExperience1.getTitle().trim().equalsIgnoreCase(workExperience2.getTitle().trim()) &&
+            workExperience1.getCompanyName().trim().equalsIgnoreCase(workExperience2.getCompanyName().trim()) &&
+            workExperience1.getEmploymentType().toString().trim().equalsIgnoreCase(workExperience2.getEmploymentType().toString().trim()) &&
+            workExperience1.getStartDate().equals(workExperience2.getStartDate()) &&
+            workExperience1.getEndDate().equals(workExperience2.getEndDate()) &&
+            workExperience1.getUser().getId() == workExperience2.getUser().getId()) {
+            return true;
+        }
+
+        return false;
     }
 }

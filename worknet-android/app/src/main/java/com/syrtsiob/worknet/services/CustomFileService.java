@@ -1,4 +1,4 @@
-package com.syrtsiob.worknet.interfaces;
+package com.syrtsiob.worknet.services;
 
 import okhttp3.MultipartBody;
 import retrofit2.http.Multipart;

@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public class WorkExperienceDTO implements Serializable {
 
+    private Long id;
     private String title;
     private EmploymentType employmentType;
     private String companyName;
@@ -17,6 +18,14 @@ public class WorkExperienceDTO implements Serializable {
     private SmallUserDTO user;
 
     private boolean isPublic;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
@@ -50,7 +59,7 @@ public class WorkExperienceDTO implements Serializable {
         this.location = location;
     }
 
-    public boolean isCurrentlyWorking() {
+    public boolean getCurrentlyWorking() {
         return currentlyWorking;
     }
 

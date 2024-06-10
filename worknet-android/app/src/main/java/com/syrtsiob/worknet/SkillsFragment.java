@@ -19,10 +19,8 @@ import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.interfaces.EducationService;
-import com.syrtsiob.worknet.interfaces.SkillService;
-import com.syrtsiob.worknet.interfaces.UserService;
-import com.syrtsiob.worknet.model.EducationDTO;
+import com.syrtsiob.worknet.services.SkillService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
@@ -55,8 +53,8 @@ public class SkillsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        // if the user wants to see a connection's profile show connection's education
-        // otherwise show user's education (my profile)
+        // if the user wants to see a connection's profile show connection's skills
+        // otherwise show user's skills (my profile)
 
 
         addSkillButton = requireView().findViewById(R.id.add_skills_button);
@@ -158,12 +156,12 @@ public class SkillsFragment extends Fragment {
                     if (response.isSuccessful()){
                         List<SkillDTO> skills = response.body().getSkills();
 
-                        // if connection has no educations, or all educations are private show empty text
+                        // if connection has no skills, or all skills are private show empty text
                         if (skills.isEmpty() || isAllPrivateInfo(response.body())){
                             showConnectionEmptySkills();
                         }else{
                             for (SkillDTO skill: skills){
-                                if (skill.getIsPublic()){ // show only public educations
+                                if (skill.getIsPublic()){ // show only public skills
                                     AddConnectionSkillListEntry(skill);
                                 }
                             }
@@ -306,9 +304,9 @@ public class SkillsFragment extends Fragment {
             UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
 
                 Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-                SkillService educationService = retrofit.create(SkillService.class);
+                SkillService skillService = retrofit.create(SkillService.class);
 
-                educationService.deleteSkill(skillDTO.getId()).enqueue(new Callback<String>() {
+                skillService.deleteSkill(skillDTO.getId()).enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(Call<String> call, Response<String> response) {
                         if (response.isSuccessful()) {

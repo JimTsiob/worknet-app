@@ -2,29 +2,18 @@ package com.syrtsiob.worknet;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.enums.EmploymentType;
-import com.syrtsiob.worknet.interfaces.EducationService;
-import com.syrtsiob.worknet.interfaces.SkillService;
-import com.syrtsiob.worknet.model.EducationDTO;
+import com.syrtsiob.worknet.services.SkillService;
 import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
-import com.syrtsiob.worknet.model.WorkExperienceDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
 import java.util.ListIterator;

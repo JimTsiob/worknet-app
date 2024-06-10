@@ -1,6 +1,5 @@
 package com.example.worknet.services;
 
-import com.example.worknet.entities.Education;
 import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
@@ -53,7 +52,8 @@ public class SkillServiceImpl implements SkillService {
     }
 
     public boolean equalsSkill(Skill skill1, Skill skill2) {
-        if (skill1.getName().trim().equalsIgnoreCase(skill2.getName().trim())) {
+        if (skill1.getName().trim().equalsIgnoreCase(skill2.getName().trim()) && 
+            skill1.getUser().getId() == skill2.getUser().getId()) {
             return true;
         }
 

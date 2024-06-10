@@ -1,4 +1,4 @@
-package com.syrtsiob.worknet.interfaces;
+package com.syrtsiob.worknet.services;
 
 import com.syrtsiob.worknet.model.LoginUserDTO;
 import com.syrtsiob.worknet.model.RegisterUserDTO;
