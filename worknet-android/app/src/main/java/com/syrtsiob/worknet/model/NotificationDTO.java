@@ -1,10 +1,14 @@
 package com.syrtsiob.worknet.model;
 
+import com.syrtsiob.worknet.enums.NotificationType;
+
 public class NotificationDTO {
     private Long id;
     private String text;
     private SmallUserDTO user;
     private SmallPostDTO post;
+
+    private NotificationType notificationType;
 
     public Long getId() {
         return id;
@@ -36,5 +40,13 @@ public class NotificationDTO {
 
     public void setPost(SmallPostDTO post) {
         this.post = post;
+    }
+
+    public NotificationType getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(NotificationType notificationType) {
+        this.notificationType = notificationType;
     }
 }
