@@ -1,6 +1,8 @@
 package com.example.worknet.entities;
 
 
+import com.example.worknet.enums.NotificationType;
+import com.example.worknet.enums.WorkplaceType;
 import jakarta.persistence.*;
 
 
@@ -24,6 +26,9 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @Enumerated(EnumType.STRING)
+    private NotificationType notificationType;
 
     public Notification() {}
 
@@ -57,5 +62,13 @@ public class Notification {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public NotificationType getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(NotificationType notificationType) {
+        this.notificationType = notificationType;
     }
 }

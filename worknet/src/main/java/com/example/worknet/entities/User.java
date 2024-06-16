@@ -53,9 +53,9 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-            name = "sender_recipient",
-            joinColumns = @JoinColumn(name = "sender_id"),
-            inverseJoinColumns = @JoinColumn(name = "recipient_id")
+            name = "user_messages",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "message_id")
     )
     private List<Message> messages;
 
