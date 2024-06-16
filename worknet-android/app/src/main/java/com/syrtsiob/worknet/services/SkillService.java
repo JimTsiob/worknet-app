@@ -1,6 +1,5 @@
-package com.syrtsiob.worknet.interfaces;
+package com.syrtsiob.worknet.services;
 
-import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
 
 import retrofit2.Call;

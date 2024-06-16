@@ -1,8 +1,11 @@
 package com.example.worknet.controllers;
 
 import com.example.worknet.dto.WorkExperienceDTO;
+import com.example.worknet.entities.Skill;
+import com.example.worknet.entities.User;
 import com.example.worknet.entities.WorkExperience;
 import com.example.worknet.modelMapper.StrictModelMapper;
+import com.example.worknet.services.UserService;
 import com.example.worknet.services.WorkExperienceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,9 @@ public class WorkExperienceController {
 
     @Autowired
     private WorkExperienceService workExperienceService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -45,11 +51,20 @@ public class WorkExperienceController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addWorkExperience(@RequestBody WorkExperienceDTO workExperienceDTO) {
+    public ResponseEntity<?> addWorkExperience(@RequestBody WorkExperienceDTO workExperienceDTO, @RequestParam String email) {
         try {
             WorkExperience workExperience = modelMapper.map(workExperienceDTO, WorkExperience.class);
+            User user = userService.getUserByEmail(email);
+            List<WorkExperience> workExperiences = user.getWorkExperiences();
 
-            workExperienceService.addWorkExperience(workExperience);
+            // do not allow same work experience to be added twice
+            for (WorkExperience we: workExperiences) {
+                if (workExperienceService.equalsWorkExperience(workExperience,we)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same work experience twice.");
+                }
+            }
+
+            workExperienceService.addWorkExperience(workExperience, user);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Work experience added successfully");
         } catch (Exception e) {

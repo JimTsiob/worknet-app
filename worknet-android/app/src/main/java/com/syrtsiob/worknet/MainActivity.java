@@ -20,13 +20,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.syrtsiob.worknet.LiveData.AuthResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
-import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.CustomFileDTO;
-import com.syrtsiob.worknet.model.LoginUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 

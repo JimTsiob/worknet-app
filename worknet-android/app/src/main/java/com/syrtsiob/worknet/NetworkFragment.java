@@ -169,7 +169,7 @@ public class NetworkFragment extends Fragment {
         List<WorkExperienceDTO> workExperiences = connection.getWorkExperiences();
 
         String positionText =  workExperiences.stream()
-                .filter(WorkExperienceDTO::isCurrentlyWorking)
+                .filter(WorkExperienceDTO::getCurrentlyWorking)
                 .map(WorkExperienceDTO::getTitle)
                 .findFirst()
                 .orElse(null);
@@ -177,7 +177,7 @@ public class NetworkFragment extends Fragment {
         position.setText(positionText);
 
         String employerText =  workExperiences.stream()
-                .filter(WorkExperienceDTO::isCurrentlyWorking)
+                .filter(WorkExperienceDTO::getCurrentlyWorking)
                 .map(WorkExperienceDTO::getCompanyName)
                 .findFirst()
                 .orElse(null);

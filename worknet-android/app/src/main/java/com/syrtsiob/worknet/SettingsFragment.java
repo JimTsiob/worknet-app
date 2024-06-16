@@ -18,16 +18,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.syrtsiob.worknet.LiveData.RegisterResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.LiveData.UserEmailResultLiveData;
-import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
