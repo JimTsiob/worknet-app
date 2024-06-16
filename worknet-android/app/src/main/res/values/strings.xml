@@ -79,4 +79,6 @@
     <string name="job_title">Job Title</string>
     <string name="company">Company</string>
     <string name="workplace_type">Workplace Type</string>
+    <string name="learn_more">Learn More</string>
+    <string name="returnLabel">Return</string>
 </resources>

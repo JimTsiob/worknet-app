@@ -60,7 +60,7 @@ public class ViewMyJobPostingsFragment extends Fragment {
         viewJobPostingsContainer.addView(jobPostingEntry);
     }
 
-    private void AddJobPostingEntry(JobDTO skillDTO) {
+    private void AddJobPostingEntry(JobDTO jobDTO) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View jobPostingEntry = inflater
                 .inflate(R.layout.job_posting_entry, viewJobPostingsContainer, false);
@@ -71,11 +71,11 @@ public class ViewMyJobPostingsFragment extends Fragment {
         TextView jobLocation = jobPostingEntry.findViewById(R.id.jobLocation);
         TextView employmentType = jobPostingEntry.findViewById(R.id.employmentType);
 
-        title.setText(skillDTO.getJobTitle());
-        company.setText(skillDTO.getCompany());
-        workplaceType.setText(skillDTO.getWorkplaceType().toString());
-        jobLocation.setText(skillDTO.getJobLocation());
-        employmentType.setText(skillDTO.getEmploymentType().toString());
+        title.setText(jobDTO.getJobTitle());
+        company.setText(jobDTO.getCompany());
+        workplaceType.setText(jobDTO.getWorkplaceType().toString());
+        jobLocation.setText(jobDTO.getJobLocation());
+        employmentType.setText(jobDTO.getEmploymentType().toString());
 
         Button deleteButton = jobPostingEntry.findViewById(R.id.jobPostingButton);
         deleteButton.setText(R.string.delete);
