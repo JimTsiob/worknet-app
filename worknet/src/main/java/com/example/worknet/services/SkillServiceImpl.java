@@ -1,6 +1,7 @@
 package com.example.worknet.services;
 
 import com.example.worknet.entities.Skill;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,9 @@ public class SkillServiceImpl implements SkillService {
         return skillRepository.findAll();
     }
 
-    public Skill addSkill(Skill skill){
+    public Skill addSkill(Skill skill, User user){
+        user.getSkills().add(skill);
+
         return skillRepository.save(skill);
     }
 
@@ -46,5 +49,14 @@ public class SkillServiceImpl implements SkillService {
 
     public void deleteSkill(Long id){
         skillRepository.deleteById(id);
+    }
+
+    public boolean equalsSkill(Skill skill1, Skill skill2) {
+        if (skill1.getName().trim().equalsIgnoreCase(skill2.getName().trim()) && 
+            skill1.getUser().getId() == skill2.getUser().getId()) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class EducationDTO implements Serializable {
 
+    private Long id;
+
     private String school;
     private String degree;
     private String fieldOfStudy;
@@ -13,8 +15,15 @@ public class EducationDTO implements Serializable {
     private String description;
     private SmallUserDTO user;
 
-    private Boolean isPublic;
+    private boolean isPublic;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getSchool() {
         return school;
@@ -80,11 +89,11 @@ public class EducationDTO implements Serializable {
         this.user = user;
     }
 
-    public Boolean getPublic() {
+    public boolean getIsPublic() {
         return isPublic;
     }
 
-    public void setPublic(Boolean aPublic) {
-        isPublic = aPublic;
+    public void setIsPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 }

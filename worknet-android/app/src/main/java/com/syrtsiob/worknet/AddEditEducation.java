@@ -7,12 +7,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.interfaces.EducationService;
+import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
@@ -20,6 +19,7 @@ import com.syrtsiob.worknet.retrofit.RetrofitService;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ListIterator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,7 +33,11 @@ public class AddEditEducation extends AppCompatActivity {
     static final String ACTIVITY_MODE = "activity_mode";
     static final String SERIALIZABLE = "serializable";
 
+    static final Long EDUCATION_ID = 0L;
+
     String activityMode;
+
+    Long educationId;
 
     TextView activityTitle;
     EditText school, degree, fieldOfStudy, startDate, endDate, grade, description;
@@ -46,6 +50,7 @@ public class AddEditEducation extends AppCompatActivity {
         setContentView(R.layout.activity_add_edit_education);
 
         activityMode = getIntent().getStringExtra(ACTIVITY_MODE);
+        educationId = getIntent().getLongExtra(EDUCATION_ID.toString(), 0L);
 
         activityTitle = findViewById(R.id.activityTitle);
         if (activityMode.equals(ADD_MODE))
@@ -92,7 +97,7 @@ public class AddEditEducation extends AppCompatActivity {
 
                 EducationDTO educationDTO = new EducationDTO();
                 boolean isPublicChecked = isPublic.isChecked();
-                educationDTO.setPublic(isPublicChecked);
+                educationDTO.setIsPublic(isPublicChecked);
                 educationDTO.setGrade(grade.getText().toString());
                 educationDTO.setDegree(degree.getText().toString());
                 educationDTO.setDescription(description.getText().toString());
@@ -108,7 +113,6 @@ public class AddEditEducation extends AppCompatActivity {
                         public void onResponse(Call<String> call, Response<String> response) {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditEducation.this, "added education successfully.", Toast.LENGTH_LONG).show();
-                                UserDtoResultLiveData.getInstance().setValue(userDTO);
                             } else {
                                 Toast.makeText(AddEditEducation.this, "education addition failed. Check the format.", Toast.LENGTH_LONG).show();
                             }
@@ -121,23 +125,41 @@ public class AddEditEducation extends AppCompatActivity {
                             Toast.makeText(AddEditEducation.this, "education addition failed. Server failure.", Toast.LENGTH_LONG).show();
                         }
                     });
-                }else{
+                }else if (activityMode.equals(EDIT_MODE)){
+                    educationService.updateEducation(educationId, educationDTO).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(AddEditEducation.this, "updated education successfully.", Toast.LENGTH_LONG).show();
 
+                                // Replace old education with new one in the userDTO list.
+                                ListIterator<EducationDTO> iterator = userDTO.getEducations().listIterator();
+                                while (iterator.hasNext()) {
+                                    EducationDTO next = iterator.next();
+                                    if (next.getId() == educationId) {
+                                        //Replace element
+                                        educationDTO.setId(educationId);
+                                        iterator.set(educationDTO);
+                                    }
+                                }
+
+                            } else {
+                                Toast.makeText(AddEditEducation.this, "education update failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            // Handle the error
+                            Log.e("fail: ", t.getLocalizedMessage());
+                        }
+                    });
                 }
-
-
             });
+
 
             finish();
         });
-
-        OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finish();
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, finishWhenBackPressed);
     }
 
     private boolean ValidateDate(String startDateStr, String endDateStr){
@@ -218,6 +240,6 @@ public class AddEditEducation extends AppCompatActivity {
         endDate.setText(educationDTO.getEndDate());
         description.setText(educationDTO.getDescription());
         grade.setText(educationDTO.getGrade());
-        isPublic.setChecked(educationDTO.getPublic());
+        isPublic.setChecked(educationDTO.getIsPublic());
     }
 }

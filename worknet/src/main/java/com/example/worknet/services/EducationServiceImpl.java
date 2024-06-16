@@ -42,4 +42,17 @@ public class EducationServiceImpl implements EducationService {
     public void deleteEducation(Long id) {
         educationRepository.deleteById(id);
     }
+
+    public boolean educationEquals(Education education1, Education education2) {
+        if (education1.getSchool().trim().equalsIgnoreCase(education2.getSchool().trim()) &&
+            education1.getDegree().trim().equalsIgnoreCase(education2.getDegree().trim()) &&
+            education1.getFieldOfStudy().trim().equalsIgnoreCase(education2.getFieldOfStudy().trim()) &&
+            education1.getStartDate().equals(education2.getStartDate()) &&
+            education1.getEndDate().equals(education2.getEndDate()) &&
+            education1.getUser().getId() == education2.getUser().getId()) {
+            return true;
+        }
+
+        return false;
+    }
 }

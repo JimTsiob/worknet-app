@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.content.ContentResolver;
-import android.database.Cursor;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,8 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.syrtsiob.worknet.LiveData.RegisterResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserEmailResultLiveData;
-import com.syrtsiob.worknet.interfaces.CustomFileService;
-import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.services.CustomFileService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.RegisterUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;

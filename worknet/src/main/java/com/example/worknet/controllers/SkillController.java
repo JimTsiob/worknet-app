@@ -1,9 +1,12 @@
 package com.example.worknet.controllers;
 
 import com.example.worknet.dto.SkillDTO;
+import com.example.worknet.entities.Education;
 import com.example.worknet.entities.Skill;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.SkillService;
+import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,9 @@ public class SkillController {
 
     @Autowired
     private SkillService skillService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -46,11 +52,20 @@ public class SkillController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addSkill(@RequestBody SkillDTO skillDTO) {
+    public ResponseEntity<?> addSkill(@RequestBody SkillDTO skillDTO, @RequestParam String email) {
         try {
             Skill skill = modelMapper.map(skillDTO, Skill.class);
+            User user = userService.getUserByEmail(email);
+            List<Skill> skills = user.getSkills();
 
-            skillService.addSkill(skill);
+            // do not allow same skill to be added twice
+            for (Skill s: skills) {
+                if (skillService.equalsSkill(skill,s)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same skill twice.");
+                }
+            }
+
+            skillService.addSkill(skill, user);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Skill added successfully");
         } catch (Exception e) {

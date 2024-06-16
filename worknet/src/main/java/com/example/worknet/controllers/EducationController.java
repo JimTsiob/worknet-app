@@ -56,6 +56,14 @@ public class EducationController {
         try {
             Education education = modelMapper.map(educationDTO, Education.class);
             User user = userService.getUserByEmail(email);
+            List<Education> educations = user.getEducations();
+
+            // do not allow same education to be added twice
+            for (Education e: educations) {
+                if (educationService.educationEquals(education,e)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same education twice.");
+                }
+            }
 
             // this is to satisfy constraint
 

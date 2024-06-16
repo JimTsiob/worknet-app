@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.syrtsiob.worknet.LiveData.AuthResultLiveData;
-import com.syrtsiob.worknet.interfaces.UserService;
+import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.LoginUserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
