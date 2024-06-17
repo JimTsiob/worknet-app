@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
 
@@ -69,7 +70,21 @@ public class NotificationsFragment extends Fragment {
         text.setText(notificationDTO.getText());
 
         notificationEntry.setOnClickListener(listener -> {
-            // TODO implement switch based on context
+            NotificationType notificationType = notificationDTO.getNotificationType();
+            switch (notificationType) {
+                case CONNECTION:
+                    // TODO implement
+                    break;
+                case APPLY_TO_JOB_POST:
+                    // TODO implement
+                    break;
+                case LIKE_POST:
+                    // TODO implement
+                    break;
+                case MESSAGE:
+                    // TODO implement
+                    break;
+            }
         });
 
         notificationContainer.addView(notificationEntry);
