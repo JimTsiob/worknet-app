@@ -80,7 +80,7 @@ public class AddEditEducation extends AppCompatActivity {
 
         submitButton.setOnClickListener(listener -> {
 
-            if (!isEmptyField())
+            if (isEmptyField())
                 return;
 
             if (!ValidateDate(startDate.getText().toString(), endDate.getText().toString()))
@@ -187,40 +187,40 @@ public class AddEditEducation extends AppCompatActivity {
         // no empty fields allowed
         if (school.getText().toString().isEmpty()){
             Toast.makeText(this, "School cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (degree.getText().toString().isEmpty()){
             Toast.makeText(this, "Degree cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (fieldOfStudy.getText().toString().isEmpty()){
             Toast.makeText(this, "Field of study cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (startDate.getText().toString().isEmpty()){
             Toast.makeText(this, "Start date cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (endDate.getText().toString().isEmpty()){
             Toast.makeText(this, "End date cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (grade.getText().toString().isEmpty()){
             Toast.makeText(this, "Grade cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (description.getText().toString().isEmpty()){
             Toast.makeText(this, "Description cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void PopulateInputs(EducationDTO educationDTO) {
