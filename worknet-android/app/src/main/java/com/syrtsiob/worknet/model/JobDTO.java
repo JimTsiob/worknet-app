@@ -3,9 +3,10 @@ package com.syrtsiob.worknet.model;
 import com.syrtsiob.worknet.enums.EmploymentType;
 import com.syrtsiob.worknet.enums.WorkplaceType;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class JobDTO {
+public class JobDTO implements Serializable {
 
     private Long id;
     private String jobTitle;

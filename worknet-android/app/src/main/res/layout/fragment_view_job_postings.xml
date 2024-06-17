@@ -3,11 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NotificationsFragment">
+    tools:context=".ViewJobPostingsFragment">
+
     <LinearLayout
-        android:id="@+id/notificationContainer"
+        android:id="@+id/viewJobPostingsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
     </LinearLayout>
+
 </ScrollView>
