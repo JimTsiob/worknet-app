@@ -16,6 +16,8 @@ public class UserDTO {
     private String profilePicture;
     private List<CustomFileDTO> files;
     private List<ConnectionDTO> connections;
+
+    private List<JobDTO> jobs;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
     private List<MessageDTO> messages;
@@ -107,6 +109,14 @@ public class UserDTO {
 
     public void setConnections(List<ConnectionDTO> connections) {
         this.connections = connections;
+    }
+
+    public List<JobDTO> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<JobDTO> jobs) {
+        this.jobs = jobs;
     }
 
     public List<SmallJobDTO> getAppliedJobs() {

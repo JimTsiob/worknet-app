@@ -14,6 +14,8 @@ public class JobDTO implements Serializable {
     private WorkplaceType workplaceType;
     private String jobLocation;
     private EmploymentType employmentType;
+
+    private String description;
     private SmallUserDTO jobPoster;
     private List<SmallUserDTO> interestedUsers;
     private List<ViewDTO> views;
@@ -66,6 +68,14 @@ public class JobDTO implements Serializable {
 
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public SmallUserDTO getJobPoster() {

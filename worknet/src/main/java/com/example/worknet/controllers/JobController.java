@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -48,11 +49,11 @@ public class JobController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addJob(@RequestBody JobDTO jobDTO) {
+    public ResponseEntity<?> addJob(@RequestBody JobDTO jobDTO, @RequestParam List<String> skillNames) {
         try {
             Job job = modelMapper.map(jobDTO, Job.class);
 
-            jobService.addJob(job);
+            jobService.addJob(job, skillNames);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Job added successfully");
         } catch (Exception e) {
@@ -75,7 +76,7 @@ public class JobController {
     
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody JobDTO jobDTO) {
+    public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody JobDTO jobDTO, @RequestParam List<String> skillNames) {
         try {
 
             Job existingJob = jobService.getJobById(id);
@@ -85,7 +86,7 @@ public class JobController {
 
             modelMapper.map(jobDTO, existingJob);
 
-            jobService.updateJob(id, existingJob);
+            jobService.updateJob(id, existingJob, skillNames);
 
             return ResponseEntity.ok("Job updated successfully");
         } catch (Exception e) {
@@ -110,7 +111,9 @@ public class JobController {
             }
 
             existingJob.getInterestedUsers().clear();
-            jobService.updateJob(id, existingJob);
+            List<String> emptyList = new ArrayList<>();
+
+            jobService.updateJob(id, existingJob, emptyList);
 
             jobService.deleteJob(id);
 
