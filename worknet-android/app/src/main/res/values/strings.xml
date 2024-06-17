@@ -68,4 +68,17 @@
     <string name="edit_skill_title">Edit your skill</string>
     <string name="your_skill">Your Skill</string>
     <string name="logout">Logout</string>
+    <string name="make_a_new_post">Make a new post</string>
+    <string name="add_image">+ Image</string>
+    <string name="add_video">+ Video</string>
+    <string name="add_audio">+ Audio</string>
+    <string name="add_post">+ Post</string>
+    <string name="create_job_posting">Create Job Posting</string>
+    <string name="apply">Apply</string>
+    <string name="create_a_new_job_posting">Create a new Job Posting</string>
+    <string name="job_title">Job Title</string>
+    <string name="company">Company</string>
+    <string name="workplace_type">Workplace Type</string>
+    <string name="learn_more">Learn More</string>
+    <string name="returnLabel">Return</string>
 </resources>
