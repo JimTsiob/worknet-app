@@ -96,7 +96,7 @@ public class AddEditSkill extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditSkill.this, "added skill successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditSkill.this, "skill addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditSkill.this, "skill addition failed. You cannot add the same skill twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 

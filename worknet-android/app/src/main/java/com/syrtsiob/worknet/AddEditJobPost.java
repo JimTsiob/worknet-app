@@ -168,7 +168,7 @@ public class AddEditJobPost extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditJobPost.this, "added job post successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditJobPost.this, "job post addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditJobPost.this, "job post addition failed. You cannot add the same job twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 

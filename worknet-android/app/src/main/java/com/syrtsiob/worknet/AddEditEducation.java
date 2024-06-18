@@ -114,7 +114,7 @@ public class AddEditEducation extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditEducation.this, "added education successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditEducation.this, "education addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditEducation.this, "education addition failed. You cannot add the same education twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 

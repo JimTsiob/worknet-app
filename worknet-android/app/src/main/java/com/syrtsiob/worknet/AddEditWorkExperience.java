@@ -158,7 +158,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditWorkExperience.this, "added work experience successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditWorkExperience.this, "work experience addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditWorkExperience.this, "work experience addition failed. You cannot add the same work experience twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 

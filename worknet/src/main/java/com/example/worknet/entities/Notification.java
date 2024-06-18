@@ -2,7 +2,6 @@ package com.example.worknet.entities;
 
 
 import com.example.worknet.enums.NotificationType;
-import com.example.worknet.enums.WorkplaceType;
 import jakarta.persistence.*;
 
 

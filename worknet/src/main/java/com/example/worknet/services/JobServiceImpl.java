@@ -2,6 +2,7 @@ package com.example.worknet.services;
 
 import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Skill;
+import com.example.worknet.entities.WorkExperience;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.JobRepository;
 import com.example.worknet.repositories.SkillRepository;
@@ -151,5 +152,18 @@ public class JobServiceImpl implements JobService {
 
         jobRepository.save(job);
         
+    }
+
+    public boolean equalsJob(Job job1, Job job2){
+        if (job1.getJobTitle().trim().equalsIgnoreCase(job2.getJobTitle().trim()) &&
+            job1.getCompany().trim().equalsIgnoreCase(job2.getCompany().trim()) &&
+            job1.getEmploymentType().toString().trim().equalsIgnoreCase(job2.getEmploymentType().toString().trim()) &&
+            job1.getJobLocation().trim().equalsIgnoreCase(job2.getJobLocation().trim()) &&
+            job1.getWorkplaceType().toString().trim().equalsIgnoreCase(job2.getWorkplaceType().toString().trim()) &&
+            job1.getJobPoster().getId() == job2.getJobPoster().getId()) {
+            return true;
+        }
+
+        return false;
     }
 }

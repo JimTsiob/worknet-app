@@ -11,4 +11,5 @@ public interface JobService {
     Job updateJob(Long id,Job job, List<String> skillNames);
     void deleteJob(Long id);
     void addSkill(Long id, String skillName);
+    boolean equalsJob(Job job1, Job job2);
 }

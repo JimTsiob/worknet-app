@@ -2,9 +2,12 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.JobDTO;
 import com.example.worknet.entities.Job;
+import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.JobService;
+import com.example.worknet.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,9 @@ public class JobController {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -52,6 +58,16 @@ public class JobController {
     public ResponseEntity<?> addJob(@RequestBody JobDTO jobDTO, @RequestParam List<String> skillNames) {
         try {
             Job job = modelMapper.map(jobDTO, Job.class);
+
+            User user = userService.getUserById(job.getJobPoster().getId());
+            List<Job> jobs = user.getJobs();
+
+            // do not allow same job post to be added twice
+            for (Job j: jobs) {
+                if (jobService.equalsJob(job,j)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same job post twice.");
+                }
+            }
 
             jobService.addJob(job, skillNames);
 
