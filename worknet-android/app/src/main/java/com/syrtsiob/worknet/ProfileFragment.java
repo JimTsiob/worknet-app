@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.CustomFileDTO;
@@ -109,6 +110,25 @@ public class ProfileFragment extends Fragment {
         profileViewPagerAdapter = new ProfileViewPagerAdapter(this);
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
+
+        // if user comes here to see an applicant show the applicant's profile.
+        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
+                    if (applicantDTO != null) {
+                        ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                        String profilePicName = applicantDTO.getProfilePicture();
+                        List<CustomFileDTO> files = applicantDTO.getFiles();
+                        Optional<CustomFileDTO> profilePicture = files.stream()
+                                .filter(file -> file.getFileName().equals(profilePicName))
+                                .findFirst();
+                        if (profilePicture.isPresent()) {
+                            Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                            profilePic.setImageBitmap(bitmap);
+                        }
+
+                        TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                        fullName.setText(applicantDTO.getFirstName() + " " + applicantDTO.getLastName());
+                    }
+                });
 
         // if user clicks on connection profile show connection profile elements.
         // Otherwise show own profile elements.

@@ -114,6 +114,8 @@ public class UserController {
         List<Skill> userSkills = user.getSkills();
         List<Job> jobs = jobService.getAllJobs();
 
+        List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
+
         // recommendation by matrix factorization on user's connections
         if (!connections.isEmpty()) {
             List<View> connectionViews = new ArrayList<>();
@@ -140,13 +142,10 @@ public class UserController {
             List<Job> recommendedJobs = recommendationSystem.getRecommendedJobs(user, connectionJobs);
 
             // turn them to DTOs and return
-            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
             for (Job recommendedJob : recommendedJobs) {
                 SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
                 recommendedJobDTOs.add(recommendedJobDTO);
             }
-
-            return ResponseEntity.ok(recommendedJobDTOs);
         }
 
         // recommendation by user skills 
@@ -155,18 +154,14 @@ public class UserController {
             RecommendationSystem recommendationSystem = new RecommendationSystem();
 
             HashSet<Job> recommendedJobs = recommendationSystem.recommendJobsBySkill(user, jobs);
-            
-            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
 
             for (Job recommendedJob : recommendedJobs) {
                 SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
                 recommendedJobDTOs.add(recommendedJobDTO);
             }
-
-            return ResponseEntity.ok(recommendedJobDTOs);
         }
 
-        return new ResponseEntity<>("Add connections or skills to get recommendations for job posts!", HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(recommendedJobDTOs);
     }
 
     @PostMapping("/")
