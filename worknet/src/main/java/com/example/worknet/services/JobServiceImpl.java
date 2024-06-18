@@ -45,29 +45,16 @@ public class JobServiceImpl implements JobService {
 
         job.setSkills(skillsList);
 
-//        if (job.getSkills() == null) {
-//            List<Skill> skills = new ArrayList<>();
-//            skills.add(skill);
-//            job.setSkills(skills);
-//        }else{
-//            job.getSkills().add(skill);
-//        }
-
         return jobRepository.save(job);
     }
 
     public Job updateJob(Long id, Job job, List<String> skillNames) {
         Optional<Job> jobOptional = jobRepository.findById(id);
         if (jobOptional.isPresent()) {
-            // Delete all skills first to satisfy constraint
-            // and save new ones (or same ones in case of no updating on skills)
 
-//            for (Skill skill : job.getSkills()) {
-//                skill.getJob().remove;
-//            }
             Job existingJob = jobOptional.get();
 
-            // Remove and delete existing skills
+            // Remove and delete existing skills to satisfy constraint
             List<Skill> existingSkills = new ArrayList<>(existingJob.getSkills());
 
             for (Skill skill : existingJob.getSkills()) {
@@ -99,38 +86,6 @@ public class JobServiceImpl implements JobService {
 
             // Save the job with the new skills
             return jobRepository.save(existingJob);
-
-//            List<Skill> jobSkillsList = new ArrayList<>(job.getSkills());
-//            for (Skill s: jobSkillsList) {
-//                s.setJob(null);
-//                skillRepository.save(s);
-//            }
-//
-//            job.getSkills().removeAll(jobSkillsList);
-//
-//            jobRepository.save(job);
-//
-//            skillRepository.deleteAll(jobSkillsList);
-//
-//            List<Skill> skillsList = new ArrayList<>();
-//
-//            for (String skillName : skillNames) {
-//                Skill skill = new Skill();
-//                skill.setName(skillName);
-//                skill.setJob(job);
-//                skill.setIsPublic(true);
-//                skillsList.add(skill);
-//            }
-//
-//            Job existingJob = jobOptional.get();
-//
-//            existingJob.setSkills(skillsList);
-//
-//            StrictModelMapper modelMapper = new StrictModelMapper();
-//
-//            modelMapper.map(job, existingJob);
-//
-//            return jobRepository.save(existingJob);
         }
 
         return null;
