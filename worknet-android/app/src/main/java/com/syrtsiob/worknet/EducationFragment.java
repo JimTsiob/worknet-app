@@ -146,13 +146,13 @@ public class EducationFragment extends Fragment {
                         List<EducationDTO> educations = response.body().getEducations();
 
                         // if connection has no educations, or all educations are private show empty text
-                        if (educations.isEmpty() || isAllPrivateInfo(response.body())){
+                        if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                             showConnectionEmptyEducation();
                         }else{
                             for (EducationDTO education: educations){
-                                if (education.getIsPublic()){ // show only public educations
+                                //if (education.getIsPublic()){ // show only public educations
                                     AddConnectionEducationListEntry(education);
-                                }
+                               // }
                             }
                         }
                     }else{
@@ -233,6 +233,13 @@ public class EducationFragment extends Fragment {
 
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 50, 0, 0);
+        educationListEntry.setLayoutParams(params);
 
         educationList.addView(educationListEntry);
     }

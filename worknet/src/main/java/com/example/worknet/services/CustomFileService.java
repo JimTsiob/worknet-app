@@ -5,6 +5,7 @@ import com.example.worknet.entities.CustomFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public interface CustomFileService {
@@ -17,4 +18,5 @@ public interface CustomFileService {
     String savePostFile(MultipartFile file) throws IOException;
     String saveProfilePicture(MultipartFile file, Long userId) throws IOException;
     void deleteProfilePicture(String fileName) throws IOException;
+    String encodeInputStreamToBase64(InputStream inputStream) throws IOException;
 }

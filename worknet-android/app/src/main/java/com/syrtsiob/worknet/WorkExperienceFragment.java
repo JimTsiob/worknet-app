@@ -144,13 +144,13 @@ public class WorkExperienceFragment extends Fragment {
                         List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
 
                         // if connection has no work experiences, or all work experiences are private show empty text
-                        if (workExperiences.isEmpty() || isAllPrivateInfo(response.body())){
+                        if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                             showConnectionEmptyWorkExperience();
                         }else{
                             for (WorkExperienceDTO workExperience: workExperiences){
-                                if (workExperience.getIsPublic()){ // show only public work experiences
+                                //if (workExperience.getIsPublic()){ // show only public work experiences
                                     AddConnectionWorkExperienceListEntry(workExperience);
-                                }
+                                //}
                             }
                         }
                     }else{
@@ -239,6 +239,13 @@ public class WorkExperienceFragment extends Fragment {
 
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 50, 0, 0);
+        workExperienceListEntry.setLayoutParams(params);
 
         workExperienceList.addView(workExperienceListEntry);
     }

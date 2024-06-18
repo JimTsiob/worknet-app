@@ -157,13 +157,13 @@ public class SkillsFragment extends Fragment {
                         List<SkillDTO> skills = response.body().getSkills();
 
                         // if connection has no skills, or all skills are private show empty text
-                        if (skills.isEmpty() || isAllPrivateInfo(response.body())){
+                        if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                             showConnectionEmptySkills();
                         }else{
                             for (SkillDTO skill: skills){
-                                if (skill.getIsPublic()){ // show only public skills
+                                //if (skill.getIsPublic()){ // show only public skills
                                     AddConnectionSkillListEntry(skill);
-                                }
+                                //}
                             }
                         }
                     }else{
@@ -180,7 +180,7 @@ public class SkillsFragment extends Fragment {
     }
 
     /*
-     * Method used for showing empty text on connections that have all their info private.
+     * Method used for showing empty text on unconnected users that have all their info private.
      * */
     public boolean isAllPrivateInfo(UserDTO connection){
         int privateCounter = 0;
@@ -220,6 +220,13 @@ public class SkillsFragment extends Fragment {
 
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 50, 0, 0);
+        skillListEntry.setLayoutParams(params);
 
         skillList.addView(skillListEntry);
     }
