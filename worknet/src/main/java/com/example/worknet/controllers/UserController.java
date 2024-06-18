@@ -141,7 +141,7 @@ public class UserController {
 
             List<Job> recommendedJobs = recommendationSystem.getRecommendedJobs(user, connectionJobs);
 
-            // turn them to DTOs and return
+            // turn them to DTOs
             for (Job recommendedJob : recommendedJobs) {
                 SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
                 recommendedJobDTOs.add(recommendedJobDTO);
