@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.ConnectionDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.JobDTO;
@@ -29,8 +30,11 @@ import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,14 +106,14 @@ public class ApplicantsFragment extends Fragment {
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
             List<JobDTO> jobs = userDTO.getJobs();
-            List<SmallUserDTO> applicants = new ArrayList<>();
+            List<ApplicantDTO> applicants = new ArrayList<>();
             for (JobDTO job: jobs){
                 applicants.addAll(job.getInterestedUsers());
             }
 
             if (applicants.isEmpty()){
                 TextView noApplicantsTextView = new TextView(getActivity());
-                noApplicantsTextView.setText("There are no applicants. \n");
+                noApplicantsTextView.setText("There are no applicants yet. \n");
                 noApplicantsTextView.setTextSize(20); // Set desired text size
                 noApplicantsTextView.setTextColor(Color.BLACK);
 
@@ -124,7 +128,7 @@ public class ApplicantsFragment extends Fragment {
             }
 
 
-            for (SmallUserDTO applicant : applicants){
+            for (ApplicantDTO applicant : applicants){
                 addEntryToList(applicant);
             }
         });
@@ -133,7 +137,7 @@ public class ApplicantsFragment extends Fragment {
     }
 
     // TODO replace with applicants?
-    private void addEntryToList(SmallUserDTO applicant) {
+    private void addEntryToList(ApplicantDTO applicant) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View applicantsListEntry = inflater
                 .inflate(R.layout.network_list_entry_template, applicantsList, false);
@@ -150,7 +154,7 @@ public class ApplicantsFragment extends Fragment {
                 .findFirst();
 
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get().getFileName());
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
             profilePic.setImageBitmap(bitmap);
         }
 
@@ -191,14 +195,15 @@ public class ApplicantsFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromConnectionFile(String fileName) {
-        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
+    // method that returns images from the db.
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }

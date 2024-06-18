@@ -90,11 +90,14 @@ public class CustomFileController {
                 // Process and save the file
                 String fileName = customFileService.savePostFile(file);
 
+                String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
+
                 // Create and save CustomFile entity
                 CustomFile customFile = new CustomFile();
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());
+                customFile.setInputStream(inputStreamString);
 
                 // Set the associated User and Post
                 customFile.setUser(user);
@@ -148,9 +151,10 @@ public class CustomFileController {
 
                 String fileName = customFileService.saveProfilePicture(file, userId);
 
-
+                String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
 
                 CustomFile customFile = new CustomFile();
+                customFile.setInputStream(inputStreamString);
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());

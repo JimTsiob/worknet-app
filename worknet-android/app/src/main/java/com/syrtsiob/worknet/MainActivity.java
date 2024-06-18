@@ -28,7 +28,10 @@ import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         .filter(file -> file.getFileName().equals(profilePicName))
                         .findFirst();
                 if (profilePicture.isPresent()){
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
                     profileImage.setImageBitmap(bitmap);
                     profileImage.setOnClickListener(listener -> {
                         drawerLayout.openDrawer(GravityCompat.START);
@@ -218,14 +221,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromFile(String fileName) {
-        File imgFile = new File(getFilesDir(), "FileStorage/images/" + fileName);
+    // method that returns images from the db.
+    private Bitmap loadImageFromFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }

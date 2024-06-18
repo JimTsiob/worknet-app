@@ -2,6 +2,8 @@ package com.example.worknet.entities;
 
 import jakarta.persistence.*;
 
+import java.io.InputStream;
+
 @Entity
 @Table(name = "custom_files")
 public class CustomFile {
@@ -19,6 +21,9 @@ public class CustomFile {
 
     @Column(name = "size")
     private Long size;
+
+    @Column(name = "input_stream", columnDefinition = "TEXT")
+    private String inputStream;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -76,5 +81,13 @@ public class CustomFile {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(String inputStream) {
+        this.inputStream = inputStream;
     }
 }

@@ -112,7 +112,7 @@ public class UserController {
 
         List<User> connections = user.getConnections();
         List<Skill> userSkills = user.getSkills();
-        List<Job> jobs = jobService.getAllJobs();
+        List<Job> jobs = jobService.getAllJobs(); // used for recommendation by skills
 
         List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
 

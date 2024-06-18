@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.*;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,6 +59,12 @@ public class CustomFileServiceImpl implements CustomFileService {
 
     public void deleteCustomFile(Long id){
         customFileRepository.deleteById(id);
+    }
+
+    // used to save input stream as string
+    public String encodeInputStreamToBase64(InputStream inputStream) throws IOException {
+        byte[] bytes = inputStream.readAllBytes();
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
     public String savePostFile(MultipartFile file) throws IOException {

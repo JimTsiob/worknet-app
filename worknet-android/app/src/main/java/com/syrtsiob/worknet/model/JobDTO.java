@@ -17,7 +17,7 @@ public class JobDTO implements Serializable {
 
     private String description;
     private SmallUserDTO jobPoster;
-    private List<SmallUserDTO> interestedUsers;
+    private List<ApplicantDTO> interestedUsers;
     private List<ViewDTO> views;
     private List<SkillDTO> skills;
 
@@ -86,11 +86,11 @@ public class JobDTO implements Serializable {
         this.jobPoster = jobPoster;
     }
 
-    public List<SmallUserDTO> getInterestedUsers() {
+    public List<ApplicantDTO> getInterestedUsers() {
         return interestedUsers;
     }
 
-    public void setInterestedUsers(List<SmallUserDTO> interestedUsers) {
+    public void setInterestedUsers(List<ApplicantDTO> interestedUsers) {
         this.interestedUsers = interestedUsers;
     }
 

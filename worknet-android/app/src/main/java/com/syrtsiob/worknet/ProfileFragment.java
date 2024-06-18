@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,10 @@ import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -121,7 +125,7 @@ public class ProfileFragment extends Fragment {
                                 .filter(file -> file.getFileName().equals(profilePicName))
                                 .findFirst();
                         if (profilePicture.isPresent()) {
-                            Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
                             profilePic.setImageBitmap(bitmap);
                         }
 
@@ -141,7 +145,7 @@ public class ProfileFragment extends Fragment {
                         .filter(file -> file.getFileName().equals(profilePicName))
                         .findFirst();
                 if (profilePicture.isPresent()) {
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
                     profilePic.setImageBitmap(bitmap);
                 }
 
@@ -157,7 +161,7 @@ public class ProfileFragment extends Fragment {
                                 .filter(file -> file.getFileName().equals(profilePicName))
                                 .findFirst();
                         if (profilePicture.isPresent()) {
-                            Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
                             profilePic.setImageBitmap(bitmap);
                         }
 
@@ -190,14 +194,17 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromFile(String fileName) {
-        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
-
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // method that returns images from the database.
+    private Bitmap loadImageFromFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        return BitmapFactory.decodeStream(inputStream);
     }
+
+    // used to decode the image's base64 string from the db
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
+    }
+
+
 }

@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -256,6 +258,19 @@ public class ViewMyJobPostingsFragment extends Fragment {
             viewJobPostingsContainer.removeView(jobPostingEntry);
         });
 
+        // view applicants logic
+        Button viewApplicantsButton = jobPostingEntry.findViewById(R.id.viewApplicantsButton);
+        viewApplicantsButton.setOnClickListener(listener -> {
+            replaceFragment(ApplicantsFragment.newInstance());
+        });
+
         viewJobPostingsContainer.addView(jobPostingEntry);
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
     }
 }
