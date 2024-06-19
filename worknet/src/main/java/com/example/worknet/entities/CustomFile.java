@@ -2,8 +2,6 @@ package com.example.worknet.entities;
 
 import jakarta.persistence.*;
 
-import java.io.InputStream;
-
 @Entity
 @Table(name = "custom_files")
 public class CustomFile {
