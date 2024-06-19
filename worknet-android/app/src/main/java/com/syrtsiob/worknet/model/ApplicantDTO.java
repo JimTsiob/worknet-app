@@ -1,8 +1,9 @@
 package com.syrtsiob.worknet.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ApplicantDTO {
+public class ApplicantDTO implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;

@@ -4,6 +4,7 @@ import com.example.worknet.enums.EmploymentType;
 import com.example.worknet.enums.WorkplaceType;
 
 import java.util.List;
+import java.util.Objects;
 
 public class JobDTO {
 
@@ -15,7 +16,7 @@ public class JobDTO {
     private EmploymentType employmentType;
     private String description;
     private SmallUserDTO jobPoster;
-    private List<SmallUserDTO> interestedUsers;
+    private List<ApplicantDTO> interestedUsers;
     private List<ViewDTO> views;
     private List<SkillDTO> skills;
 
@@ -84,11 +85,11 @@ public class JobDTO {
         this.jobPoster = jobPoster;
     }
 
-    public List<SmallUserDTO> getInterestedUsers() {
+    public List<ApplicantDTO> getInterestedUsers() {
         return interestedUsers;
     }
 
-    public void setInterestedUsers(List<SmallUserDTO> interestedUsers) {
+    public void setInterestedUsers(List<ApplicantDTO> interestedUsers) {
         this.interestedUsers = interestedUsers;
     }
 
@@ -106,5 +107,18 @@ public class JobDTO {
 
     public void setSkills(List<SkillDTO> skills) {
         this.skills = skills;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobDTO myData = (JobDTO) o;
+        return jobTitle.equals(myData.jobTitle) && Objects.equals(id, myData.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jobTitle, id);
     }
 }

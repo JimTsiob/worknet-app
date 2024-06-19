@@ -1,9 +1,14 @@
 package com.syrtsiob.worknet.services;
 
+import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.LoginUserDTO;
 import com.syrtsiob.worknet.model.RegisterUserDTO;
+import com.syrtsiob.worknet.model.SmallJobDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 
+import java.util.List;
+
+import kotlinx.coroutines.Job;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -28,4 +33,13 @@ public interface UserService {
 
     @GET("users/logout")
     Call<String> logoutUser(@Query("email") String email);
+
+    @GET("users/recommendation")
+    Call<List<JobDTO>> recommendJobs(@Query("userId") Long userId);
+
+    @POST("users/addView")
+    Call<String> addView(@Query("userId") Long userId, @Query("jobId") Long jobId);
+
+    @POST("users/applyToJob")
+    Call<String> applyToJob(@Query("userId") Long userId, @Query("jobId") Long jobId);
 }

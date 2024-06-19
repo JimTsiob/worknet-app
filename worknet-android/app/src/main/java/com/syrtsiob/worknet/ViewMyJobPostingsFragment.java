@@ -184,6 +184,7 @@ public class ViewMyJobPostingsFragment extends Fragment {
         TextView workplaceType = jobPostingEntry.findViewById(R.id.workplaceType);
         TextView jobLocation = jobPostingEntry.findViewById(R.id.jobLocation);
         TextView employmentType = jobPostingEntry.findViewById(R.id.employmentType);
+        TextView description = jobPostingEntry.findViewById(R.id.jobDescription);
         TextView skills = jobPostingEntry.findViewById(R.id.job_skills);
 
         title.setText(jobDTO.getJobTitle());
@@ -206,6 +207,8 @@ public class ViewMyJobPostingsFragment extends Fragment {
         }else{
             workplaceType.setText("Hybrid");
         }
+
+        description.setText(jobDTO.getDescription());
 
         // show each skill separated by a comma and space, apart from the last one
         StringJoiner skillset = new StringJoiner(", ");

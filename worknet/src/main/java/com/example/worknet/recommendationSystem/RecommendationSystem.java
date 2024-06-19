@@ -117,13 +117,13 @@ public class RecommendationSystem {
 
         Set<String> userSkillNames = new HashSet<>();
         for (Skill userSkill : userSkills) {
-            userSkillNames.add(userSkill.getName().toLowerCase()); // case insensitive skill search.
+            userSkillNames.add(userSkill.getName().trim().toLowerCase()); // case insensitive skill search.
         }
 
         for (Job job : jobs){
             List<Skill> individualJobSkills = job.getSkills();
             for (Skill skill : individualJobSkills){
-                if (userSkillNames.contains(skill.getName().toLowerCase())) {
+                if (userSkillNames.contains(skill.getName().trim().toLowerCase())) {
                     recommendedJobs.add(job);
                 }
             }

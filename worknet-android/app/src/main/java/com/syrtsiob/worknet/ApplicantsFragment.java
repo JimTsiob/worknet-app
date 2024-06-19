@@ -136,7 +136,6 @@ public class ApplicantsFragment extends Fragment {
 
     }
 
-    // TODO replace with applicants?
     private void addEntryToList(ApplicantDTO applicant) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View applicantsListEntry = inflater

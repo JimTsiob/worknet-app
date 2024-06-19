@@ -153,10 +153,50 @@ public class Register extends AppCompatActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(Register.this, "Register successful!", Toast.LENGTH_LONG).show();
-                    RegisterResultLiveData.getInstance().setValue(true);
+
+//                    getUserByEmailForImageUpload(email);
+
+                    userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
+                        @Override
+                        public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                            if (response.isSuccessful()) {
+                                // Convert image to MultipartBody.Part and upload
+                                try {
+                                    File file = createTempFileFromUri(imageUri);
+
+                                    try {
+                                        ImageDecoder.Source source = ImageDecoder
+                                                .createSource(getContentResolver(), imageUri);
+                                        selectedImageBitmap = ImageDecoder.decodeBitmap(source);
+                                        // save image to android folder so we can show it on profile page and home.
+                                        saveImageToInternalStorage(selectedImageBitmap, response.body().getId() + "_profile_picture.jpg");
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    uploadImage(file, response.body().getId()); // upload to PC folder.
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                Toast.makeText(Register.this, "user by email failed!", Toast.LENGTH_LONG).show();
+                                UserEmailResultLiveData.getInstance().setValue(0L);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<UserDTO> call, Throwable t) {
+                            Log.e("fail: ", t.getLocalizedMessage());
+                            // Handle the error
+                            Toast.makeText(Register.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
+                            UserEmailResultLiveData.getInstance().setValue(0L);
+                        }
+                    });
+
+                    Intent intent = new Intent(Register.this, Login.class);
+                    intent.putExtra(getResources().getString(R.string.e_mail), email);
+                    startActivity(intent);
                 } else {
                     Toast.makeText(Register.this, "Register failed! your email exists in the database.", Toast.LENGTH_LONG).show();
-                    RegisterResultLiveData.getInstance().setValue(false);
                 }
             }
 
@@ -166,40 +206,6 @@ public class Register extends AppCompatActivity {
                 // Handle the error
                 Toast.makeText(Register.this, "Register failed! Server failure.", Toast.LENGTH_LONG).show();
                 RegisterResultLiveData.getInstance().setValue(false);
-            }
-        });
-
-        RegisterResultLiveData.getInstance().observe(this, isRegistered -> {
-            if (isRegistered) {
-                // Handle register success
-                getUserByEmailForImageUpload(email);
-
-                UserEmailResultLiveData.getInstance().observe(this, userId -> {
-                    // Convert image to MultipartBody.Part and upload
-                    try {
-                        File file = createTempFileFromUri(this.imageUri);
-
-                        try {
-                            ImageDecoder.Source source = ImageDecoder
-                                    .createSource(this.getContentResolver(), this.imageUri);
-                            selectedImageBitmap = ImageDecoder.decodeBitmap(source);
-                            // save image to android folder so we can show it on profile page and home.
-                            saveImageToInternalStorage(selectedImageBitmap, userId + "_profile_picture.jpg");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        uploadImage(file, userId); // upload to PC folder.
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-
-                Intent intent = new Intent(this, Login.class);
-                intent.putExtra(getResources().getString(R.string.e_mail), email);
-                startActivity(intent);
-            } else {
-                // Handle register failure
-                Toast.makeText(Register.this, "Try entering another email.", Toast.LENGTH_LONG).show();
             }
         });
     }

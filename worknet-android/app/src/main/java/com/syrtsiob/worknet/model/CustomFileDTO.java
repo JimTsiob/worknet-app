@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class CustomFileDTO {
+import java.io.Serializable;
+
+public class CustomFileDTO implements Serializable {
 
     private Long id;
     private String fileName;

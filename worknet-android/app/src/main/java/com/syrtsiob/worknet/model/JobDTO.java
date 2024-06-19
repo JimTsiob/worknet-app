@@ -5,6 +5,7 @@ import com.syrtsiob.worknet.enums.WorkplaceType;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class JobDTO implements Serializable {
 
@@ -108,5 +109,18 @@ public class JobDTO implements Serializable {
 
     public void setSkills(List<SkillDTO> skills) {
         this.skills = skills;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JobDTO myData = (JobDTO) o;
+        return jobTitle.equals(myData.jobTitle) && Objects.equals(id, myData.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(jobTitle, id);
     }
 }
