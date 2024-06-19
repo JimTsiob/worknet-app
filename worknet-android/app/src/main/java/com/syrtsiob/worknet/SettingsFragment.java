@@ -138,9 +138,6 @@ public class SettingsFragment extends Fragment {
 
             cancelButton = requireView().findViewById(R.id.buttonCancel);
             cancelButton.setOnClickListener(listener -> {
-//                Intent intent = new Intent(getActivity(), MainActivity.class);
-//                intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
-//                startActivity(intent);
                 replaceFragment(HomeFragment.newInstance());
             });
 
@@ -177,7 +174,6 @@ public class SettingsFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), MainActivity.class);
                     intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
                     startActivity(intent);
-//                    replaceFragment(HomeFragment.newInstance());
                 } else {
                     // Handle user failure
                     Log.d("error", "User not found.");
