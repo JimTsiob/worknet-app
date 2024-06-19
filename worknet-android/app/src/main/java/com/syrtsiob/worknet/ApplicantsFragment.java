@@ -197,7 +197,7 @@ public class ApplicantsFragment extends Fragment {
 
     // method that returns images from the db.
     private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
-        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
         return BitmapFactory.decodeStream(inputStream);
     }
 

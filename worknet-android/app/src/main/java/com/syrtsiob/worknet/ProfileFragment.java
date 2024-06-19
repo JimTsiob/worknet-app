@@ -196,7 +196,7 @@ public class ProfileFragment extends Fragment {
 
     // method that returns images from the database.
     private Bitmap loadImageFromFile(CustomFileDTO file) {
-        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
         return BitmapFactory.decodeStream(inputStream);
     }
 

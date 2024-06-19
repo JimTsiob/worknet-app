@@ -2,7 +2,6 @@ package com.example.worknet.services;
 
 import com.example.worknet.entities.Job;
 import com.example.worknet.entities.Skill;
-import com.example.worknet.entities.WorkExperience;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.repositories.JobRepository;
 import com.example.worknet.repositories.SkillRepository;

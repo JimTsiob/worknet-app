@@ -252,6 +252,7 @@ public class Register extends AppCompatActivity {
 
     private File createTempFileFromUri(Uri uri) throws IOException {
         File file = new File(getCacheDir(), "temp_image.jpg");
+
         try (InputStream inputStream = getContentResolver().openInputStream(uri);
              FileOutputStream outputStream = new FileOutputStream(file)) {
             if (inputStream != null) {

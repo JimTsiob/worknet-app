@@ -174,10 +174,10 @@ public class SettingsFragment extends Fragment {
 
                     UserDtoResultLiveData.getInstance().setValue(userDTO);
 
-//                    Intent intent = new Intent(getActivity(), MainActivity.class);
-//                    intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
-//                    startActivity(intent);
-                    replaceFragment(HomeFragment.newInstance());
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
+                    startActivity(intent);
+//                    replaceFragment(HomeFragment.newInstance());
                 } else {
                     // Handle user failure
                     Log.d("error", "User not found.");

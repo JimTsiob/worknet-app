@@ -22,8 +22,9 @@ public class CustomFile {
     @Column(name = "size")
     private Long size;
 
-    @Column(name = "input_stream", columnDefinition = "TEXT")
-    private String inputStream;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] fileContent;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -83,11 +84,11 @@ public class CustomFile {
         this.user = user;
     }
 
-    public String getInputStream() {
-        return inputStream;
+    public byte[] getFileContent() {
+        return fileContent;
     }
 
-    public void setInputStream(String inputStream) {
-        this.inputStream = inputStream;
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
 }

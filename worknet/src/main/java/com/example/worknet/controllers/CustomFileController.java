@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.ByteArrayInputStream;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -90,14 +91,14 @@ public class CustomFileController {
                 // Process and save the file
                 String fileName = customFileService.savePostFile(file);
 
-                String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
+                // String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
 
                 // Create and save CustomFile entity
                 CustomFile customFile = new CustomFile();
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());
-                customFile.setInputStream(inputStreamString);
+                customFile.setFileContent(file.getBytes());
 
                 // Set the associated User and Post
                 customFile.setUser(user);
@@ -151,10 +152,8 @@ public class CustomFileController {
 
                 String fileName = customFileService.saveProfilePicture(file, userId);
 
-                String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
-
                 CustomFile customFile = new CustomFile();
-                customFile.setInputStream(inputStreamString);
+                customFile.setFileContent(file.getBytes());
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());

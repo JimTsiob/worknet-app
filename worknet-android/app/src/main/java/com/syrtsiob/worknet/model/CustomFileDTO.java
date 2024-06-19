@@ -6,7 +6,8 @@ public class CustomFileDTO {
     private String fileName;
     private String contentType;
     private Long size;
-    private String inputStream;
+
+    private String fileContent;
 //    private PostDTO post;
 //    private UserDTO user;
 
@@ -44,11 +45,11 @@ public class CustomFileDTO {
         this.size = size;
     }
 
-    public String getInputStream() {
-        return inputStream;
+    public String getFileContent() {
+        return fileContent;
     }
 
-    public void setInputStream(String inputStream) {
-        this.inputStream = inputStream;
+    public void setFileContent(String fileContent) {
+        this.fileContent = fileContent;
     }
 }

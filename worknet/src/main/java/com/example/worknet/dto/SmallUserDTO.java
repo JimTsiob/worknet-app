@@ -1,7 +1,5 @@
 package com.example.worknet.dto;
 
-import java.util.List;
-
 public class SmallUserDTO {
     private Long id;
     private String firstName;

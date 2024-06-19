@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
     // method that returns images from the db.
     private Bitmap loadImageFromFile(CustomFileDTO file) {
-        InputStream inputStream = decodeBase64ToInputStream(file.getInputStream());
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
         return BitmapFactory.decodeStream(inputStream);
     }
 

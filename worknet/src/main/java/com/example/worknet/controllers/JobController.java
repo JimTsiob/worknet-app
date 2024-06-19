@@ -2,7 +2,6 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.JobDTO;
 import com.example.worknet.entities.Job;
-import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.JobService;

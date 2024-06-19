@@ -29,7 +29,10 @@ import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,7 +163,7 @@ public class NetworkFragment extends Fragment {
                 .findFirst();
 
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get().getFileName());
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
             profilePic.setImageBitmap(bitmap);
         }
 
@@ -201,14 +204,15 @@ public class NetworkFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromConnectionFile(String fileName) {
-        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
+    // method that returns images from the db.
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }
