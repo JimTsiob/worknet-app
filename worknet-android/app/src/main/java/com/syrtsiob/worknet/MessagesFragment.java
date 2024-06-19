@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -77,7 +78,7 @@ public class MessagesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        chatsList = requireView().findViewById(R.id.notificationContainer);
+        chatsList = requireView().findViewById(R.id.chatsList);
 
         AddChatEntry();
         AddChatEntry();
@@ -91,7 +92,8 @@ public class MessagesFragment extends Fragment {
                 .inflate(R.layout.chat_list_entry, chatsList, false);
 
         chatEntry.setOnClickListener(listener -> {
-            // TODO new chat activity
+            Intent intent = new Intent(getContext(), Chat.class);
+            startActivity(intent);
         });
 
         chatsList.addView(chatEntry);
@@ -109,7 +111,8 @@ public class MessagesFragment extends Fragment {
         userName.setText(smallUserDTO.getFirstName() + " " + smallUserDTO.getLastName());
 
         chatEntry.setOnClickListener(listener -> {
-            // TODO new chat activity
+            Intent intent = new Intent(getContext(), Chat.class);
+            startActivity(intent);
         });
 
         chatsList.addView(chatEntry);
