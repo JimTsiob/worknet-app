@@ -17,8 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.ApplicantDTO;
+import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
@@ -56,20 +60,27 @@ public class WorkExperienceFragment extends Fragment {
         // if the user wants to see a connection's profile show connection's work experience
         // otherwise show user's work experience (my profile)
 
-
         addWorkExperienceButton = requireView().findViewById(R.id.add_work_experience_button);
 
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            if (connectionDTO != null){
+        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
+            if (applicantDTO != null) {
                 addWorkExperienceButton.setVisibility(View.GONE);
 
-                fetchConnectionData();
+                fetchApplicantData(applicantDTO);
             }else{
-                if (itemsDisplayed >= requiredItems){
-                    return;
-                }
+                ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
+                    if (connectionDTO != null){
+                        addWorkExperienceButton.setVisibility(View.GONE);
 
-                fetchData();
+                        fetchConnectionData(connectionDTO);
+                    }else{
+                        if (itemsDisplayed >= requiredItems){
+                            return;
+                        }
+
+                        fetchData();
+                    }
+                });
             }
         });
 
@@ -129,40 +140,73 @@ public class WorkExperienceFragment extends Fragment {
         });
     }
 
-    public void fetchConnectionData(){
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            UserService userService = retrofit.create(UserService.class);
+    public void fetchConnectionData(ConnectionDTO connectionDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
 
-            workExperienceList = requireView().findViewById(R.id.work_experience_list);
-            workExperienceList.removeAllViews(); // clear before showing new ones. Removes duplicates
+        workExperienceList = requireView().findViewById(R.id.work_experience_list);
+        workExperienceList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-            userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
-                @Override
-                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                    if (response.isSuccessful()){
-                        List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
+        userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
 
-                        // if connection has no work experiences, or all work experiences are private show empty text
-                        if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
-                            showConnectionEmptyWorkExperience();
-                        }else{
-                            for (WorkExperienceDTO workExperience: workExperiences){
-                                //if (workExperience.getIsPublic()){ // show only public work experiences
-                                    AddConnectionWorkExperienceListEntry(workExperience);
-                                //}
-                            }
-                        }
+                    // if connection has no work experiences, or all work experiences are private show empty text
+                    if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showConnectionEmptyWorkExperience();
                     }else{
-                        Log.d("format fail:", "something bad happened here.");
+                        for (WorkExperienceDTO workExperience: workExperiences){
+                            //if (workExperience.getIsPublic()){ // show only public work experiences
+                                AddConnectionWorkExperienceListEntry(workExperience);
+                            //}
+                        }
                     }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
+            }
 
-                @Override
-                public void onFailure(Call<UserDTO> call, Throwable t) {
-                    Log.d("Server fail:", t.getLocalizedMessage());
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void fetchApplicantData(ApplicantDTO applicantDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
+
+        workExperienceList = requireView().findViewById(R.id.work_experience_list);
+        workExperienceList.removeAllViews(); // clear before showing new ones. Removes duplicates
+
+        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
+
+                    // if connection has no work experiences, or all work experiences are private show empty text
+                    if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showApplicantEmptyWorkExperience();
+                    }else{
+                        for (WorkExperienceDTO workExperience: workExperiences){
+                            //if (workExperience.getIsPublic()){ // show only public work experiences
+                            AddConnectionWorkExperienceListEntry(workExperience);
+                            //}
+                        }
+                    }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
-            });
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
         });
     }
 
@@ -280,6 +324,22 @@ public class WorkExperienceFragment extends Fragment {
         itemsDisplayed += 1;
 
         workExperienceList.addView(addWorkExperiencesTextView);
+    }
+
+    private void showApplicantEmptyWorkExperience(){
+        TextView noWorkExperiencesTextView = new TextView(getActivity());
+        noWorkExperiencesTextView.setText("This applicant has no work experiences added.");
+        noWorkExperiencesTextView.setTextSize(20); // Set desired text size
+        noWorkExperiencesTextView.setTextColor(Color.BLACK);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(100, 300, 16, 16);
+        noWorkExperiencesTextView.setLayoutParams(params);
+
+        workExperienceList.addView(noWorkExperiencesTextView);
     }
 
     private void showConnectionEmptyWorkExperience(){

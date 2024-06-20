@@ -17,8 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.ApplicantDTO;
+import com.syrtsiob.worknet.model.ConnectionDTO;
 import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.EducationDTO;
@@ -26,6 +29,7 @@ import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,22 +64,32 @@ public class EducationFragment extends Fragment {
 
         addEducationButton = requireView().findViewById(R.id.add_education_button);
 
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            if (connectionDTO != null){
+        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
+            if (applicantDTO != null) {
                 addEducationButton.setVisibility(View.GONE);
 
-                fetchConnectionData();
+                fetchApplicantData(applicantDTO);
             }else{
-                if (itemsDisplayed >= requiredItems){
-                    return;
-                }
+                ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
+                    if (connectionDTO != null){
+                        addEducationButton.setVisibility(View.GONE);
 
-                fetchData();
+                        fetchConnectionData(connectionDTO);
+                    }else{
+                        if (itemsDisplayed >= requiredItems){
+                            return;
+                        }
+
+                        fetchData();
+                    }
+                });
             }
         });
 
         itemsDisplayed = 0; // reset in order to have realistic updating in the page.
     }
+
+
 
 
     public void fetchData(){
@@ -131,40 +145,74 @@ public class EducationFragment extends Fragment {
         });
     }
 
-    public void fetchConnectionData(){
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            UserService userService = retrofit.create(UserService.class);
+    public void fetchApplicantData(ApplicantDTO applicantDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
 
-            educationList = requireView().findViewById(R.id.education_list);
-            educationList.removeAllViews(); // clear before showing new ones. Removes duplicates
+        educationList = requireView().findViewById(R.id.education_list);
+        educationList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-            userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
-                @Override
-                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                    if (response.isSuccessful()){
-                        List<EducationDTO> educations = response.body().getEducations();
+        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<EducationDTO> educations = response.body().getEducations();
 
-                        // if connection has no educations, or all educations are private show empty text
-                        if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
-                            showConnectionEmptyEducation();
-                        }else{
-                            for (EducationDTO education: educations){
-                                //if (education.getIsPublic()){ // show only public educations
-                                    AddConnectionEducationListEntry(education);
-                               // }
-                            }
-                        }
+                    // if connection has no educations, or all educations are private show empty text
+                    if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showApplicantEmptyEducation();
                     }else{
-                        Log.d("format fail:", "something bad happened here.");
+                        for (EducationDTO education: educations){
+                            //if (education.getIsPublic()){ // show only public educations
+                            AddConnectionEducationListEntry(education); // same method works for applicants
+                            // }
+                        }
                     }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
+            }
 
-                @Override
-                public void onFailure(Call<UserDTO> call, Throwable t) {
-                    Log.d("Server fail:", t.getLocalizedMessage());
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
+        });
+
+    }
+
+    public void fetchConnectionData(ConnectionDTO connectionDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
+
+        educationList = requireView().findViewById(R.id.education_list);
+        educationList.removeAllViews(); // clear before showing new ones. Removes duplicates
+
+        userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<EducationDTO> educations = response.body().getEducations();
+
+                    // if connection has no educations, or all educations are private show empty text
+                    if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showConnectionEmptyEducation();
+                    }else{
+                        for (EducationDTO education: educations){
+                            //if (education.getIsPublic()){ // show only public educations
+                                AddConnectionEducationListEntry(education);
+                           // }
+                        }
+                    }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
-            });
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
         });
     }
 
@@ -279,6 +327,22 @@ public class EducationFragment extends Fragment {
     private void showConnectionEmptyEducation(){
         TextView noEducationsTextView = new TextView(getActivity());
         noEducationsTextView.setText("This connection has no educations added.");
+        noEducationsTextView.setTextSize(20); // Set desired text size
+        noEducationsTextView.setTextColor(Color.BLACK);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(100, 300, 16, 16);
+        noEducationsTextView.setLayoutParams(params);
+
+        educationList.addView(noEducationsTextView);
+    }
+
+    private void showApplicantEmptyEducation(){
+        TextView noEducationsTextView = new TextView(getActivity());
+        noEducationsTextView.setText("This applicant has no educations added.");
         noEducationsTextView.setTextSize(20); // Set desired text size
         noEducationsTextView.setTextColor(Color.BLACK);
 

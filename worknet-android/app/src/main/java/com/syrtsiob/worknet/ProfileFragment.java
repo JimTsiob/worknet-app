@@ -100,9 +100,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        // Clear the ConnectionDTO when the fragment view is destroyed
+        // Clear the ConnectionDTO and applicantDTO when the fragment view is destroyed
         // so we can see the logged in user's profile
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
+        ApplicantUserDtoResultLiveData.getInstance().setValue(null);
     }
 
     @Override
@@ -131,46 +132,48 @@ public class ProfileFragment extends Fragment {
 
                         TextView fullName = requireView().findViewById(R.id.fullNameProfile);
                         fullName.setText(applicantDTO.getFirstName() + " " + applicantDTO.getLastName());
+                    }else{
+                        // if user clicks on connection profile show connection profile elements.
+                        // Otherwise show own profile elements.
+                        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
+                            if (connectionDTO != null){
+                                ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                                String profilePicName = connectionDTO.getProfilePicture();
+                                List<CustomFileDTO> files = connectionDTO.getFiles();
+                                Optional<CustomFileDTO> profilePicture = files.stream()
+                                        .filter(file -> file.getFileName().equals(profilePicName))
+                                        .findFirst();
+                                if (profilePicture.isPresent()) {
+                                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
+                                    profilePic.setImageBitmap(bitmap);
+                                }
+
+                                TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                                fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
+                            }else{
+                                UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+                                    if (userDTO != null){
+                                        ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                                        String profilePicName = userDTO.getProfilePicture();
+                                        List<CustomFileDTO> files = userDTO.getFiles();
+                                        Optional<CustomFileDTO> profilePicture = files.stream()
+                                                .filter(file -> file.getFileName().equals(profilePicName))
+                                                .findFirst();
+                                        if (profilePicture.isPresent()) {
+                                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
+                                            profilePic.setImageBitmap(bitmap);
+                                        }
+
+                                        TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                                        fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+                                    }
+                                });
+                            }
+                        });
                     }
                 });
 
-        // if user clicks on connection profile show connection profile elements.
-        // Otherwise show own profile elements.
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            if (connectionDTO != null){
-                ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
-                String profilePicName = connectionDTO.getProfilePicture();
-                List<CustomFileDTO> files = connectionDTO.getFiles();
-                Optional<CustomFileDTO> profilePicture = files.stream()
-                        .filter(file -> file.getFileName().equals(profilePicName))
-                        .findFirst();
-                if (profilePicture.isPresent()) {
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
-                    profilePic.setImageBitmap(bitmap);
-                }
 
-                TextView fullName = requireView().findViewById(R.id.fullNameProfile);
-                fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
-            }else{
-                UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
-                    if (userDTO != null){
-                        ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
-                        String profilePicName = userDTO.getProfilePicture();
-                        List<CustomFileDTO> files = userDTO.getFiles();
-                        Optional<CustomFileDTO> profilePicture = files.stream()
-                                .filter(file -> file.getFileName().equals(profilePicName))
-                                .findFirst();
-                        if (profilePicture.isPresent()) {
-                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
-                            profilePic.setImageBitmap(bitmap);
-                        }
-
-                        TextView fullName = requireView().findViewById(R.id.fullNameProfile);
-                        fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
-                    }
-                });
-            }
-        });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
