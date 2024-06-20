@@ -42,7 +42,10 @@
                 android:layout_height="wrap_content"
                 android:minLines="5"
                 android:scrollbars="vertical"
-                android:inputType="textMultiLine"/>
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:hint="Enter your text here..."
+                android:padding="16dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

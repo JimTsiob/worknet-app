@@ -60,7 +60,7 @@ public class CustomFileServiceImpl implements CustomFileService {
         customFileRepository.deleteById(id);
     }
 
-    public String savePostFile(MultipartFile file) throws IOException {
+    public String savePostFile(MultipartFile file, Long postId) throws IOException {
 
         String originalFileName = file.getOriginalFilename();
         String fileExtension = "";
@@ -72,7 +72,7 @@ public class CustomFileServiceImpl implements CustomFileService {
         }
 
         // Generate a unique filename or use customName
-        String fileName = originalFileName == null ? UUID.randomUUID().toString() + fileExtension : originalFileName;
+        String fileName = originalFileName == null ? UUID.randomUUID().toString() + fileExtension : "post_" + postId + "_" + originalFileName;
 
         // Path to save the uploaded file
         Path path = Paths.get("../FileStorage/posts/" + fileName);

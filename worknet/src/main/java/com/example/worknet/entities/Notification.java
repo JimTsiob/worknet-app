@@ -5,7 +5,7 @@ import com.example.worknet.enums.NotificationType;
 import jakarta.persistence.*;
 
 
-// class used for connection and post like notifications.
+// class used for connection, apply to job, message and post like notifications.
 @Entity
 @Table(name = "notifications")
 public class Notification {

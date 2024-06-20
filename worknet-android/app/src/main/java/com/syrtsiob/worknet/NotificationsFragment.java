@@ -84,6 +84,9 @@ public class NotificationsFragment extends Fragment {
                 case MESSAGE:
                     // TODO implement
                     break;
+                case COMMENT:
+                    // TODO implement
+                    break;
             }
         });
 

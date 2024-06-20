@@ -88,7 +88,7 @@ public class CustomFileController {
 
             for (MultipartFile file : files) {
                 // Process and save the file
-                String fileName = customFileService.savePostFile(file);
+                String fileName = customFileService.savePostFile(file,postId);
 
                 // String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
 

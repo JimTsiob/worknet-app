@@ -154,8 +154,6 @@ public class Register extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(Register.this, "Register successful!", Toast.LENGTH_LONG).show();
 
-//                    getUserByEmailForImageUpload(email);
-
                     userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
                         @Override
                         public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
@@ -208,32 +206,6 @@ public class Register extends AppCompatActivity {
                 RegisterResultLiveData.getInstance().setValue(false);
             }
         });
-    }
-
-    private void getUserByEmailForImageUpload(String email){
-        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
-        UserService userService = retrofit.create(UserService.class);
-
-        userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
-            @Override
-            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                if (response.isSuccessful()) {
-                    UserEmailResultLiveData.getInstance().setValue(response.body().getId());
-                } else {
-                    Toast.makeText(Register.this, "user by email failed!", Toast.LENGTH_LONG).show();
-                    UserEmailResultLiveData.getInstance().setValue(0L);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<UserDTO> call, Throwable t) {
-                Log.e("fail: ", t.getLocalizedMessage());
-                // Handle the error
-                Toast.makeText(Register.this, "user by email failed! Server failure.", Toast.LENGTH_LONG).show();
-                UserEmailResultLiveData.getInstance().setValue(0L);
-            }
-        });
-
     }
 
     private boolean ValidatePasswordRepeat(String password, String repeatPassword) {
