@@ -1,19 +1,27 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MessagesFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.syrtsiob.worknet.enums.NotificationType;
+import com.syrtsiob.worknet.model.NotificationDTO;
+import com.syrtsiob.worknet.model.SmallUserDTO;
+
 public class MessagesFragment extends Fragment {
+
+    LinearLayout chatsList;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,5 +72,49 @@ public class MessagesFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_messages, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        chatsList = requireView().findViewById(R.id.chatsList);
+
+        AddChatEntry();
+        AddChatEntry();
+        AddChatEntry();
+    }
+
+    // TODO this is for testing purposes -- remove
+    private void AddChatEntry() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View chatEntry = inflater
+                .inflate(R.layout.chat_list_entry, chatsList, false);
+
+        chatEntry.setOnClickListener(listener -> {
+            Intent intent = new Intent(getContext(), Chat.class);
+            startActivity(intent);
+        });
+
+        chatsList.addView(chatEntry);
+    }
+
+    private void AddChatEntry(SmallUserDTO smallUserDTO) {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View chatEntry = inflater
+                .inflate(R.layout.chat_list_entry, chatsList, false);
+
+        ImageView picture = chatEntry.findViewById(R.id.chatImage);
+        TextView userName = chatEntry.findViewById(R.id.chatUserName);
+
+        // TODO update change picture or remove it from notification structure
+        userName.setText(smallUserDTO.getFirstName() + " " + smallUserDTO.getLastName());
+
+        chatEntry.setOnClickListener(listener -> {
+            Intent intent = new Intent(getContext(), Chat.class);
+            startActivity(intent);
+        });
+
+        chatsList.addView(chatEntry);
     }
 }
