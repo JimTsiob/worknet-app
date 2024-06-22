@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +20,27 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
+import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class NotificationsFragment extends Fragment {
 
@@ -54,15 +64,35 @@ public class NotificationsFragment extends Fragment {
         notificationContainer = requireView().findViewById(R.id.notificationContainer);
 
         UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
-            List<NotificationDTO> notifications = userDTO.getReceivedNotifications();
+            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+            UserService userService = retrofit.create(UserService.class);
 
-            if (!notifications.isEmpty()){
-                for (NotificationDTO notification: notifications){
-                    AddNotification(notification);
+            userService.getUserById(userDTO.getId()).enqueue(new Callback<UserDTO>() {
+                @Override
+                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    if (response.isSuccessful()){
+                        List<NotificationDTO> notifications = response.body().getReceivedNotifications();
+
+                        if (!notifications.isEmpty()){
+                            for (NotificationDTO notification: notifications){
+                                AddNotification(notification);
+                            }
+                        }else{
+                            showEmptyNotifications();
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "Notifications fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
                 }
-            }else{
-                showEmptyNotifications();
-            }
+
+                @Override
+                public void onFailure(Call<UserDTO> call, Throwable t) {
+                    Log.d("notifs failure: ", t.getLocalizedMessage());
+                    Toast.makeText(getActivity(), "Notifications fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
 
         });
     }
@@ -107,16 +137,18 @@ public class NotificationsFragment extends Fragment {
 
         text.setText(notificationDTO.getText());
 
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
         NotificationType notificationType = notificationDTO.getNotificationType();
         switch (notificationType) {
             case CONNECTION:
                 // TODO implement
                 break;
             case APPLY_TO_JOB_POST:
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
+
                 params.setMargins(0, 0, 80, 0);
 
                 leftButton.setLayoutParams(params);
@@ -132,7 +164,16 @@ public class NotificationsFragment extends Fragment {
                 // TODO implement
                 break;
             case MESSAGE:
-                // TODO implement
+                params.setMargins(0, 0, 30, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to messages");
+
+                leftButton.setOnClickListener(listener -> {
+                    replaceFragment(MessagesFragment.newInstance());
+                });
+
+                rightButton.setVisibility(View.GONE);
                 break;
             case COMMENT:
                 // TODO implement

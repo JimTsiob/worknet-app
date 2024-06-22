@@ -2,7 +2,9 @@ package com.syrtsiob.worknet.model;
 
 import com.syrtsiob.worknet.enums.NotificationType;
 
-public class NotificationDTO {
+import java.io.Serializable;
+
+public class NotificationDTO implements Serializable {
     private Long id;
     private String text;
     private SmallPostDTO post;

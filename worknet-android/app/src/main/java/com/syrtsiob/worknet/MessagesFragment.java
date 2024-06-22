@@ -22,6 +22,9 @@ import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.MessageDTO;
 import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.MessageService;
+import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -33,6 +36,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MessagesFragment extends Fragment {
 
@@ -97,45 +105,65 @@ public class MessagesFragment extends Fragment {
         chatsList = requireView().findViewById(R.id.chatsList);
 
         UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
-            List<MessageDTO> receivedMessages = userDTO.getReceivedMessages();
-            List<MessageDTO> sentMessages = userDTO.getSentMessages();
 
-            if (receivedMessages.isEmpty() && sentMessages.isEmpty()){
-                showEmptyMessages();
-            }
+            // Call server to refresh the page with new messages dynamically afterwards.
 
-            // users who sent or received messages from the examined user.
-            List<EnlargedUserDTO> users = new ArrayList<>();
+            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+            UserService userService = retrofit.create(UserService.class);
 
-            for (MessageDTO message: receivedMessages){
-                users.add(message.getSender());
-            }
+            userService.getUserById(userDTO.getId()).enqueue(new Callback<UserDTO>() {
+                @Override
+                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    if (response.isSuccessful()){
+                        List<MessageDTO> receivedMessages = response.body().getReceivedMessages();
+                        List<MessageDTO> sentMessages = response.body().getSentMessages();
 
-            for (MessageDTO message: sentMessages){
-                users.add(message.getReceiver());
-            }
+                        if (receivedMessages.isEmpty() && sentMessages.isEmpty()){
+                            showEmptyMessages();
+                        }
 
-            // DTO used for proper chat functionality later on
-            EnlargedUserDTO loggedInUser = new EnlargedUserDTO();
-            loggedInUser.setEducations(userDTO.getEducations());
-            loggedInUser.setFiles(userDTO.getFiles());
-            loggedInUser.setEmail(userDTO.getEmail());
-            loggedInUser.setId(userDTO.getId());
-            loggedInUser.setLastName(userDTO.getLastName());
-            loggedInUser.setFirstName(userDTO.getFirstName());
-            loggedInUser.setSkills(userDTO.getSkills());
-            loggedInUser.setProfilePicture(userDTO.getProfilePicture());
-            loggedInUser.setWorkExperiences(userDTO.getWorkExperiences());
+                        // users who sent or received messages from the examined user.
+                        List<EnlargedUserDTO> users = new ArrayList<>();
 
-            // Remove duplicate users
+                        for (MessageDTO message: receivedMessages){
+                            users.add(message.getSender());
+                        }
 
-            List<EnlargedUserDTO> uniqueUsers = removeDuplicates(users);
+                        for (MessageDTO message: sentMessages){
+                            users.add(message.getReceiver());
+                        }
+
+                        // DTO used for proper chat functionality later on
+                        EnlargedUserDTO loggedInUser = new EnlargedUserDTO();
+                        loggedInUser.setEducations(userDTO.getEducations());
+                        loggedInUser.setFiles(userDTO.getFiles());
+                        loggedInUser.setEmail(userDTO.getEmail());
+                        loggedInUser.setId(userDTO.getId());
+                        loggedInUser.setLastName(userDTO.getLastName());
+                        loggedInUser.setFirstName(userDTO.getFirstName());
+                        loggedInUser.setSkills(userDTO.getSkills());
+                        loggedInUser.setProfilePicture(userDTO.getProfilePicture());
+                        loggedInUser.setWorkExperiences(userDTO.getWorkExperiences());
+
+                        // Remove duplicate users
+
+                        List<EnlargedUserDTO> uniqueUsers = removeDuplicates(users);
 
 
-            // get all chat entries
-            for (EnlargedUserDTO user: uniqueUsers){
-                AddChatEntry(user, loggedInUser, userDTO);
-            }
+                        // get all chat entries
+                        for (EnlargedUserDTO user: uniqueUsers){
+                            AddChatEntry(user, loggedInUser, userDTO);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDTO> call, Throwable t) {
+
+                }
+            });
+
+
         });
     }
 
