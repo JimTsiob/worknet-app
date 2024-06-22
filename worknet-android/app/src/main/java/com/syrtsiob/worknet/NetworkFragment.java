@@ -7,12 +7,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,25 +18,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
-import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -107,7 +98,7 @@ public class NetworkFragment extends Fragment {
         networkList = requireView().findViewById(R.id.network_list);
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
-            List<ConnectionDTO> connections = userDTO.getConnections();
+            List<EnlargedUserDTO> connections = userDTO.getConnections();
             if (connections.isEmpty()){
                 TextView noConnectionsTextView = new TextView(getActivity());
                 noConnectionsTextView.setText("You have no connections. \n");
@@ -138,7 +129,7 @@ public class NetworkFragment extends Fragment {
                 networkList.addView(addConnectionsTextView);
             }
 
-            for (ConnectionDTO connection : connections){
+            for (EnlargedUserDTO connection : connections){
                 addEntryToList(connection);
             }
         });
@@ -146,7 +137,7 @@ public class NetworkFragment extends Fragment {
 
     }
 
-    private void addEntryToList(ConnectionDTO connection) {
+    private void addEntryToList(EnlargedUserDTO connection) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View networkListEntry = inflater
                 .inflate(R.layout.network_list_entry_template, networkList, false);

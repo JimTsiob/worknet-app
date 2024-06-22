@@ -7,8 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.model.UserDTO;
@@ -127,7 +125,7 @@ public class ViewJobPostingsFragment extends Fragment {
                 @Override
                 public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                     if (response.isSuccessful()){
-                        List<ConnectionDTO> connections = response.body().getConnections();
+                        List<EnlargedUserDTO> connections = response.body().getConnections();
                         List<SkillDTO> skills = response.body().getSkills();
 
                         if (connections.isEmpty() && skills.isEmpty()){

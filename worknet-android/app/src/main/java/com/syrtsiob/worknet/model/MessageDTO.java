@@ -1,12 +1,14 @@
 package com.syrtsiob.worknet.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class MessageDTO {
+public class MessageDTO implements Serializable {
 
     private Long id;
     private String text;
-    private List<SmallUserDTO> users;
+    private EnlargedUserDTO sender;
+    private EnlargedUserDTO receiver;
 
     public Long getId() {
         return id;
@@ -24,11 +26,19 @@ public class MessageDTO {
         this.text = text;
     }
 
-    public List<SmallUserDTO> getUsers() {
-        return users;
+    public EnlargedUserDTO getSender() {
+        return sender;
     }
 
-    public void setUsers(List<SmallUserDTO> users) {
-        this.users = users;
+    public void setSender(EnlargedUserDTO sender) {
+        this.sender = sender;
+    }
+
+    public EnlargedUserDTO getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(EnlargedUserDTO receiver) {
+        this.receiver = receiver;
     }
 }

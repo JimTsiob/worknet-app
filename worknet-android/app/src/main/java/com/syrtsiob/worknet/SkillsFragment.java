@@ -21,7 +21,7 @@ import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ApplicantDTO;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.SkillService;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.SkillDTO;
@@ -187,14 +187,14 @@ public class SkillsFragment extends Fragment {
         });
     }
 
-    public void fetchConnectionData(ConnectionDTO connectionDTO){
+    public void fetchConnectionData(EnlargedUserDTO enlargedUserDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         skillList = requireView().findViewById(R.id.skills_list);
         skillList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(enlargedUserDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
@@ -300,7 +300,7 @@ public class SkillsFragment extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(100, 300, 16, 16);
+        params.setMargins(200, 300, 16, 16);
         noEducationsTextView.setLayoutParams(params);
 
         skillList.addView(noEducationsTextView);

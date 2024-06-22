@@ -8,18 +8,18 @@ import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
+import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.ApplicantDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
+import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.NotificationService;
 import com.syrtsiob.worknet.services.UserService;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -108,8 +108,69 @@ public class JobPostingDetails extends AppCompatActivity {
 
         Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
         UserService userService = retrofit.create(UserService.class);
+        NotificationService notificationService = retrofit.create(NotificationService.class);
 
         applyButton.setOnClickListener(listener -> {
+
+            NotificationDTO notificationDTO = new NotificationDTO();
+            NotificationType notificationType = NotificationType.valueOf("APPLY_TO_JOB_POST");
+            notificationDTO.setNotificationType(notificationType);
+
+            notificationDTO.setReceiver(jobDTO.getJobPoster());
+
+            // Send notification to job poster
+            userService.getUserById(userId).enqueue(new Callback<UserDTO>() {
+                @Override
+                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    if (response.isSuccessful()){
+                        EnlargedUserDTO sender = new EnlargedUserDTO(); // taking this object type for ease.
+                        sender.setId(response.body().getId());
+                        sender.setEducations(response.body().getEducations());
+                        sender.setEmail(response.body().getEmail());
+                        sender.setWorkExperiences(response.body().getWorkExperiences());
+                        sender.setSkills(response.body().getSkills());
+                        sender.setFiles(response.body().getFiles());
+                        sender.setProfilePicture(response.body().getProfilePicture());
+                        sender.setLastName(response.body().getLastName());
+                        sender.setFirstName(response.body().getFirstName());
+
+                        String notificationText = response.body().getFirstName() + " " + response.body().getLastName() + " has applied to your "
+                                + jobDTO.getJobTitle() + " job posting.";
+
+                        notificationDTO.setText(notificationText);
+                        notificationDTO.setSender(sender);
+
+                        notificationService.addNotification(notificationDTO).enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                if (response.isSuccessful()){
+                                    // do nothing
+                                }else{
+                                    Toast.makeText(JobPostingDetails.this, "Notification addition failed! Check the format.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Toast.makeText(JobPostingDetails.this, "Notification addition failed! Server failure.", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                    }else{
+                        Toast.makeText(JobPostingDetails.this, "User by id failed! Check the format", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDTO> call, Throwable t) {
+                    Log.d("user by id fail: ", t.getLocalizedMessage());
+                    Toast.makeText(JobPostingDetails.this, "User by id failed! Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
+            // Apply to job
+
 
             userService.applyToJob(userId,jobDTO.getId()).enqueue(new Callback<String>() {
                 @Override

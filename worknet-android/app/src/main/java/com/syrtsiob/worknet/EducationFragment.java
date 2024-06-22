@@ -21,7 +21,7 @@ import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ApplicantDTO;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.EducationDTO;
@@ -29,7 +29,6 @@ import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -181,14 +180,14 @@ public class EducationFragment extends Fragment {
 
     }
 
-    public void fetchConnectionData(ConnectionDTO connectionDTO){
+    public void fetchConnectionData(EnlargedUserDTO enlargedUserDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         educationList = requireView().findViewById(R.id.education_list);
         educationList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(enlargedUserDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){

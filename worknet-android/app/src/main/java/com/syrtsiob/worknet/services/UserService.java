@@ -42,4 +42,7 @@ public interface UserService {
 
     @POST("users/applyToJob")
     Call<String> applyToJob(@Query("userId") Long userId, @Query("jobId") Long jobId);
+
+    @GET("users/{id}")
+    Call<UserDTO> getUserById(@Path("id") Long userId);
 }

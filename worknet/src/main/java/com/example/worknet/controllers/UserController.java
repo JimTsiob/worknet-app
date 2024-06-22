@@ -247,19 +247,6 @@ public class UserController {
         }
     }
 
-    @PostMapping("/sendMessage")
-    public ResponseEntity<?> sendMessage(@RequestBody MessageDTO messageDTO) {
-
-        try {
-            Message message = modelMapper.map(messageDTO, Message.class);
-            userService.sendMessage(message);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Message sent successfully.");
-        } catch (Exception e) {
-            String errorMessage = "Failed to send message: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-        }
-    }
-
     @PostMapping("/addView")
     public ResponseEntity<?> addView(@RequestParam Long userId,
                                      @RequestParam Long jobId) {

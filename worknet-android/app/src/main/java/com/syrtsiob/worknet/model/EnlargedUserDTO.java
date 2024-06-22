@@ -1,16 +1,21 @@
-package com.example.worknet.dto;
+package com.syrtsiob.worknet.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-public class ConnectionDTO {
+public class EnlargedUserDTO implements Serializable {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
+
     private String profilePicture;
     private List<WorkExperienceDTO> workExperiences;
+
     private List<EducationDTO> educations;
     private List<SkillDTO> skills;
+
     private List<CustomFileDTO> files;
 
     public Long getId() {
@@ -49,7 +54,7 @@ public class ConnectionDTO {
         return profilePicture;
     }
 
-    public void setProfilePicture(String profilePicture){
+    public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
     }
 
@@ -65,7 +70,7 @@ public class ConnectionDTO {
         return files;
     }
 
-    public void setFiles(List<CustomFileDTO> files){
+    public void setFiles(List<CustomFileDTO> files) {
         this.files = files;
     }
 

@@ -19,8 +19,12 @@ public class Notification {
     private String text;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    private User user;
+    @JoinColumn(name="sender_user_id", nullable = false)
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name="receiver_user_id", nullable = false)
+    private User receiver;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -47,12 +51,20 @@ public class Notification {
         this.text = text;
     }
 
-    public User getUser() {
-        return user;
+    public User getSender() {
+        return sender;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 
     public Post getPost() {

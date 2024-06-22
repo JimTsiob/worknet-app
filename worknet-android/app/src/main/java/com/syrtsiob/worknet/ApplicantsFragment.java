@@ -20,18 +20,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
-import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ApplicantDTO;
-import com.syrtsiob.worknet.model.ConnectionDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.JobDTO;
-import com.syrtsiob.worknet.model.SmallUserDTO;
-import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;

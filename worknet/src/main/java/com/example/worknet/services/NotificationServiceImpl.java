@@ -57,31 +57,31 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
 
-    public void sendNotification(Long userId, Long postId){
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Optional<Post> post = postRepository.findById(postId);
-
-        Notification notification = new Notification();
-
-        // notification for connection
-        // in front end we get the id of the sender and set text there.
-        if (post.isEmpty()){
-            notification.setUser(user);
-            user.getNotifications().add(notification);
-
-            userRepository.save(user);
-            return;
-        }
-
-        // notification for like on post by someone.
-        // same procedure for this one.
-
-        notification.setUser(user);
-        notification.setPost(post.get());
-
-        user.getNotifications().add(notification);
-
-        userRepository.save(user);
-        postRepository.save(post.get());
-    }
+//    public void sendNotification(Long userId, Long postId){
+//        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+//        Optional<Post> post = postRepository.findById(postId);
+//
+//        Notification notification = new Notification();
+//
+//        // notification for connection
+//        // in front end we get the id of the sender and set text there.
+//        if (post.isEmpty()){
+//            notification.setUser(user);
+//            user.getNotifications().add(notification);
+//
+//            userRepository.save(user);
+//            return;
+//        }
+//
+//        // notification for like on post by someone.
+//        // same procedure for this one.
+//
+//        notification.setUser(user);
+//        notification.setPost(post.get());
+//
+//        user.getNotifications().add(notification);
+//
+//        userRepository.save(user);
+//        postRepository.save(post.get());
+//    }
 }

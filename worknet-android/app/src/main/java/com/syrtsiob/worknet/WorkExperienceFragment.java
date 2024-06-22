@@ -21,8 +21,7 @@ import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ApplicantDTO;
-import com.syrtsiob.worknet.model.ConnectionDTO;
-import com.syrtsiob.worknet.model.SkillDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
@@ -140,14 +139,14 @@ public class WorkExperienceFragment extends Fragment {
         });
     }
 
-    public void fetchConnectionData(ConnectionDTO connectionDTO){
+    public void fetchConnectionData(EnlargedUserDTO enlargedUserDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         workExperienceList = requireView().findViewById(R.id.work_experience_list);
         workExperienceList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(enlargedUserDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
@@ -258,7 +257,15 @@ public class WorkExperienceFragment extends Fragment {
         TextView privacy_label = workExperienceListEntry.findViewById(R.id.privacy_label);
 
         title.setText(workExperienceDTO.getTitle());
-        employmentType.setText(workExperienceDTO.getEmploymentType().toString());
+
+        if (workExperienceDTO.getEmploymentType().toString().equals("FULL_TIME")){
+            employmentType.setText("Full time position");
+        }else if (workExperienceDTO.getEmploymentType().toString().equals("PART_TIME")){
+            employmentType.setText("Part time position");
+        }else{
+            employmentType.setText("Contract position");
+        }
+
         companyName.setText(workExperienceDTO.getCompanyName());
         location.setText(workExperienceDTO.getLocation());
 
@@ -269,7 +276,13 @@ public class WorkExperienceFragment extends Fragment {
         }
 
         startDate.setText(workExperienceDTO.getStartDate());
-        endDate.setText(workExperienceDTO.getEndDate());
+
+        if (workExperienceDTO.getEndDate() != null){
+            endDate.setText(workExperienceDTO.getEndDate().toString());
+        }else{
+            endDate.setText("today");
+        }
+
         description.setText(workExperienceDTO.getDescription());
 
         if (workExperienceDTO.getIsPublic()){
@@ -385,6 +398,7 @@ public class WorkExperienceFragment extends Fragment {
         companyName.setText(workExperienceDTO.getCompanyName());
         location.setText(workExperienceDTO.getLocation());
         startDate.setText(workExperienceDTO.getStartDate().toString());
+
         if (workExperienceDTO.getEndDate() != null){
             endDate.setText(workExperienceDTO.getEndDate().toString());
         }else{

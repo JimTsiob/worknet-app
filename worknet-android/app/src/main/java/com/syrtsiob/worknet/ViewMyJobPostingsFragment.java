@@ -53,6 +53,10 @@ public class ViewMyJobPostingsFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_view_my_job_postings, container, false);
     }
 
+    public static ViewMyJobPostingsFragment newInstance() {
+        return new ViewMyJobPostingsFragment();
+    }
+
     @Override
     public void onStart() {
         super.onStart();

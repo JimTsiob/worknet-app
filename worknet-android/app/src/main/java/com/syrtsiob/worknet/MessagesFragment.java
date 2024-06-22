@@ -1,6 +1,9 @@
 package com.syrtsiob.worknet;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,9 +17,22 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.syrtsiob.worknet.enums.NotificationType;
-import com.syrtsiob.worknet.model.NotificationDTO;
-import com.syrtsiob.worknet.model.SmallUserDTO;
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
+import com.syrtsiob.worknet.model.MessageDTO;
+import com.syrtsiob.worknet.model.UserDTO;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MessagesFragment extends Fragment {
 
@@ -80,41 +96,121 @@ public class MessagesFragment extends Fragment {
 
         chatsList = requireView().findViewById(R.id.chatsList);
 
-        AddChatEntry();
-        AddChatEntry();
-        AddChatEntry();
-    }
+        UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            List<MessageDTO> receivedMessages = userDTO.getReceivedMessages();
+            List<MessageDTO> sentMessages = userDTO.getSentMessages();
 
-    // TODO this is for testing purposes -- remove
-    private void AddChatEntry() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View chatEntry = inflater
-                .inflate(R.layout.chat_list_entry, chatsList, false);
+            if (receivedMessages.isEmpty() && sentMessages.isEmpty()){
+                showEmptyMessages();
+            }
 
-        chatEntry.setOnClickListener(listener -> {
-            Intent intent = new Intent(getContext(), Chat.class);
-            startActivity(intent);
+            // users who sent or received messages from the examined user.
+            List<EnlargedUserDTO> users = new ArrayList<>();
+
+            for (MessageDTO message: receivedMessages){
+                users.add(message.getSender());
+            }
+
+            for (MessageDTO message: sentMessages){
+                users.add(message.getReceiver());
+            }
+
+            // DTO used for proper chat functionality later on
+            EnlargedUserDTO loggedInUser = new EnlargedUserDTO();
+            loggedInUser.setEducations(userDTO.getEducations());
+            loggedInUser.setFiles(userDTO.getFiles());
+            loggedInUser.setEmail(userDTO.getEmail());
+            loggedInUser.setId(userDTO.getId());
+            loggedInUser.setLastName(userDTO.getLastName());
+            loggedInUser.setFirstName(userDTO.getFirstName());
+            loggedInUser.setSkills(userDTO.getSkills());
+            loggedInUser.setProfilePicture(userDTO.getProfilePicture());
+            loggedInUser.setWorkExperiences(userDTO.getWorkExperiences());
+
+            // Remove duplicate users
+
+            List<EnlargedUserDTO> uniqueUsers = removeDuplicates(users);
+
+
+            // get all chat entries
+            for (EnlargedUserDTO user: uniqueUsers){
+                AddChatEntry(user, loggedInUser, userDTO);
+            }
         });
-
-        chatsList.addView(chatEntry);
     }
 
-    private void AddChatEntry(SmallUserDTO smallUserDTO) {
+    public static List<EnlargedUserDTO> removeDuplicates(List<EnlargedUserDTO> users) {
+        Set<Long> seenIds = new HashSet<>();
+        return users.stream()
+                .filter(user -> seenIds.add(user.getId())) // Add to set if not already present
+                .collect(Collectors.toList()); // Collect filtered users into a list
+    }
+
+    private void showEmptyMessages(){
+        TextView noMessagesTextView = new TextView(getActivity());
+        noMessagesTextView.setText("There are no messages currently for you.");
+        noMessagesTextView.setTextSize(20); // Set desired text size
+        noMessagesTextView.setTextColor(Color.BLACK);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(120, 300, 16, 16);
+        noMessagesTextView.setLayoutParams(params);
+
+        chatsList.addView(noMessagesTextView);
+    }
+
+    private void AddChatEntry(EnlargedUserDTO enlargedUserDTO, EnlargedUserDTO loggedInUser, UserDTO loggedInUserDto) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View chatEntry = inflater
                 .inflate(R.layout.chat_list_entry, chatsList, false);
+
+        LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params2.setMargins(0, 50, 0, 0);
+        chatEntry.setLayoutParams(params2);
 
         ImageView picture = chatEntry.findViewById(R.id.chatImage);
         TextView userName = chatEntry.findViewById(R.id.chatUserName);
 
-        // TODO update change picture or remove it from notification structure
-        userName.setText(smallUserDTO.getFirstName() + " " + smallUserDTO.getLastName());
+        String profilePicName = enlargedUserDTO.getProfilePicture();
+        List<CustomFileDTO> files = enlargedUserDTO.getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
+            picture.setImageBitmap(bitmap);
+        }
+
+        userName.setText(enlargedUserDTO.getFirstName() + " " + enlargedUserDTO.getLastName());
 
         chatEntry.setOnClickListener(listener -> {
             Intent intent = new Intent(getContext(), Chat.class);
+            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
+            intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, enlargedUserDTO);
+            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
             startActivity(intent);
         });
 
         chatsList.addView(chatEntry);
     }
+
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
+
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
+    }
+
+
 }
