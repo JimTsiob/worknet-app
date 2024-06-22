@@ -1,8 +1,10 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +15,26 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.MessageDTO;
+import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.MessageService;
+import com.syrtsiob.worknet.services.NotificationService;
+import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -33,6 +45,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class Chat extends AppCompatActivity {
 
@@ -107,30 +124,106 @@ public class Chat extends AppCompatActivity {
 
         chatUserName.setText("Chat with " + otherUser.getFirstName() + " " + otherUser.getLastName());
 
-        List<MessageDTO> receivedMessages = loggedInUserDto.getReceivedMessages();
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        MessageService messageService = retrofit.create(MessageService.class);
 
-        List<MessageDTO> sentMessages = loggedInUserDto.getSentMessages();
+        messageService.getAllMessages().enqueue(new Callback<List<MessageDTO>>() {
+            @Override
+            public void onResponse(Call<List<MessageDTO>> call, Response<List<MessageDTO>> response) {
+                if (response.isSuccessful()){
+                    // get only messages with our two users present
+                    List<MessageDTO> filteredMessages = new ArrayList<>();
 
-        List<MessageDTO> allMessages = new ArrayList<>();
+                    for (MessageDTO messageDTO: response.body()){
+                        if (filterMessage(messageDTO)) {
+                            filteredMessages.add(messageDTO);
+                        }
+                    }
 
-        allMessages.addAll(receivedMessages);
-        allMessages.addAll(sentMessages);
+                    // sort by ID ascendingly to show the messages in order.
+                    filteredMessages = filteredMessages.stream()
+                            .sorted(Comparator.comparing(MessageDTO::getId))
+                            .collect(Collectors.toList());
 
-        // get only messages with our two users present
-        List<MessageDTO> filteredMessages = new ArrayList<>();
+                    PopulateChat(filteredMessages);
 
-        for (MessageDTO messageDTO: allMessages){
-            if (filterMessage(messageDTO)) {
-                filteredMessages.add(messageDTO);
+                    buttonSend.setOnClickListener(listener -> {
+                        MessageDTO messageDTO = new MessageDTO();
+                        messageDTO.setText(editTextMessage.getText().toString());
+                        messageDTO.setReceiver(otherUser);
+                        messageDTO.setSender(loggedInUser);
+
+                        NotificationService notificationService = retrofit.create(NotificationService.class);
+
+                        messageService.addMessage(messageDTO).enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                if (response.isSuccessful()){
+                                    Toast.makeText(Chat.this, "message sent successfully.", Toast.LENGTH_LONG).show();
+
+                                    NotificationDTO notificationDTO = new NotificationDTO();
+                                    NotificationType notificationType = NotificationType.valueOf("MESSAGE");
+                                    notificationDTO.setNotificationType(notificationType);
+
+                                    SmallUserDTO smallOtherUserDTO = new SmallUserDTO();
+                                    smallOtherUserDTO.setId(otherUser.getId());
+                                    smallOtherUserDTO.setFirstName(otherUser.getFirstName());
+                                    smallOtherUserDTO.setLastName(otherUser.getLastName());
+
+                                    notificationDTO.setReceiver(smallOtherUserDTO);
+                                    notificationDTO.setSender(loggedInUser);
+
+                                    String notificationText = loggedInUser.getFirstName() + " " + loggedInUser.getLastName() + " has sent you a message.";
+                                    notificationDTO.setText(notificationText);
+
+
+                                    notificationService.addNotification(notificationDTO).enqueue(new Callback<String>() {
+                                        @Override
+                                        public void onResponse(Call<String> call, Response<String> response) {
+                                            if (response.isSuccessful()){
+                                                // print nothing
+//                                    replaceFragment(MessagesFragment.newInstance());
+                                                Intent intent = new Intent(Chat.this, Chat.class);
+                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
+                                                intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, otherUser);
+                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
+                                                startActivity(intent);
+
+                                            }else{
+                                                Toast.makeText(Chat.this, "Notification addition failed! Check the format.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<String> call, Throwable t) {
+                                            Log.d("message notification failure: ", t.getLocalizedMessage());
+                                            Toast.makeText(Chat.this, "Notification addition failed! Server failure.", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }else{
+                                    Toast.makeText(Chat.this, "message sending failed. Check the format.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Log.d("message failure: ", t.getLocalizedMessage());
+                                Toast.makeText(Chat.this, "message sending failed. Server failure.", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    });
+
+                }else{
+                    Toast.makeText(Chat.this, "Failed message server fetch. Check the format.", Toast.LENGTH_LONG).show();
+                }
             }
-        }
 
-        // sort by ID ascendingly to show the messages in order.
-        filteredMessages = filteredMessages.stream()
-                .sorted(Comparator.comparing(MessageDTO::getId))
-                .collect(Collectors.toList());
-
-        PopulateChat(filteredMessages);
+            @Override
+            public void onFailure(Call<List<MessageDTO>> call, Throwable t) {
+                Log.d("message failure: ", t.getLocalizedMessage());
+                Toast.makeText(Chat.this, "Failed message server fetch. Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
 
         OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
             @Override
@@ -149,6 +242,10 @@ public class Chat extends AppCompatActivity {
         ResetScrollView();
     }
 
+
+    /**
+     * Finds all messages with our loggedin User and the other chat user.
+     * */
     private boolean filterMessage(MessageDTO message){
         return (Objects.equals(message.getSender().getId(), loggedInUser.getId()) && Objects.equals(message.getReceiver().getId(), otherUser.getId())
         || (Objects.equals(message.getSender().getId(), otherUser.getId()) && Objects.equals(message.getReceiver().getId(), loggedInUser.getId())));
@@ -212,6 +309,7 @@ public class Chat extends AppCompatActivity {
         newMessage.setTextSize(20);
         newMessage.setLayoutParams(params);
 
+        // add other user's messages in the yellow box, our logged in user in the silver box.
         if(!(Objects.equals(message.getSender().getId(), loggedInUser.getId()))){
             yellowSquare.addView(newMessage);
             messages.addView(yellowSquare);
@@ -222,6 +320,13 @@ public class Chat extends AppCompatActivity {
         }
 
         ResetScrollView();
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
     }
 
     private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {

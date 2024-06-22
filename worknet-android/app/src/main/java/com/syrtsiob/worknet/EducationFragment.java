@@ -157,7 +157,7 @@ public class EducationFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<EducationDTO> educations = response.body().getEducations();
 
-                    // if connection has no educations, or all educations are private show empty text
+                    // if connection has no educations show empty text
                     if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showApplicantEmptyEducation();
                     }else{
@@ -193,7 +193,7 @@ public class EducationFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<EducationDTO> educations = response.body().getEducations();
 
-                    // if connection has no educations, or all educations are private show empty text
+                    // if connection has no educations show empty text
                     if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showConnectionEmptyEducation();
                     }else{

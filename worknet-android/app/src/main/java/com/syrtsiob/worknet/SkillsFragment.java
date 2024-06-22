@@ -165,7 +165,7 @@ public class SkillsFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<SkillDTO> skills = response.body().getSkills();
 
-                    // if connection has no skills, or all skills are private show empty text
+                    // if connection has no skills show empty text
                     if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showApplicantEmptySkills();
                     }else{
@@ -200,7 +200,7 @@ public class SkillsFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<SkillDTO> skills = response.body().getSkills();
 
-                    // if connection has no skills, or all skills are private show empty text
+                    // if connection has no skills show empty text
                     if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showConnectionEmptySkills();
                     }else{

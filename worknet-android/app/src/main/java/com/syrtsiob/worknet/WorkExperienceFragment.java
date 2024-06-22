@@ -152,7 +152,7 @@ public class WorkExperienceFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
 
-                    // if connection has no work experiences, or all work experiences are private show empty text
+                    // if connection has no work experiences show empty text
                     if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showConnectionEmptyWorkExperience();
                     }else{
@@ -187,7 +187,7 @@ public class WorkExperienceFragment extends Fragment {
                 if (response.isSuccessful()){
                     List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
 
-                    // if connection has no work experiences, or all work experiences are private show empty text
+                    // if connection has no work experiences show empty text
                     if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
                         showApplicantEmptyWorkExperience();
                     }else{
