@@ -15,6 +15,7 @@ public class PostDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDate postCreationDate;
     private List<NotificationDTO> notifications;
+    private List<CommentDTO> comments;
 
     public PostDTO() {
     }
@@ -73,5 +74,13 @@ public class PostDTO {
 
     public void setNotifications(List<NotificationDTO> notifications) {
         this.notifications = notifications;
+    }
+
+    public List<CommentDTO> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentDTO> comments) {
+        this.comments = comments;
     }
 }

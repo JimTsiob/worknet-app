@@ -4,7 +4,7 @@ public class CommentDTO {
     private Long id;
     private String text;
     private SmallUserDTO user;
-    private PostDTO post;
+    private SmallPostDTO post;
 
     public Long getId() {
         return id;
@@ -30,11 +30,11 @@ public class CommentDTO {
         this.user = user;
     }
 
-    public PostDTO getPost() {
+    public SmallPostDTO getPost() {
         return post;
     }
 
-    public void setPost(PostDTO post) {
+    public void setPost(SmallPostDTO post) {
         this.post = post;
     }
 }
