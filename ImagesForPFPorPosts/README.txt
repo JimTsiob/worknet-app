@@ -1,4 +1,0 @@
-1. add your desired image to device explorer -> sdcard/donwnload.
-2. open virtual phone and go to download folder through Files app.
-3. move the images to sdcard/pictures.
-4. done.

@@ -17,8 +17,13 @@ public class Message {
     @Column(name = "text")
     private String text;
 
-    @ManyToMany(mappedBy = "messages")
-    private List<User> users;
+    @ManyToOne
+    @JoinColumn(name="sender_user_id", nullable = false)
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name="receiver_user_id", nullable = false)
+    private User receiver;
 
     public Message() {}
 
@@ -38,11 +43,19 @@ public class Message {
         this.text = text;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public User getSender() {
+        return sender;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 }

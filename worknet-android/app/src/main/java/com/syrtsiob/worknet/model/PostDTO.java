@@ -9,6 +9,7 @@ public class PostDTO {
     private SmallUserDTO user;
     private List<CustomFileDTO> customFiles;
     private List<PostLikeDTO> likes;
+    private List<CommentDTO> comments;
 
     public PostDTO() {
     }
@@ -51,5 +52,13 @@ public class PostDTO {
 
     public void setLikes(List<PostLikeDTO> likes) {
         this.likes = likes;
+    }
+
+    public List<CommentDTO> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentDTO> comments) {
+        this.comments = comments;
     }
 }

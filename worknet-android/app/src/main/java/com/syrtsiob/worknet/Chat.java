@@ -1,7 +1,13 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -9,19 +15,49 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.syrtsiob.worknet.enums.NotificationType;
+import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
+import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.MessageDTO;
+import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.MessageService;
+import com.syrtsiob.worknet.services.NotificationService;
+import com.syrtsiob.worknet.services.UserService;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class Chat extends AppCompatActivity {
 
     LinearLayout messages;
+
+    LinearLayout yellowBox;
+
+    LinearLayout silverBox;
     ScrollView scrollView;
 
     ImageButton buttonSend;
@@ -31,7 +67,17 @@ public class Chat extends AppCompatActivity {
     ImageView chatImage;
     TextView chatUserName;
 
-    SmallUserDTO currentUser;
+    EnlargedUserDTO loggedInUser;
+
+    EnlargedUserDTO otherUser;
+
+    UserDTO loggedInUserDto;
+
+    static final String SERIALIZABLE_LOGGED_IN_USER = "serializable_logged_in_user";
+
+    static final String SERIALIZABLE_OTHER_USER = "serializable_other_user";
+
+    static final String SERIALIZABLE_LOGGED_IN_USER_DTO = "serializable_logged_in_user_dto";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +85,14 @@ public class Chat extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         messages = findViewById(R.id.messages);
+
+        yellowBox = findViewById(R.id.yellowBox);
+
+        silverBox = findViewById(R.id.silverBox);
+
+        yellowBox.setVisibility(View.GONE);
+        silverBox.setVisibility(View.GONE);
+
         scrollView = findViewById(R.id.scrollView);
 
         chatImage = findViewById(R.id.chatImage);
@@ -51,12 +105,125 @@ public class Chat extends AppCompatActivity {
 
         buttonSend = findViewById(R.id.buttonSend);
 
-        // TODO set current user - SmallUserDTO
+        loggedInUser = getIntent().getSerializableExtra(SERIALIZABLE_LOGGED_IN_USER, EnlargedUserDTO.class);
 
-        // TODO also set profile pic and name of other user
+        otherUser = getIntent().getSerializableExtra(SERIALIZABLE_OTHER_USER, EnlargedUserDTO.class);
 
-        // TODO call populate chat with messages' arraylist
-        TestPopulateChat();
+        loggedInUserDto = getIntent().getSerializableExtra(SERIALIZABLE_LOGGED_IN_USER_DTO, UserDTO.class);
+
+        String profilePicName = otherUser.getProfilePicture();
+        List<CustomFileDTO> files = otherUser.getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
+            chatImage.setImageBitmap(bitmap);
+        }
+
+        chatUserName.setText("Chat with " + otherUser.getFirstName() + " " + otherUser.getLastName());
+
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        MessageService messageService = retrofit.create(MessageService.class);
+
+        messageService.getAllMessages().enqueue(new Callback<List<MessageDTO>>() {
+            @Override
+            public void onResponse(Call<List<MessageDTO>> call, Response<List<MessageDTO>> response) {
+                if (response.isSuccessful()){
+                    // get only messages with our two users present
+                    List<MessageDTO> filteredMessages = new ArrayList<>();
+
+                    for (MessageDTO messageDTO: response.body()){
+                        if (filterMessage(messageDTO)) {
+                            filteredMessages.add(messageDTO);
+                        }
+                    }
+
+                    // sort by ID ascendingly to show the messages in order.
+                    filteredMessages = filteredMessages.stream()
+                            .sorted(Comparator.comparing(MessageDTO::getId))
+                            .collect(Collectors.toList());
+
+                    PopulateChat(filteredMessages);
+
+                    buttonSend.setOnClickListener(listener -> {
+                        MessageDTO messageDTO = new MessageDTO();
+                        messageDTO.setText(editTextMessage.getText().toString());
+                        messageDTO.setReceiver(otherUser);
+                        messageDTO.setSender(loggedInUser);
+
+                        NotificationService notificationService = retrofit.create(NotificationService.class);
+
+                        messageService.addMessage(messageDTO).enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                if (response.isSuccessful()){
+                                    Toast.makeText(Chat.this, "message sent successfully.", Toast.LENGTH_LONG).show();
+
+                                    NotificationDTO notificationDTO = new NotificationDTO();
+                                    NotificationType notificationType = NotificationType.valueOf("MESSAGE");
+                                    notificationDTO.setNotificationType(notificationType);
+
+                                    SmallUserDTO smallOtherUserDTO = new SmallUserDTO();
+                                    smallOtherUserDTO.setId(otherUser.getId());
+                                    smallOtherUserDTO.setFirstName(otherUser.getFirstName());
+                                    smallOtherUserDTO.setLastName(otherUser.getLastName());
+
+                                    notificationDTO.setReceiver(smallOtherUserDTO);
+                                    notificationDTO.setSender(loggedInUser);
+
+                                    String notificationText = loggedInUser.getFirstName() + " " + loggedInUser.getLastName() + " has sent you a message.";
+                                    notificationDTO.setText(notificationText);
+
+
+                                    notificationService.addNotification(notificationDTO).enqueue(new Callback<String>() {
+                                        @Override
+                                        public void onResponse(Call<String> call, Response<String> response) {
+                                            if (response.isSuccessful()){
+                                                // print nothing
+//                                    replaceFragment(MessagesFragment.newInstance());
+                                                Intent intent = new Intent(Chat.this, Chat.class);
+                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
+                                                intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, otherUser);
+                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
+                                                startActivity(intent);
+
+                                            }else{
+                                                Toast.makeText(Chat.this, "Notification addition failed! Check the format.", Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<String> call, Throwable t) {
+                                            Log.d("message notification failure: ", t.getLocalizedMessage());
+                                            Toast.makeText(Chat.this, "Notification addition failed! Server failure.", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }else{
+                                    Toast.makeText(Chat.this, "message sending failed. Check the format.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Log.d("message failure: ", t.getLocalizedMessage());
+                                Toast.makeText(Chat.this, "message sending failed. Server failure.", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    });
+
+                }else{
+                    Toast.makeText(Chat.this, "Failed message server fetch. Check the format.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MessageDTO>> call, Throwable t) {
+                Log.d("message failure: ", t.getLocalizedMessage());
+                Toast.makeText(Chat.this, "Failed message server fetch. Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
 
         OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
             @Override
@@ -75,6 +242,15 @@ public class Chat extends AppCompatActivity {
         ResetScrollView();
     }
 
+
+    /**
+     * Finds all messages with our loggedin User and the other chat user.
+     * */
+    private boolean filterMessage(MessageDTO message){
+        return (Objects.equals(message.getSender().getId(), loggedInUser.getId()) && Objects.equals(message.getReceiver().getId(), otherUser.getId())
+        || (Objects.equals(message.getSender().getId(), otherUser.getId()) && Objects.equals(message.getReceiver().getId(), loggedInUser.getId())));
+    }
+
     // Should always be called after chat interaction
     private void ResetScrollView() {
         scrollView.post(new Runnable() {
@@ -85,7 +261,7 @@ public class Chat extends AppCompatActivity {
         });
     }
 
-    private void PopulateChat(ArrayList<MessageDTO> messageList) {
+    private void PopulateChat(List<MessageDTO> messageList) {
         for (MessageDTO message : messageList) {
             AddNewMessage(message);
         }
@@ -94,32 +270,73 @@ public class Chat extends AppCompatActivity {
     private void AddNewMessage(MessageDTO message) {
         TextView newMessage = new TextView(this);
 
-        newMessage.setText(message.getText());
-        newMessage.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        if ((Objects.equals(message.getSender().getId(), loggedInUser.getId()))){
+            newMessage.setText("You: " + message.getText());
+        }else{
+            newMessage.setText(message.getSender().getFirstName() + " " + message.getSender().getLastName() + ": " + message.getText());
+        }
 
-        if(currentUser != message.getUsers().get(0))
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        params.setMargins(0, 50, 0, 0);
+
+        if(!(Objects.equals(message.getSender().getId(), loggedInUser.getId())))
             newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
         else
             newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
-        messages.addView(newMessage);
+        LinearLayout yellowSquare = new LinearLayout(getApplicationContext());
+        yellowSquare.setLayoutParams(yellowBox.getLayoutParams()); // Copy layout params
+        yellowSquare.setOrientation(yellowBox.getOrientation()); // Copy orientation (optional)
+
+        int yellowColor = getApplicationContext().getResources().getColor(R.color.yellow); // Get color from resources
+        yellowSquare.setBackgroundColor(yellowColor);
+
+        yellowSquare.setPadding(yellowBox.getPaddingLeft(), yellowBox.getPaddingTop(), yellowBox.getPaddingRight(), yellowBox.getPaddingBottom());
+
+        LinearLayout silverSquare = new LinearLayout(getApplicationContext());
+        silverSquare.setLayoutParams(silverBox.getLayoutParams());
+        silverSquare.setOrientation(silverBox.getOrientation());
+
+        int silverColor = getApplicationContext().getResources().getColor(R.color.silver);
+        silverSquare.setBackgroundColor(silverColor);
+
+        silverSquare.setPadding(silverBox.getPaddingLeft(), silverBox.getPaddingTop(), silverBox.getPaddingRight(), silverBox.getPaddingBottom());
+
+
+        newMessage.setTextSize(20);
+        newMessage.setLayoutParams(params);
+
+        // add other user's messages in the yellow box, our logged in user in the silver box.
+        if(!(Objects.equals(message.getSender().getId(), loggedInUser.getId()))){
+            yellowSquare.addView(newMessage);
+            messages.addView(yellowSquare);
+        }
+        else{
+            silverSquare.addView(newMessage);
+            messages.addView(silverSquare);
+        }
+
         ResetScrollView();
     }
 
-    private void TestPopulateChat() {
-        for (int i = 0; i <50; i++) {
-            TextView newMessage = new TextView(this);
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
+    }
 
-            newMessage.setText("Message " + i);
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-            if(i%2==0)
-                newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-            else
-                newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-
-            messages.addView(newMessage);
-            ResetScrollView();
-        }
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }

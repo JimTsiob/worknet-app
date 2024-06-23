@@ -12,14 +12,17 @@ public class UserDTO {
     private String password;
     private String profilePicture;
     private List<CustomFileDTO> files;
-    private List<ConnectionDTO> connections;
+    private List<EnlargedUserDTO> connections;
+    private List<JobDTO> jobs;
     private List<SmallJobDTO> appliedJobs;
     private List<UserLikeDTO> likes;
     private List<SmallPostDTO> posts;
-    private List<MessageDTO> messages;
+    private List<MessageDTO> sentMessages;
+    private List<MessageDTO> receivedMessages;
     private List<SkillDTO> skills;
     private List<EducationDTO> educations;
-    private List<NotificationDTO> notifications;
+    private List<NotificationDTO> sentNotifications;
+    private List<NotificationDTO> receivedNotifications;
     private List<WorkExperienceDTO> workExperiences;
 
 
@@ -97,12 +100,20 @@ public class UserDTO {
         this.files = files;
     }
 
-    public List<ConnectionDTO> getConnections() {
+    public List<EnlargedUserDTO> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<ConnectionDTO> connections) {
+    public void setConnections(List<EnlargedUserDTO> connections) {
         this.connections = connections;
+    }
+
+    public List<JobDTO> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<JobDTO> jobs) {
+        this.jobs = jobs;
     }
 
     public List<SmallJobDTO> getAppliedJobs() {
@@ -121,12 +132,20 @@ public class UserDTO {
         this.likes = likes;
     }
 
-    public List<MessageDTO> getMessages() {
-        return messages;
+    public List<MessageDTO> getSentMessages() {
+        return sentMessages;
     }
 
-    public void setMessages(List<MessageDTO> messages) {
-        this.messages = messages;
+    public void setSentMessages(List<MessageDTO> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<MessageDTO> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(List<MessageDTO> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 
     public List<SkillDTO> getSkills() {
@@ -145,12 +164,20 @@ public class UserDTO {
         this.educations = educations;
     }
 
-    public List<NotificationDTO> getNotifications() {
-        return notifications;
+    public List<NotificationDTO> getSentNotifications() {
+        return sentNotifications;
     }
 
-    public void setNotifications(List<NotificationDTO> notifications) {
-        this.notifications = notifications;
+    public void setSentNotifications(List<NotificationDTO> sentNotifications) {
+        this.sentNotifications = sentNotifications;
+    }
+
+    public List<NotificationDTO> getReceivedNotifications() {
+        return receivedNotifications;
+    }
+
+    public void setReceivedNotifications(List<NotificationDTO> receivedNotifications) {
+        this.receivedNotifications = receivedNotifications;
     }
 
     public List<SmallPostDTO> getPosts() {

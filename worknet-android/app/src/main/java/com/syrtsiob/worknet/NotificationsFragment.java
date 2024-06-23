@@ -1,12 +1,18 @@
 package com.syrtsiob.worknet;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +20,27 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.enums.NotificationType;
+import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
+import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.UserService;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class NotificationsFragment extends Fragment {
 
@@ -40,22 +63,54 @@ public class NotificationsFragment extends Fragment {
 
         notificationContainer = requireView().findViewById(R.id.notificationContainer);
 
-        AddNotification();
-        AddNotification();
-        AddNotification();
+        UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+            UserService userService = retrofit.create(UserService.class);
+
+            userService.getUserById(userDTO.getId()).enqueue(new Callback<UserDTO>() {
+                @Override
+                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    if (response.isSuccessful()){
+                        List<NotificationDTO> notifications = response.body().getReceivedNotifications();
+
+                        if (!notifications.isEmpty()){
+                            for (NotificationDTO notification: notifications){
+                                AddNotification(notification);
+                            }
+                        }else{
+                            showEmptyNotifications();
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "Notifications fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDTO> call, Throwable t) {
+                    Log.d("notifs failure: ", t.getLocalizedMessage());
+                    Toast.makeText(getActivity(), "Notifications fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
+
+        });
     }
 
-    // TODO this is for testing purposes -- remove
-    private void AddNotification() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View notificationEntry = inflater
-                .inflate(R.layout.notification_entry, notificationContainer, false);
+    private void showEmptyNotifications(){
+        TextView noNotificationsTextView = new TextView(getActivity());
+        noNotificationsTextView.setText("There are no notifications currently for you.");
+        noNotificationsTextView.setTextSize(20); // Set desired text size
+        noNotificationsTextView.setTextColor(Color.BLACK);
 
-        notificationEntry.setOnClickListener(listener -> {
-            // TODO implement switch based on context
-        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(100, 300, 16, 16);
+        noNotificationsTextView.setLayoutParams(params);
 
-        notificationContainer.addView(notificationEntry);
+        notificationContainer.addView(noNotificationsTextView);
     }
 
     private void AddNotification(NotificationDTO notificationDTO) {
@@ -64,29 +119,86 @@ public class NotificationsFragment extends Fragment {
                 .inflate(R.layout.notification_entry, notificationContainer, false);
 
         ImageView picture = notificationEntry.findViewById(R.id.notificationPicture);
-        TextView text = notificationEntry.findViewById(R.id.notificationText);
 
-        // TODO update change picture or remove it from notification structure
+        String profilePicName = notificationDTO.getSender().getProfilePicture();
+        List<CustomFileDTO> files = notificationDTO.getSender().getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
+            picture.setImageBitmap(bitmap);
+        }
+
+        TextView text = notificationEntry.findViewById(R.id.notificationText);
+        Button leftButton = notificationEntry.findViewById(R.id.notificationButton1);
+        Button rightButton = notificationEntry.findViewById(R.id.notificationButton2);
+
         text.setText(notificationDTO.getText());
 
-        notificationEntry.setOnClickListener(listener -> {
-            NotificationType notificationType = notificationDTO.getNotificationType();
-            switch (notificationType) {
-                case CONNECTION:
-                    // TODO implement
-                    break;
-                case APPLY_TO_JOB_POST:
-                    // TODO implement
-                    break;
-                case LIKE_POST:
-                    // TODO implement
-                    break;
-                case MESSAGE:
-                    // TODO implement
-                    break;
-            }
-        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        NotificationType notificationType = notificationDTO.getNotificationType();
+        switch (notificationType) {
+            case CONNECTION:
+                // TODO implement
+                break;
+            case APPLY_TO_JOB_POST:
+
+                params.setMargins(0, 0, 80, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to job posting");
+
+                leftButton.setOnClickListener(listener -> {
+                    replaceFragment(ViewMyJobPostingsFragment.newInstance());
+                });
+
+                rightButton.setVisibility(View.GONE);
+                break;
+            case LIKE_POST:
+                // TODO implement
+                break;
+            case MESSAGE:
+                params.setMargins(0, 0, 30, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to messages");
+
+                leftButton.setOnClickListener(listener -> {
+                    replaceFragment(MessagesFragment.newInstance());
+                });
+
+                rightButton.setVisibility(View.GONE);
+                break;
+            case COMMENT:
+                // TODO implement
+                break;
+        }
 
         notificationContainer.addView(notificationEntry);
+    }
+
+    // method that returns images from the db.
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
+
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
     }
 }

@@ -19,13 +19,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ConnectionDTO;
+import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,10 +100,15 @@ public class ApplicantsFragment extends Fragment {
         applicantsList = requireView().findViewById(R.id.applicant_list);
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
-            List<ConnectionDTO> connections = userDTO.getConnections();
-            if (connections.isEmpty()){
+            List<JobDTO> jobs = userDTO.getJobs();
+            List<ApplicantDTO> applicants = new ArrayList<>();
+            for (JobDTO job: jobs){
+                applicants.addAll(job.getInterestedUsers());
+            }
+
+            if (applicants.isEmpty()){
                 TextView noApplicantsTextView = new TextView(getActivity());
-                noApplicantsTextView.setText("There are no applicants. \n");
+                noApplicantsTextView.setText("There are no applicants yet. \n");
                 noApplicantsTextView.setTextSize(20); // Set desired text size
                 noApplicantsTextView.setTextColor(Color.BLACK);
 
@@ -113,17 +122,16 @@ public class ApplicantsFragment extends Fragment {
                 applicantsList.addView(noApplicantsTextView);
             }
 
-            // TODO replace with applicants
-//            for (ConnectionDTO connection : connections){
-//                addEntryToList(connection);
-//            }
+
+            for (ApplicantDTO applicant : applicants){
+                addEntryToList(applicant);
+            }
         });
 
 
     }
 
-    // TODO replace with applicants?
-    private void addEntryToList(ConnectionDTO connection) {
+    private void addEntryToList(ApplicantDTO applicant) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View applicantsListEntry = inflater
                 .inflate(R.layout.network_list_entry_template, applicantsList, false);
@@ -133,19 +141,19 @@ public class ApplicantsFragment extends Fragment {
         TextView employer = applicantsListEntry.findViewById(R.id.employer);
 
         ImageView profilePic = applicantsListEntry.findViewById(R.id.user_profile_pic);
-        String profilePicName = connection.getProfilePicture();
-        List<CustomFileDTO> files = connection.getFiles();
+        String profilePicName = applicant.getProfilePicture();
+        List<CustomFileDTO> files = applicant.getFiles();
         Optional<CustomFileDTO> profilePicture = files.stream()
                 .filter(file -> file.getFileName().equals(profilePicName))
                 .findFirst();
 
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get().getFileName());
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
             profilePic.setImageBitmap(bitmap);
         }
 
-        fullName.setText(connection.getFirstName() + " " + connection.getLastName());
-        List<WorkExperienceDTO> workExperiences = connection.getWorkExperiences();
+        fullName.setText(applicant.getFirstName() + " " + applicant.getLastName());
+        List<WorkExperienceDTO> workExperiences = applicant.getWorkExperiences();
 
         String positionText =  workExperiences.stream()
                 .filter(WorkExperienceDTO::getCurrentlyWorking)
@@ -167,7 +175,7 @@ public class ApplicantsFragment extends Fragment {
 
         goToProfileButton.setOnClickListener(listener -> {
             // add connection and once user leaves profile page reset to proper user.
-            ConnectionUserDtoResultLiveData.getInstance().setValue(connection);
+            ApplicantUserDtoResultLiveData.getInstance().setValue(applicant);
             replaceFragment(ProfileFragment.newInstance());
         });
 
@@ -181,14 +189,15 @@ public class ApplicantsFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromConnectionFile(String fileName) {
-        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
+    // method that returns images from the db.
+    private Bitmap loadImageFromConnectionFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }

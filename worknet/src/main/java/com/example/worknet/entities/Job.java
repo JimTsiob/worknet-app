@@ -31,13 +31,16 @@ public class Job {
     @Enumerated(EnumType.STRING)
     private EmploymentType employmentType;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToMany(mappedBy = "appliedJobs")
     private List<User> interestedUsers; // field for users who are interested in the job post
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     private List<View> views;
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     private List<Skill> skills;
 
     @ManyToOne
@@ -103,6 +106,14 @@ public class Job {
         this.jobPoster = jobPoster;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public List<User> getInterestedUsers() {
         return interestedUsers;
     }
@@ -123,7 +134,7 @@ public class Job {
         return skills;
     }
 
-    public void setSKills(List<Skill> skills) {
+    public void setSkills(List<Skill> skills) {
         this.skills = skills;
     }
 }

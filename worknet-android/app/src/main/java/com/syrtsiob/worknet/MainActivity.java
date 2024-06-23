@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
@@ -28,7 +29,9 @@ import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         // do this to show user image on profile
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
+        ApplicantUserDtoResultLiveData.getInstance().setValue(null);
 
         Intent intent = getIntent();
         String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
@@ -125,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         .filter(file -> file.getFileName().equals(profilePicName))
                         .findFirst();
                 if (profilePicture.isPresent()){
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
                     profileImage.setImageBitmap(bitmap);
                     profileImage.setOnClickListener(listener -> {
                         drawerLayout.openDrawer(GravityCompat.START);
@@ -218,14 +222,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromFile(String fileName) {
-        File imgFile = new File(getFilesDir(), "FileStorage/images/" + fileName);
+    // method that returns images from the db.
+    private Bitmap loadImageFromFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
 
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 }

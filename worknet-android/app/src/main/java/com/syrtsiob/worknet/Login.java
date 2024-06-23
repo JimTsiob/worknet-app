@@ -50,7 +50,7 @@ public class Login extends AppCompatActivity {
               // Handle authentication success
               finishAffinity();
               Intent intent = new Intent(this, MainActivity.class);
-              intent.putExtra(getResources().getString(R.string.e_mail), email); // TODO add any other extras
+              intent.putExtra(getResources().getString(R.string.e_mail), email);
               startActivity(intent);
           } else {
               // Handle authentication failure

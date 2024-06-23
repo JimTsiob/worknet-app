@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -18,11 +17,9 @@ import androidx.appcompat.widget.SwitchCompat;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.enums.EmploymentType;
-import com.syrtsiob.worknet.model.EducationDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
-import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.services.WorkExperienceService;
 
 import java.text.ParseException;
@@ -90,6 +87,8 @@ public class AddEditWorkExperience extends AppCompatActivity {
                 android.R.layout.simple_spinner_dropdown_item, items);
         employmentType.setAdapter(adapter);
         WorkExperienceDTO workExperienceDTO = new WorkExperienceDTO();
+
+        // This ensures that the dropdown will have the correct input for the DB and for update.
         employmentType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -121,7 +120,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
         });
 
         submitButton.setOnClickListener(listener -> {
-            if (!isEmptyField())
+            if (isEmptyField())
                 return;
 
             if (!ValidateDate(startDate.getText().toString(), endDate.getText().toString()))
@@ -159,7 +158,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditWorkExperience.this, "added work experience successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditWorkExperience.this, "work experience addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditWorkExperience.this, "work experience addition failed. You cannot add the same work experience twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -177,7 +176,7 @@ public class AddEditWorkExperience extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditWorkExperience.this, "updated work experience successfully.", Toast.LENGTH_LONG).show();
 
-                                // Replace old education with new one in the userDTO list.
+                                // Replace old work experience with new one in the userDTO list.
                                 ListIterator<WorkExperienceDTO> iterator = userDTO.getWorkExperiences().listIterator();
                                 while (iterator.hasNext()) {
                                     WorkExperienceDTO next = iterator.next();
@@ -220,37 +219,37 @@ public class AddEditWorkExperience extends AppCompatActivity {
         // no empty fields allowed
         if (title.getText().toString().isEmpty()){
             Toast.makeText(this, "Title cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (companyName.getText().toString().isEmpty()){
             Toast.makeText(this, "Company name cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (location.getText().toString().isEmpty()){
             Toast.makeText(this, "Location cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (startDate.getText().toString().isEmpty()){
             Toast.makeText(this, "Start date cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
         if (!isCurrentlyWorkingChecked){ // if currently working is checked this field should be null.
             if (endDate.getText().toString().isEmpty()){
                 Toast.makeText(this, "End date cannot be empty.", Toast.LENGTH_LONG).show();
-                return false;
+                return true;
             }
         }
 
         if (description.getText().toString().isEmpty()){
             Toast.makeText(this, "Description cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private boolean ValidateDate(String startDateStr, String endDateStr){

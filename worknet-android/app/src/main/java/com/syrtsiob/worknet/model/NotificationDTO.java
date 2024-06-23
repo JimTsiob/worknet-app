@@ -2,11 +2,14 @@ package com.syrtsiob.worknet.model;
 
 import com.syrtsiob.worknet.enums.NotificationType;
 
-public class NotificationDTO {
+import java.io.Serializable;
+
+public class NotificationDTO implements Serializable {
     private Long id;
     private String text;
-    private SmallUserDTO user;
     private SmallPostDTO post;
+    private EnlargedUserDTO sender;
+    private SmallUserDTO receiver;
 
     private NotificationType notificationType;
 
@@ -26,12 +29,20 @@ public class NotificationDTO {
         this.text = text;
     }
 
-    public SmallUserDTO getUser() {
-        return user;
+    public EnlargedUserDTO getSender() {
+        return sender;
     }
 
-    public void setUser(SmallUserDTO user) {
-        this.user = user;
+    public void setSender(EnlargedUserDTO sender) {
+        this.sender = sender;
+    }
+
+    public SmallUserDTO getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(SmallUserDTO receiver) {
+        this.receiver = receiver;
     }
 
     public SmallPostDTO getPost() {

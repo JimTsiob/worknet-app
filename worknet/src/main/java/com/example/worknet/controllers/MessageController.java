@@ -2,8 +2,10 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.MessageDTO;
 import com.example.worknet.entities.Message;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.MessageService;
+import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -49,6 +54,12 @@ public class MessageController {
     public ResponseEntity<?> addMessage(@RequestBody MessageDTO messageDTO) {
         try {
             Message message = modelMapper.map(messageDTO, Message.class);
+
+            User sender = userService.getUserById(message.getSender().getId());
+            sender.getSentMessages().add(message);
+
+            User receiver = userService.getUserById(message.getReceiver().getId());
+            receiver.getReceivedMessages().add(message);
 
             messageService.addMessage(message);
 

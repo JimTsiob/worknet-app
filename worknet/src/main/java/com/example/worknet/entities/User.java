@@ -48,24 +48,22 @@ public class User {
     @OneToMany(mappedBy = "jobPoster", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Job> jobs; // field for jobs that the user has posted.
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<CustomFile> files;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_messages",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "message_id")
-    )
-    private List<Message> messages;
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private List<Message> sentMessages;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    private List<Message> receivedMessages;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Like> likes;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;
 
     @ManyToMany
@@ -84,14 +82,17 @@ public class User {
     )
     private List<Job> appliedJobs; // field that contains job postings that the user expressed interest in.
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<View> views; // views on job postings, used for recommendation system.
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Notification> notifications;
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    private List<Notification> sentNotifications; // sent notifications
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    private List<Notification> receivedNotifications; // received notifications
 
     public User() {
-        this.messages = new ArrayList<>();
+
     }
 
     public Long getId() {
@@ -190,12 +191,20 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public List<Message> getSentMessages() {
+        return sentMessages;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
+    public void setSentMessages(List<Message> sentMessages) {
+        this.sentMessages = sentMessages;
+    }
+
+    public List<Message> getReceivedMessages() {
+        return receivedMessages;
+    }
+
+    public void setReceivedMessages(List<Message> receivedMessages) {
+        this.receivedMessages = receivedMessages;
     }
 
     public List<Like> getLikes() {
@@ -254,12 +263,20 @@ public class User {
         this.views = views;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<Notification> getSentNotifications() {
+        return sentNotifications;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setSentNotifications(List<Notification> sentNotifications) {
+        this.sentNotifications = sentNotifications;
+    }
+
+    public List<Notification> getReceivedNotifications() {
+        return receivedNotifications;
+    }
+
+    public void setReceivedNotifications(List<Notification> receivedNotifications) {
+        this.receivedNotifications = receivedNotifications;
     }
 
     public int countViewsForJob(Long jobId) {

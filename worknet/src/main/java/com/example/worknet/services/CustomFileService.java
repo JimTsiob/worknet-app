@@ -14,7 +14,7 @@ public interface CustomFileService {
     CustomFile addCustomFile(CustomFile customFile);
     CustomFile updateCustomFile(Long id, CustomFile customFile);
     void deleteCustomFile(Long id);
-    String savePostFile(MultipartFile file) throws IOException;
+    String savePostFile(MultipartFile file, Long postId) throws IOException;
     String saveProfilePicture(MultipartFile file, Long userId) throws IOException;
     void deleteProfilePicture(String fileName) throws IOException;
 }

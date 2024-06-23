@@ -3,8 +3,10 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.NotificationDTO;
 import com.example.worknet.entities.Notification;
+import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.NotificationService;
+import com.example.worknet.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ public class NotificationController {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -51,6 +56,12 @@ public class NotificationController {
         try {
             Notification notification = modelMapper.map(notificationDTO, Notification.class);
 
+            User sender = userService.getUserById(notification.getSender().getId());
+            sender.getSentNotifications().add(notification);
+
+            User receiver = userService.getUserById(notification.getReceiver().getId());
+            receiver.getReceivedNotifications().add(notification);
+
             notificationService.addNotification(notification);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Notification added successfully");
@@ -64,7 +75,7 @@ public class NotificationController {
     public ResponseEntity<?> addView(@RequestParam Long userId,
                                      @RequestParam Long postId) {
         try {
-            notificationService.sendNotification(userId, postId);
+//            notificationService.sendNotification(userId, postId);
             return ResponseEntity.status(HttpStatus.CREATED).body("Sent notification successfully");
         } catch (Exception e) {
             String errorMessage = "Failed to send notification: " + e.getMessage();

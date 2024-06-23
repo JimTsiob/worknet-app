@@ -88,13 +88,16 @@ public class CustomFileController {
 
             for (MultipartFile file : files) {
                 // Process and save the file
-                String fileName = customFileService.savePostFile(file);
+                String fileName = customFileService.savePostFile(file,postId);
+
+                // String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
 
                 // Create and save CustomFile entity
                 CustomFile customFile = new CustomFile();
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());
+                customFile.setFileContent(file.getBytes());
 
                 // Set the associated User and Post
                 customFile.setUser(user);
@@ -148,9 +151,8 @@ public class CustomFileController {
 
                 String fileName = customFileService.saveProfilePicture(file, userId);
 
-
-
                 CustomFile customFile = new CustomFile();
+                customFile.setFileContent(file.getBytes());
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());

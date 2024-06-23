@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class SmallJobDTO {
+import java.io.Serializable;
+
+public class SmallJobDTO implements Serializable {
 
     private Long id;
     private String jobTitle;

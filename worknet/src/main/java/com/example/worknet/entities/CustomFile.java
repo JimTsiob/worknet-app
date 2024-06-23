@@ -20,6 +20,10 @@ public class CustomFile {
     @Column(name = "size")
     private Long size;
 
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] fileContent;
+
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
@@ -76,5 +80,13 @@ public class CustomFile {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public byte[] getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
 }

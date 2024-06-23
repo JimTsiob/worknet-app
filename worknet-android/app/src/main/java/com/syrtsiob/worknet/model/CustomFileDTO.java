@@ -1,11 +1,15 @@
 package com.syrtsiob.worknet.model;
 
-public class CustomFileDTO {
+import java.io.Serializable;
+
+public class CustomFileDTO implements Serializable {
 
     private Long id;
     private String fileName;
     private String contentType;
     private Long size;
+
+    private String fileContent;
 //    private PostDTO post;
 //    private UserDTO user;
 
@@ -41,5 +45,13 @@ public class CustomFileDTO {
 
     public void setSize(Long size) {
         this.size = size;
+    }
+
+    public String getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(String fileContent) {
+        this.fileContent = fileContent;
     }
 }

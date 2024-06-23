@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -78,11 +79,6 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-
-        // remove messages too
-        for (Message message : user.getMessages()){
-            removeMessage(id, message.getId());
-        }
 
         userRepository.deleteById(id);
     }
@@ -171,33 +167,6 @@ public class UserServiceImpl implements UserService {
         postRepository.save(post);
 
         likeRepository.delete(like);
-    }
-
-    public void sendMessage(Message message) {
-
-        messageRepository.save(message);
-
-        for (User user: message.getUsers()){
-            User messageUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-            messageUser.getMessages().add(message);
-            userRepository.save(messageUser);
-        }
-    }
-
-    public void removeMessage(Long userId, Long messageId) {
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new RuntimeException("Message not found"));
-
-        // completely delete messages to maintain best practice
-        // and save space in the database.
-
-        for (User messageuser : message.getUsers()) {
-            messageuser.getMessages().remove(message);
-            userRepository.save(messageuser);
-        }
-
-        message.getUsers().clear();
-
-        messageRepository.delete(message);
     }
 
     public void addView(Long userId, Long jobId){

@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class ViewDTO {
+import java.io.Serializable;
+
+public class ViewDTO implements Serializable {
 
     private Long id;
     private SmallUserDTO user;

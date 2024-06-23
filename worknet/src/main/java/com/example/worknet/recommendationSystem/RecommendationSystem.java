@@ -78,13 +78,14 @@ public class RecommendationSystem {
     public List<Job> getRecommendedJobs(User user, List<Job> jobs) {
         int numJobs = Q.length;
 
+        // Get results for my user
         double[] userPredictions = new double[numJobs];
         for (int j = 0; j < numJobs; j++) {
             userPredictions[j] = dotProduct(this.P[this.P.length - 1], this.Q[j]); // get last element of array, which is wanted user, to get results back.
         }
 
         // Get top-N recommendations
-        int N = 5; // Number of recommendations
+        int N = 10; // Number of recommendations
         List<Integer> recommendedJobIndexes = getTopNRecommendations(userPredictions, N);
         List<Job> recommendedJobs = new ArrayList<>();
         for (int index: recommendedJobIndexes) {
@@ -116,13 +117,13 @@ public class RecommendationSystem {
 
         Set<String> userSkillNames = new HashSet<>();
         for (Skill userSkill : userSkills) {
-            userSkillNames.add(userSkill.getName().toLowerCase()); // case insensitive skill search.
+            userSkillNames.add(userSkill.getName().trim().toLowerCase()); // case insensitive skill search.
         }
 
         for (Job job : jobs){
             List<Skill> individualJobSkills = job.getSkills();
             for (Skill skill : individualJobSkills){
-                if (userSkillNames.contains(skill.getName().toLowerCase())) {
+                if (userSkillNames.contains(skill.getName().trim().toLowerCase())) {
                     recommendedJobs.add(job);
                 }
             }

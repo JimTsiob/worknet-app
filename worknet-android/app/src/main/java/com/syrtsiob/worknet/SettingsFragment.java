@@ -9,6 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -136,9 +138,7 @@ public class SettingsFragment extends Fragment {
 
             cancelButton = requireView().findViewById(R.id.buttonCancel);
             cancelButton.setOnClickListener(listener -> {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
-                startActivity(intent);
+                replaceFragment(HomeFragment.newInstance());
             });
 
             submitButton = requireView().findViewById(R.id.buttonSubmit);
@@ -180,6 +180,13 @@ public class SettingsFragment extends Fragment {
                 }
             });
         });
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.commit();
     }
 
     private boolean ValidatePasswordRequirements(String password){

@@ -17,8 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.ApplicantDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.SkillService;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.SkillDTO;
@@ -53,23 +56,30 @@ public class SkillsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        // if the user wants to see a connection's profile show connection's skills
+        // if the user wants to see a connection's or an applicant's profile show respective skills
         // otherwise show user's skills (my profile)
-
 
         addSkillButton = requireView().findViewById(R.id.add_skills_button);
 
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            if (connectionDTO != null){
+        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
+            if (applicantDTO != null) {
                 addSkillButton.setVisibility(View.GONE);
 
-                fetchConnectionData();
+                fetchApplicantData(applicantDTO);
             }else{
-                if (itemsDisplayed >= requiredItems){
-                    return;
-                }
+                ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
+                    if (connectionDTO != null){
+                        addSkillButton.setVisibility(View.GONE);
 
-                fetchData();
+                        fetchConnectionData(connectionDTO);
+                    }else{
+                        if (itemsDisplayed >= requiredItems){
+                            return;
+                        }
+
+                        fetchData();
+                    }
+                });
             }
         });
 
@@ -142,45 +152,78 @@ public class SkillsFragment extends Fragment {
         });
     }
 
-    public void fetchConnectionData(){
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            UserService userService = retrofit.create(UserService.class);
+    public void fetchApplicantData(ApplicantDTO applicantDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
 
-            skillList = requireView().findViewById(R.id.skills_list);
-            skillList.removeAllViews(); // clear before showing new ones. Removes duplicates
+        skillList = requireView().findViewById(R.id.skills_list);
+        skillList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-            userService.getUserByEmail(connectionDTO.getEmail()).enqueue(new Callback<UserDTO>() {
-                @Override
-                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                    if (response.isSuccessful()){
-                        List<SkillDTO> skills = response.body().getSkills();
+        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<SkillDTO> skills = response.body().getSkills();
 
-                        // if connection has no skills, or all skills are private show empty text
-                        if (skills.isEmpty() || isAllPrivateInfo(response.body())){
-                            showConnectionEmptySkills();
-                        }else{
-                            for (SkillDTO skill: skills){
-                                if (skill.getIsPublic()){ // show only public skills
-                                    AddConnectionSkillListEntry(skill);
-                                }
-                            }
-                        }
+                    // if connection has no skills show empty text
+                    if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showApplicantEmptySkills();
                     }else{
-                        Log.d("format fail:", "something bad happened here.");
+                        for (SkillDTO skill: skills){
+                            //if (skill.getIsPublic()){ // show only public skills
+                            AddConnectionSkillListEntry(skill);
+                            //}
+                        }
                     }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
+            }
 
-                @Override
-                public void onFailure(Call<UserDTO> call, Throwable t) {
-                    Log.d("Server fail:", t.getLocalizedMessage());
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void fetchConnectionData(EnlargedUserDTO enlargedUserDTO){
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        UserService userService = retrofit.create(UserService.class);
+
+        skillList = requireView().findViewById(R.id.skills_list);
+        skillList.removeAllViews(); // clear before showing new ones. Removes duplicates
+
+        userService.getUserByEmail(enlargedUserDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<SkillDTO> skills = response.body().getSkills();
+
+                    // if connection has no skills show empty text
+                    if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
+                        showConnectionEmptySkills();
+                    }else{
+                        for (SkillDTO skill: skills){
+                            //if (skill.getIsPublic()){ // show only public skills
+                                AddConnectionSkillListEntry(skill);
+                            //}
+                        }
+                    }
+                }else{
+                    Log.d("format fail:", "something bad happened here.");
                 }
-            });
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("Server fail:", t.getLocalizedMessage());
+            }
         });
     }
 
     /*
-     * Method used for showing empty text on connections that have all their info private.
+     * Method used for showing empty text on unconnected users that have all their info private.
      * */
     public boolean isAllPrivateInfo(UserDTO connection){
         int privateCounter = 0;
@@ -221,6 +264,13 @@ public class SkillsFragment extends Fragment {
         editButton.setVisibility(View.GONE);
         deleteButton.setVisibility(View.GONE);
 
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 50, 0, 0);
+        skillListEntry.setLayoutParams(params);
+
         skillList.addView(skillListEntry);
     }
 
@@ -238,6 +288,22 @@ public class SkillsFragment extends Fragment {
         noSkillsTextView.setLayoutParams(params);
 
         skillList.addView(noSkillsTextView);
+    }
+
+    private void showApplicantEmptySkills(){
+        TextView noEducationsTextView = new TextView(getActivity());
+        noEducationsTextView.setText("This applicant has no skills added.");
+        noEducationsTextView.setTextSize(20); // Set desired text size
+        noEducationsTextView.setTextColor(Color.BLACK);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(200, 300, 16, 16);
+        noEducationsTextView.setLayoutParams(params);
+
+        skillList.addView(noEducationsTextView);
     }
 
     private void showEmptySkills(){

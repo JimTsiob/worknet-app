@@ -1,6 +1,7 @@
 package com.syrtsiob.worknet.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SmallUserDTO implements Serializable {
 

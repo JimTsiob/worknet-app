@@ -30,8 +30,9 @@
             android:name=".JobPostingDetails"
             android:exported="false" />
         <activity
-            android:name=".CreateNewJobPosting"
-            android:exported="false" />
+            android:name=".AddEditJobPost"
+            android:windowSoftInputMode="adjustPan"
+            android:exported="false" /> <!-- adjust pan makes the keyboard not cover input text fields -->
         <activity
             android:name=".AddEditSkill"
             android:exported="false" />

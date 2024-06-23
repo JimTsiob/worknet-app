@@ -6,6 +6,7 @@ public class CustomFileDTO {
     private String fileName;
     private String contentType;
     private Long size;
+    private byte[] fileContent;
 //    private PostDTO post;
 //    private UserDTO user;
 
@@ -41,5 +42,13 @@ public class CustomFileDTO {
 
     public void setSize(Long size) {
         this.size = size;
+    }
+
+    public byte[] getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(byte[] fileContent) {
+        this.fileContent = fileContent;
     }
 }

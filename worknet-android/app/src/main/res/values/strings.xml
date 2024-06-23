@@ -74,8 +74,11 @@
     <string name="add_audio">+ Audio</string>
     <string name="add_post">+ Post</string>
     <string name="create_job_posting">Create Job Posting</string>
+    <string name="edit_job_posting">Edit Job Posting</string>
     <string name="apply">Apply</string>
     <string name="create_a_new_job_posting">Create a new Job Posting</string>
+    <string name="job_skills">Job skills</string>
+    <string name="view_applicants">View applicants</string>
     <string name="job_title">Job Title</string>
     <string name="company">Company</string>
     <string name="workplace_type">Workplace Type</string>

@@ -1,19 +1,16 @@
-package com.syrtsiob.worknet.model;
+package com.example.worknet.dto;
 
 import java.util.List;
 
-public class ConnectionDTO {
+public class ApplicantDTO {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
-
     private String profilePicture;
     private List<WorkExperienceDTO> workExperiences;
-
     private List<EducationDTO> educations;
     private List<SkillDTO> skills;
-
     private List<CustomFileDTO> files;
 
     public Long getId() {
@@ -52,7 +49,7 @@ public class ConnectionDTO {
         return profilePicture;
     }
 
-    public void setProfilePicture(String profilePicture) {
+    public void setProfilePicture(String profilePicture){
         this.profilePicture = profilePicture;
     }
 
@@ -68,7 +65,7 @@ public class ConnectionDTO {
         return files;
     }
 
-    public void setFiles(List<CustomFileDTO> files) {
+    public void setFiles(List<CustomFileDTO> files){
         this.files = files;
     }
 

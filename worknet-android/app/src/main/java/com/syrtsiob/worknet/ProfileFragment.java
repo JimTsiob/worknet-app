@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -95,9 +100,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        // Clear the ConnectionDTO when the fragment view is destroyed
+        // Clear the ConnectionDTO and applicantDTO when the fragment view is destroyed
         // so we can see the logged in user's profile
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
+        ApplicantUserDtoResultLiveData.getInstance().setValue(null);
     }
 
     @Override
@@ -110,43 +116,64 @@ public class ProfileFragment extends Fragment {
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
 
-        // if user clicks on connection profile show connection profile elements.
-        // Otherwise show own profile elements.
-        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
-            if (connectionDTO != null){
-                ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
-                String profilePicName = connectionDTO.getProfilePicture();
-                List<CustomFileDTO> files = connectionDTO.getFiles();
-                Optional<CustomFileDTO> profilePicture = files.stream()
-                        .filter(file -> file.getFileName().equals(profilePicName))
-                        .findFirst();
-                if (profilePicture.isPresent()) {
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
-                    profilePic.setImageBitmap(bitmap);
-                }
-
-                TextView fullName = requireView().findViewById(R.id.fullNameProfile);
-                fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
-            }else{
-                UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
-                    if (userDTO != null){
+        // if user comes here to see an applicant show the applicant's profile.
+        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
+                    if (applicantDTO != null) {
                         ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
-                        String profilePicName = userDTO.getProfilePicture();
-                        List<CustomFileDTO> files = userDTO.getFiles();
+                        String profilePicName = applicantDTO.getProfilePicture();
+                        List<CustomFileDTO> files = applicantDTO.getFiles();
                         Optional<CustomFileDTO> profilePicture = files.stream()
                                 .filter(file -> file.getFileName().equals(profilePicName))
                                 .findFirst();
                         if (profilePicture.isPresent()) {
-                            Bitmap bitmap = loadImageFromFile(profilePicture.get().getFileName());
+                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
                             profilePic.setImageBitmap(bitmap);
                         }
 
                         TextView fullName = requireView().findViewById(R.id.fullNameProfile);
-                        fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+                        fullName.setText(applicantDTO.getFirstName() + " " + applicantDTO.getLastName());
+                    }else{
+                        // if user clicks on connection profile show connection profile elements.
+                        // Otherwise show own profile elements.
+                        ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
+                            if (connectionDTO != null){
+                                ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                                String profilePicName = connectionDTO.getProfilePicture();
+                                List<CustomFileDTO> files = connectionDTO.getFiles();
+                                Optional<CustomFileDTO> profilePicture = files.stream()
+                                        .filter(file -> file.getFileName().equals(profilePicName))
+                                        .findFirst();
+                                if (profilePicture.isPresent()) {
+                                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
+                                    profilePic.setImageBitmap(bitmap);
+                                }
+
+                                TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                                fullName.setText(connectionDTO.getFirstName() + " " + connectionDTO.getLastName());
+                            }else{
+                                UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+                                    if (userDTO != null){
+                                        ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
+                                        String profilePicName = userDTO.getProfilePicture();
+                                        List<CustomFileDTO> files = userDTO.getFiles();
+                                        Optional<CustomFileDTO> profilePicture = files.stream()
+                                                .filter(file -> file.getFileName().equals(profilePicName))
+                                                .findFirst();
+                                        if (profilePicture.isPresent()) {
+                                            Bitmap bitmap = loadImageFromFile(profilePicture.get());
+                                            profilePic.setImageBitmap(bitmap);
+                                        }
+
+                                        TextView fullName = requireView().findViewById(R.id.fullNameProfile);
+                                        fullName.setText(userDTO.getFirstName() + " " + userDTO.getLastName());
+                                    }
+                                });
+                            }
+                        });
                     }
                 });
-            }
-        });
+
+
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -170,14 +197,17 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    // method that returns images from the phone's sd card.
-    private Bitmap loadImageFromFile(String fileName) {
-        File imgFile = new File(getActivity().getFilesDir(), "FileStorage/images/" + fileName);
-
-        if (imgFile.exists()) {
-            return BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-        }
-
-        return null;
+    // method that returns images from the database.
+    private Bitmap loadImageFromFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
     }
+
+    // used to decode the image's base64 string from the db
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
+    }
+
+
 }

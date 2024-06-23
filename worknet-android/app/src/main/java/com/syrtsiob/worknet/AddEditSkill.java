@@ -71,7 +71,7 @@ public class AddEditSkill extends AppCompatActivity {
 
         submitButton.setOnClickListener(listener -> {
             // TODO upload to database
-            if (!isEmptyField())
+            if (isEmptyField())
                 return;
 
             UserDtoResultLiveData.getInstance().observe(this, userDTO -> {
@@ -96,7 +96,7 @@ public class AddEditSkill extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditSkill.this, "added skill successfully.", Toast.LENGTH_LONG).show();
                             } else {
-                                Toast.makeText(AddEditSkill.this, "skill addition failed. Check the format.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(AddEditSkill.this, "skill addition failed. You cannot add the same skill twice.", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -114,7 +114,7 @@ public class AddEditSkill extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 Toast.makeText(AddEditSkill.this, "updated skill successfully.", Toast.LENGTH_LONG).show();
 
-                                // Replace old education with new one in the userDTO list.
+                                // Replace old skill with new one in the userDTO list.
                                 ListIterator<SkillDTO> iterator = userDTO.getSkills().listIterator();
                                 while (iterator.hasNext()) {
                                     SkillDTO next = iterator.next();
@@ -147,10 +147,10 @@ public class AddEditSkill extends AppCompatActivity {
         // no empty fields allowed
         if (skillDescription.getText().toString().isEmpty()){
             Toast.makeText(this, "Skill name cannot be empty.", Toast.LENGTH_LONG).show();
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void PopulateInputs(SkillDTO skillDTO) {

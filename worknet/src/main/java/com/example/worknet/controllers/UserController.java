@@ -20,8 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -112,7 +113,18 @@ public class UserController {
 
         List<User> connections = user.getConnections();
         List<Skill> userSkills = user.getSkills();
-        List<Job> jobs = jobService.getAllJobs();
+        List<Job> jobs = jobService.getAllJobs(); // used for recommendation by skills
+
+        // remove jobs created by the user who will get the recommended jobs.
+        Iterator<Job> iterator = jobs.iterator();
+        while (iterator.hasNext()) {
+            Job job = iterator.next();
+            if (job.getJobPoster().getId() == userId) {
+                iterator.remove();
+            }
+        }
+
+        List<JobDTO> recommendedJobDTOs = new ArrayList<>();
 
         // recommendation by matrix factorization on user's connections
         if (!connections.isEmpty()) {
@@ -139,14 +151,20 @@ public class UserController {
 
             List<Job> recommendedJobs = recommendationSystem.getRecommendedJobs(user, connectionJobs);
 
-            // turn them to DTOs and return
-            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
+            // turn them to DTOs
             for (Job recommendedJob : recommendedJobs) {
-                SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
+                JobDTO recommendedJobDTO = modelMapper.map(recommendedJob, JobDTO.class);
                 recommendedJobDTOs.add(recommendedJobDTO);
             }
 
-            return ResponseEntity.ok(recommendedJobDTOs);
+            // remove jobs created by the user who will get the recommended jobs.
+            Iterator<JobDTO> connectionIterator = recommendedJobDTOs.iterator();
+            while (connectionIterator.hasNext()) {
+                JobDTO job = connectionIterator.next();
+                if (job.getJobPoster().getId() == userId) {
+                    connectionIterator.remove();
+                }
+            }
         }
 
         // recommendation by user skills 
@@ -155,18 +173,15 @@ public class UserController {
             RecommendationSystem recommendationSystem = new RecommendationSystem();
 
             HashSet<Job> recommendedJobs = recommendationSystem.recommendJobsBySkill(user, jobs);
-            
-            List<SmallJobDTO> recommendedJobDTOs = new ArrayList<>();
 
             for (Job recommendedJob : recommendedJobs) {
-                SmallJobDTO recommendedJobDTO = modelMapper.map(recommendedJob, SmallJobDTO.class);
+                JobDTO recommendedJobDTO = modelMapper.map(recommendedJob, JobDTO.class);
                 recommendedJobDTOs.add(recommendedJobDTO);
             }
-
-            return ResponseEntity.ok(recommendedJobDTOs);
         }
+        List<JobDTO> uniqueRecommendedJobDTOs = recommendedJobDTOs.stream().distinct().toList();
 
-        return new ResponseEntity<>("Add connections or skills to get recommendations for job posts!", HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(uniqueRecommendedJobDTOs);
     }
 
     @PostMapping("/")
@@ -228,19 +243,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body("Post liked successfully.");
         } catch (Exception e) {
             String errorMessage = "Failed to like post: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-        }
-    }
-
-    @PostMapping("/sendMessage")
-    public ResponseEntity<?> sendMessage(@RequestBody MessageDTO messageDTO) {
-
-        try {
-            Message message = modelMapper.map(messageDTO, Message.class);
-            userService.sendMessage(message);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Message sent successfully.");
-        } catch (Exception e) {
-            String errorMessage = "Failed to send message: " + e.getMessage();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
     }

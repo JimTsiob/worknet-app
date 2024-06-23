@@ -5,11 +5,14 @@ import com.example.worknet.entities.Job;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
 import com.example.worknet.services.JobService;
+import com.example.worknet.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,6 +22,9 @@ public class JobController {
 
     @Autowired
     private JobService jobService;
+
+    @Autowired
+    private UserService userService;
 
     private final StrictModelMapper modelMapper = new StrictModelMapper();
 
@@ -48,11 +54,21 @@ public class JobController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addJob(@RequestBody JobDTO jobDTO) {
+    public ResponseEntity<?> addJob(@RequestBody JobDTO jobDTO, @RequestParam List<String> skillNames) {
         try {
             Job job = modelMapper.map(jobDTO, Job.class);
 
-            jobService.addJob(job);
+            User user = userService.getUserById(job.getJobPoster().getId());
+            List<Job> jobs = user.getJobs();
+
+            // do not allow same job post to be added twice
+            for (Job j: jobs) {
+                if (jobService.equalsJob(job,j)){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot add same job post twice.");
+                }
+            }
+
+            jobService.addJob(job, skillNames);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Job added successfully");
         } catch (Exception e) {
@@ -75,7 +91,7 @@ public class JobController {
     
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody JobDTO jobDTO) {
+    public ResponseEntity<?> updateJob(@PathVariable Long id, @RequestBody JobDTO jobDTO, @RequestParam List<String> skillNames) {
         try {
 
             Job existingJob = jobService.getJobById(id);
@@ -85,7 +101,7 @@ public class JobController {
 
             modelMapper.map(jobDTO, existingJob);
 
-            jobService.updateJob(id, existingJob);
+            jobService.updateJob(id, existingJob, skillNames);
 
             return ResponseEntity.ok("Job updated successfully");
         } catch (Exception e) {
@@ -110,7 +126,9 @@ public class JobController {
             }
 
             existingJob.getInterestedUsers().clear();
-            jobService.updateJob(id, existingJob);
+            List<String> emptyList = new ArrayList<>();
+
+            jobService.updateJob(id, existingJob, emptyList);
 
             jobService.deleteJob(id);
 
