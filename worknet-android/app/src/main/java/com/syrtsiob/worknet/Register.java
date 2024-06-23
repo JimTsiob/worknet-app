@@ -166,8 +166,6 @@ public class Register extends AppCompatActivity {
                                         ImageDecoder.Source source = ImageDecoder
                                                 .createSource(getContentResolver(), imageUri);
                                         selectedImageBitmap = ImageDecoder.decodeBitmap(source);
-                                        // save image to android folder so we can show it on profile page and home.
-                                        saveImageToInternalStorage(selectedImageBitmap, response.body().getId() + "_profile_picture.jpg");
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -299,22 +297,5 @@ public class Register extends AppCompatActivity {
         }
 
         return true;
-    }
-
-    private void saveImageToInternalStorage(Bitmap bitmap, String fileName) {
-        File directory = new File(getFilesDir(), "FileStorage/images");
-        if (!directory.exists()) {
-            directory.mkdirs(); // Create directory if it does not exist
-        }
-        File imageFile = new File(directory, fileName);
-
-        try (FileOutputStream out = new FileOutputStream(imageFile)) {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            Log.d("SaveImage", "Image saved to internal storage: " + imageFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("SaveImage", "Failed to save image", e);
-        }
     }
 }
