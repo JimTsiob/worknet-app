@@ -73,6 +73,9 @@ public class PostActivity extends AppCompatActivity {
 
 
     private static final String titleSuffix = "'s Post";
+    private static final String AUDIO = "audio";
+    private static final String IMAGE = "image";
+    private static final String VIDEO = "video";
     private void InitializePost(PostDTO postDTO) {
         postTitle.setText(String.format("%s %s%s", postDTO.getUser().getFirstName(),
                 postDTO.getUser().getLastName(), titleSuffix));
@@ -81,6 +84,18 @@ public class PostActivity extends AppCompatActivity {
 
         for (CustomFileDTO customFileDTO : postDTO.getCustomFiles()) {
             // TODO add customFile to postContent
+            if (customFileDTO.getFileName().contains(IMAGE)) {
+                
+            }
+            else if (customFileDTO.getFileName().contains(VIDEO)) {
+
+            }
+            else if (customFileDTO.getFileName().contains(AUDIO)) {
+
+            }
+            else {
+                // TODO throw error
+            }
         }
 
         /* Need to implement getComments in the backend
