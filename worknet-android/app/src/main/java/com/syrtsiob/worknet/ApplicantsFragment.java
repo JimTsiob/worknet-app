@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +19,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.JobDTO;
+import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -32,6 +37,11 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,32 +110,53 @@ public class ApplicantsFragment extends Fragment {
         applicantsList = requireView().findViewById(R.id.applicant_list);
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
-            List<JobDTO> jobs = userDTO.getJobs();
-            List<ApplicantDTO> applicants = new ArrayList<>();
-            for (JobDTO job: jobs){
-                applicants.addAll(job.getInterestedUsers());
-            }
 
-            if (applicants.isEmpty()){
-                TextView noApplicantsTextView = new TextView(getActivity());
-                noApplicantsTextView.setText("There are no applicants yet. \n");
-                noApplicantsTextView.setTextSize(20); // Set desired text size
-                noApplicantsTextView.setTextColor(Color.BLACK);
+            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+            UserService userService = retrofit.create(UserService.class);
 
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                params.setMargins(300, 300, 16, 16);
-                noApplicantsTextView.setLayoutParams(params);
+            userService.getUserByEmail(userDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+                @Override
+                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                    if (response.isSuccessful()){
+                        List<JobDTO> jobs = response.body().getJobs();
+                        List<ApplicantDTO> applicants = new ArrayList<>();
+                        for (JobDTO job: jobs){
+                            applicants.addAll(job.getInterestedUsers());
+                        }
 
-                applicantsList.addView(noApplicantsTextView);
-            }
+                        if (applicants.isEmpty()){
+                            TextView noApplicantsTextView = new TextView(getActivity());
+                            noApplicantsTextView.setText("There are no applicants yet. \n");
+                            noApplicantsTextView.setTextSize(20); // Set desired text size
+                            noApplicantsTextView.setTextColor(Color.BLACK);
+
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            params.setMargins(300, 300, 16, 16);
+                            noApplicantsTextView.setLayoutParams(params);
+
+                            applicantsList.addView(noApplicantsTextView);
+                        }
 
 
-            for (ApplicantDTO applicant : applicants){
-                addEntryToList(applicant);
-            }
+                        for (ApplicantDTO applicant : applicants){
+                            addEntryToList(applicant);
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "user fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UserDTO> call, Throwable t) {
+                    Log.d("user fetch fail: " , t.getLocalizedMessage());
+                    Toast.makeText(getActivity(), "user fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
+
+
         });
 
 
