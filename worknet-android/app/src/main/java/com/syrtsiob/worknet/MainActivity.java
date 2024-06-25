@@ -165,7 +165,18 @@ public class MainActivity extends AppCompatActivity {
         EditText searchBar = findViewById(R.id.searchBar);
         searchBar.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                replaceFragment(SearchResultsFragment.newInstance());
+                HomeFragment homeFragmentReference = (HomeFragment) getSupportFragmentManager()
+                        .findFragmentByTag("HomeFragment");
+                String searchText = searchBar.getText().toString();
+
+                if (homeFragmentReference != null && homeFragmentReference.isVisible()) {
+                    replaceFragment(SearchResultsFragment
+                            .newInstance(SearchResultsFragment.HOME_FRAG_MODE, searchText));
+                }
+                else {
+                    replaceFragment(SearchResultsFragment
+                            .newInstance(SearchResultsFragment.DEFAULT_MODE, searchText));
+                }
                 searchBar.clearFocus();
             }
             return false;

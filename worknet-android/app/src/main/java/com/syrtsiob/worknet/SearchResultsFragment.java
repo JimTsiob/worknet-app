@@ -1,12 +1,19 @@
 package com.syrtsiob.worknet;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,47 +22,43 @@ import android.view.ViewGroup;
  */
 public class SearchResultsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    static final String DEFAULT_MODE = "default_mode";
+    static final String HOME_FRAG_MODE = "home_frag_mode";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String RESULTS_MODE = "results_mode";
+    private static final String SEARCH_INPUT = "search_input";
+
+    private String resultsMode;
+    private String searchInput;
+
+    LinearLayout resultsContainer;
 
     public SearchResultsFragment() {
         // Required empty public constructor
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     * Use to create a new instance of search results
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param resultsMode The results mode depending on the context. Use SearchResultsFragment's static finals
+     * @param searchInput The user's search input.
      * @return A new instance of fragment SearchResultsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static SearchResultsFragment newInstance(String param1, String param2) {
+    public static SearchResultsFragment newInstance(String resultsMode, String searchInput) {
         SearchResultsFragment fragment = new SearchResultsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(RESULTS_MODE, resultsMode);
+        args.putString(SEARCH_INPUT, searchInput);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public static SearchResultsFragment newInstance() {
-        return new SearchResultsFragment();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            resultsMode = getArguments().getString(RESULTS_MODE);
+            searchInput = getArguments().getString(SEARCH_INPUT);
         }
     }
 
@@ -64,5 +67,60 @@ public class SearchResultsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search_results, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        resultsContainer = requireView().findViewById(R.id.resultsContainer);
+
+        switch (resultsMode) {
+            case HOME_FRAG_MODE:
+                HandleHomeFragMode(searchInput);
+                break;
+            case DEFAULT_MODE:
+                HandleDefaultMode(searchInput);
+                break;
+            default:
+                HandleUnknownMode();
+        }
+    }
+
+    private void HandleDefaultMode(String searchInput) {
+        // TODO implement
+        // if (results != null)
+
+        // else if (results == null)
+        ShowNoResults();
+    }
+
+    private void HandleHomeFragMode(String searchInput) {
+        // TODO implement
+        // if (results != null)
+
+        // else if (results == null)
+        ShowNoResults();
+    }
+
+    private void HandleUnknownMode() {
+        Toast.makeText(getActivity(),
+                "Error when loading search results", Toast.LENGTH_LONG).show();
+    }
+
+    private void ShowNoResults() {
+        TextView errorMessage = new TextView(getActivity());
+        errorMessage.setText(R.string.no_results);
+        errorMessage.setTextSize(20);
+        errorMessage.setTextColor(Color.BLACK);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 64, 0, 0);
+        errorMessage.setLayoutParams(params);
+        errorMessage.setGravity(Gravity.CENTER);
+
+        resultsContainer.addView(errorMessage);
     }
 }
