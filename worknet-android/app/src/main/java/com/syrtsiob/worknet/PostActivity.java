@@ -90,9 +90,9 @@ public class PostActivity extends AppCompatActivity {
         leaveCommentText.clearFocus();
         leaveCommentText.setText("");
 
-        // TODO implement comment leaving...
+        // TODO implement comment leaving to database
 
-        // TODO update ui with new comment
+        // AddComment(yourNewCommentDTO);
     }
 
 
@@ -145,21 +145,25 @@ public class PostActivity extends AppCompatActivity {
         }
 
         for (CommentDTO commentDTO : postDTO.getComments()) {
-            LayoutInflater inflater = LayoutInflater.from(this);
-            View comment = inflater.inflate(R.layout.post_comment_template, postComments, false);
-
-            ImageView commenterPicture = comment.findViewById(R.id.commenter_picture);
-            TextView commenterName = comment.findViewById(R.id.commenter_name);
-            TextView commentText = comment.findViewById(R.id.comment_text);
-
-            // TODO set image URI/bitmap
-            // commenterPicture.setImageURI(); / commenterPicture.setImageBitmap();
-
-            commenterName.setText(String.format("%s %s", commentDTO.getUser().getFirstName(),
-                    commentDTO.getUser().getLastName()));
-            commentText.setText(commentDTO.getText());
-
-            postComments.addView(comment);
+            AddComment(commentDTO);
         }
+    }
+
+    private void AddComment(CommentDTO commentDTO) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View comment = inflater.inflate(R.layout.post_comment_template, postComments, false);
+
+        ImageView commenterPicture = comment.findViewById(R.id.commenter_picture);
+        TextView commenterName = comment.findViewById(R.id.commenter_name);
+        TextView commentText = comment.findViewById(R.id.comment_text);
+
+        // TODO set image URI/bitmap
+        // commenterPicture.setImageURI(); / commenterPicture.setImageBitmap();
+
+        commenterName.setText(String.format("%s %s", commentDTO.getUser().getFirstName(),
+                commentDTO.getUser().getLastName()));
+        commentText.setText(commentDTO.getText());
+
+        postComments.addView(comment);
     }
 }
