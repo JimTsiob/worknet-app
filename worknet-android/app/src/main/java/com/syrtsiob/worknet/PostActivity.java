@@ -90,7 +90,9 @@ public class PostActivity extends AppCompatActivity {
         leaveCommentText.clearFocus();
         leaveCommentText.setText("");
 
-        // TODO implement comment UI
+        // TODO implement comment leaving...
+
+        // TODO update ui with new comment
     }
 
 
