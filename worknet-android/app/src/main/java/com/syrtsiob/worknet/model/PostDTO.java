@@ -1,8 +1,9 @@
 package com.syrtsiob.worknet.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PostDTO {
+public class PostDTO implements Serializable {
 
     private Long id;
     private String description;

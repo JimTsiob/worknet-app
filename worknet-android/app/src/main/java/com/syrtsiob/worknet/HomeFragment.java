@@ -11,12 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -121,7 +118,7 @@ public class HomeFragment extends Fragment {
 
         LinearLayout postPopupCommentContainer = popupView.findViewById(R.id.postPopupCommentContainer);
         for (int i = 0; i < 15; i++) {
-            View comment = inflater.inflate(R.layout.post_popup_comment_template, postPopupCommentContainer, false);
+            View comment = inflater.inflate(R.layout.post_comment_template, postPopupCommentContainer, false);
             TextView commentText = comment.findViewById(R.id.comment_text);
             commentText.setText("Comment " + i);
             postPopupCommentContainer.addView(comment);

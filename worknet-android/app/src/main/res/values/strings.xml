@@ -84,4 +84,5 @@
     <string name="workplace_type">Workplace Type</string>
     <string name="learn_more">Learn More</string>
     <string name="returnLabel">Return</string>
+    <string name="play_sound_file">Play sound file</string>
 </resources>
