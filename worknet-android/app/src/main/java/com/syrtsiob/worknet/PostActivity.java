@@ -68,9 +68,13 @@ public class PostActivity extends AppCompatActivity {
         leaveCommentButton = findViewById(R.id.leaveCommentButton);
         leaveCommentButton.setOnClickListener(listener -> LeaveComment());
 
-        // TODO call post initialization
         PostDTO postDTO = getIntent().getSerializableExtra(POST_DTO, PostDTO.class);
-        InitializePost(postDTO);
+        if (postDTO != null)
+            InitializePost(postDTO);
+        else {
+            Toast.makeText(this, "Error when loading post...", Toast.LENGTH_LONG).show();
+            finish();
+        }
 
         OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
             @Override
