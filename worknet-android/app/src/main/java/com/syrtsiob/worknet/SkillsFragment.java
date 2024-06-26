@@ -17,10 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.SkillService;
 import com.syrtsiob.worknet.services.UserService;
@@ -61,11 +60,11 @@ public class SkillsFragment extends Fragment {
 
         addSkillButton = requireView().findViewById(R.id.add_skills_button);
 
-        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
-            if (applicantDTO != null) {
+        NonConnectedUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            if (userDTO != null) {
                 addSkillButton.setVisibility(View.GONE);
 
-                fetchApplicantData(applicantDTO);
+                fetchNonConnectedUserData(userDTO);
             }else{
                 ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
                     if (connectionDTO != null){
@@ -152,27 +151,27 @@ public class SkillsFragment extends Fragment {
         });
     }
 
-    public void fetchApplicantData(ApplicantDTO applicantDTO){
+    public void fetchNonConnectedUserData(EnlargedUserDTO userDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         skillList = requireView().findViewById(R.id.skills_list);
         skillList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(userDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
                     List<SkillDTO> skills = response.body().getSkills();
 
                     // if connection has no skills show empty text
-                    if (skills.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
-                        showApplicantEmptySkills();
+                    if (skills.isEmpty() || isAllPrivateInfo(response.body())){
+                        showNonConnectedUserEmptySkills();
                     }else{
                         for (SkillDTO skill: skills){
-                            //if (skill.getIsPublic()){ // show only public skills
-                            AddConnectionSkillListEntry(skill);
-                            //}
+                            if (skill.getIsPublic()){ // show only public skills
+                                AddConnectionSkillListEntry(skill);
+                            }
                         }
                     }
                 }else{
@@ -290,9 +289,9 @@ public class SkillsFragment extends Fragment {
         skillList.addView(noSkillsTextView);
     }
 
-    private void showApplicantEmptySkills(){
+    private void showNonConnectedUserEmptySkills(){
         TextView noEducationsTextView = new TextView(getActivity());
-        noEducationsTextView.setText("This applicant has no skills added.");
+        noEducationsTextView.setText("This user has no skills added.");
         noEducationsTextView.setTextSize(20); // Set desired text size
         noEducationsTextView.setTextColor(Color.BLACK);
 
@@ -300,7 +299,7 @@ public class SkillsFragment extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(200, 300, 16, 16);
+        params.setMargins(300, 300, 16, 16);
         noEducationsTextView.setLayoutParams(params);
 
         skillList.addView(noEducationsTextView);

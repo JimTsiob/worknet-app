@@ -17,10 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.UserDTO;
@@ -61,11 +60,11 @@ public class WorkExperienceFragment extends Fragment {
 
         addWorkExperienceButton = requireView().findViewById(R.id.add_work_experience_button);
 
-        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
-            if (applicantDTO != null) {
+        NonConnectedUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            if (userDTO != null) {
                 addWorkExperienceButton.setVisibility(View.GONE);
 
-                fetchApplicantData(applicantDTO);
+                fetchNonConnectedUserData(userDTO);
             }else{
                 ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
                     if (connectionDTO != null){
@@ -174,27 +173,27 @@ public class WorkExperienceFragment extends Fragment {
         });
     }
 
-    public void fetchApplicantData(ApplicantDTO applicantDTO){
+    public void fetchNonConnectedUserData(EnlargedUserDTO userDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         workExperienceList = requireView().findViewById(R.id.work_experience_list);
         workExperienceList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(userDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
                     List<WorkExperienceDTO> workExperiences = response.body().getWorkExperiences();
 
-                    // if connection has no work experiences show empty text
-                    if (workExperiences.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
-                        showApplicantEmptyWorkExperience();
+                    // if user has no work experiences or all info is private show empty text
+                    if (workExperiences.isEmpty() || isAllPrivateInfo(response.body())){
+                        showNonConnectedUserEmptyWorkExperience();
                     }else{
                         for (WorkExperienceDTO workExperience: workExperiences){
-                            //if (workExperience.getIsPublic()){ // show only public work experiences
-                            AddConnectionWorkExperienceListEntry(workExperience);
-                            //}
+                            if (workExperience.getIsPublic()){ // show only public work experiences
+                                AddConnectionWorkExperienceListEntry(workExperience);
+                            }
                         }
                     }
                 }else{
@@ -210,7 +209,7 @@ public class WorkExperienceFragment extends Fragment {
     }
 
     /*
-     * Method used for showing empty text on connections that have all their info private.
+     * Method used for showing empty text on users that have all their info private.
      * */
     public boolean isAllPrivateInfo(UserDTO connection){
         int privateCounter = 0;
@@ -339,9 +338,9 @@ public class WorkExperienceFragment extends Fragment {
         workExperienceList.addView(addWorkExperiencesTextView);
     }
 
-    private void showApplicantEmptyWorkExperience(){
+    private void showNonConnectedUserEmptyWorkExperience(){
         TextView noWorkExperiencesTextView = new TextView(getActivity());
-        noWorkExperiencesTextView.setText("This applicant has no work experiences added.");
+        noWorkExperiencesTextView.setText("This user has no work experiences added.");
         noWorkExperiencesTextView.setTextSize(20); // Set desired text size
         noWorkExperiencesTextView.setTextColor(Color.BLACK);
 

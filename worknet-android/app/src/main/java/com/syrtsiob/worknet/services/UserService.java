@@ -48,4 +48,7 @@ public interface UserService {
 
     @GET("users/search")
     Call<List<UserDTO>> searchUser(@Query("name") String name);
+
+    @GET("users/addConnection")
+    Call<String> addConnection(@Query("userId") Long userId, @Query("connectionId") Long connectionId);
 }

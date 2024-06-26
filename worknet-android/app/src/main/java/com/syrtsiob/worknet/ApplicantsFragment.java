@@ -21,10 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.model.WorkExperienceDTO;
@@ -36,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import retrofit2.Call;
@@ -119,7 +121,9 @@ public class ApplicantsFragment extends Fragment {
                 public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                     if (response.isSuccessful()){
                         List<JobDTO> jobs = response.body().getJobs();
-                        List<ApplicantDTO> applicants = new ArrayList<>();
+                        List<EnlargedUserDTO> applicants = new ArrayList<>();
+                        List<EnlargedUserDTO> connections = response.body().getConnections();
+
                         for (JobDTO job: jobs){
                             applicants.addAll(job.getInterestedUsers());
                         }
@@ -141,9 +145,14 @@ public class ApplicantsFragment extends Fragment {
                         }
 
 
-                        for (ApplicantDTO applicant : applicants){
-                            addEntryToList(applicant);
+                        for (EnlargedUserDTO applicant : applicants){
+                            if (isConnection(applicant.getId(), connections)){
+                                addConnectedEntryToList(applicant);
+                            }else{
+                                addNonConnectedEntryToList(applicant);
+                            }
                         }
+
                     }else{
                         Toast.makeText(getActivity(), "user fetch failed. Check the format.", Toast.LENGTH_LONG).show();
                     }
@@ -162,7 +171,7 @@ public class ApplicantsFragment extends Fragment {
 
     }
 
-    private void addEntryToList(ApplicantDTO applicant) {
+    private void addNonConnectedEntryToList(EnlargedUserDTO applicant) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View applicantsListEntry = inflater
                 .inflate(R.layout.network_list_entry_template, applicantsList, false);
@@ -206,7 +215,58 @@ public class ApplicantsFragment extends Fragment {
 
         goToProfileButton.setOnClickListener(listener -> {
             // add connection and once user leaves profile page reset to proper user.
-            ApplicantUserDtoResultLiveData.getInstance().setValue(applicant);
+            NonConnectedUserDtoResultLiveData.getInstance().setValue(applicant);
+            replaceFragment(ProfileFragment.newInstance());
+        });
+
+        applicantsList.addView(applicantsListEntry);
+    }
+
+    private void addConnectedEntryToList(EnlargedUserDTO user){
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View applicantsListEntry = inflater
+                .inflate(R.layout.network_list_entry_template, applicantsList, false);
+
+        TextView fullName = applicantsListEntry.findViewById(R.id.full_name);
+        TextView position = applicantsListEntry.findViewById(R.id.position);
+        TextView employer = applicantsListEntry.findViewById(R.id.employer);
+
+        ImageView profilePic = applicantsListEntry.findViewById(R.id.user_profile_pic);
+        String profilePicName = user.getProfilePicture();
+        List<CustomFileDTO> files = user.getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
+            profilePic.setImageBitmap(bitmap);
+        }
+
+        fullName.setText(user.getFirstName() + " " + user.getLastName());
+        List<WorkExperienceDTO> workExperiences = user.getWorkExperiences();
+
+        String positionText =  workExperiences.stream()
+                .filter(WorkExperienceDTO::getCurrentlyWorking)
+                .map(WorkExperienceDTO::getTitle)
+                .findFirst()
+                .orElse(null);
+
+        position.setText(positionText);
+
+        String employerText =  workExperiences.stream()
+                .filter(WorkExperienceDTO::getCurrentlyWorking)
+                .map(WorkExperienceDTO::getCompanyName)
+                .findFirst()
+                .orElse(null);
+
+        employer.setText(employerText);
+
+        Button goToProfileButton = applicantsListEntry.findViewById(R.id.goToProfileButton);
+
+        goToProfileButton.setOnClickListener(listener -> {
+            // add connection and once user leaves profile page reset to proper user.
+            ConnectionUserDtoResultLiveData.getInstance().setValue(user);
             replaceFragment(ProfileFragment.newInstance());
         });
 
@@ -230,5 +290,18 @@ public class ApplicantsFragment extends Fragment {
     private InputStream decodeBase64ToInputStream(String base64Data) {
         byte[] bytes = Base64.getDecoder().decode(base64Data);
         return new ByteArrayInputStream(bytes);
+    }
+
+    /**
+     * Method used for showing which users are connected or not to the logged in user. Helps with showing proper stuff on Profile page.
+     * */
+    private boolean isConnection(Long userId, List<EnlargedUserDTO> connections){
+        for (EnlargedUserDTO user: connections){
+            if (Objects.equals(user.getId(), userId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

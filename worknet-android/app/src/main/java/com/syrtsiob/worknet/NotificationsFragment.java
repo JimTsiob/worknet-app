@@ -29,6 +29,8 @@ import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.EducationService;
+import com.syrtsiob.worknet.services.NotificationService;
 import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
@@ -145,7 +147,76 @@ public class NotificationsFragment extends Fragment {
         NotificationType notificationType = notificationDTO.getNotificationType();
         switch (notificationType) {
             case CONNECTION:
-                // TODO implement
+
+                leftButton.setText("Accept");
+                rightButton.setText("Decline");
+
+                Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+                NotificationService notificationService = retrofit.create(NotificationService.class);
+
+                leftButton.setOnClickListener(listener -> {
+
+                    UserService userService = retrofit.create(UserService.class);
+
+                    userService.addConnection(notificationDTO.getSender().getId(), notificationDTO.getReceiver().getId()).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()){
+                                replaceFragment(HomeFragment.newInstance());
+                                Toast.makeText(getActivity(), "Connection with user " + notificationDTO.getSender().getFirstName()
+                                        + " " + notificationDTO.getSender().getLastName() + " added successfully.", Toast.LENGTH_LONG).show();
+
+                                notificationService.deleteNotification(notificationDTO.getId()).enqueue(new Callback<String>() {
+                                    @Override
+                                    public void onResponse(Call<String> call, Response<String> response) {
+                                        if (response.isSuccessful()){
+                                            notificationContainer.removeView(notificationEntry);
+                                        }else{
+                                            Toast.makeText(getActivity(), "Notification failed. Check the format.", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<String> call, Throwable t) {
+                                        Log.d("notification failure: ", t.getLocalizedMessage());
+                                        Toast.makeText(getActivity(), "Notification failed. Server failure.", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }else{
+                                Toast.makeText(getActivity(), "Connection failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.d("connection failure: ", t.getLocalizedMessage());
+                            Toast.makeText(getActivity(), "Connection failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
+
+                rightButton.setOnClickListener(listener -> {
+                    notificationContainer.removeView(notificationEntry);
+                    notificationService.deleteNotification(notificationDTO.getId()).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()){
+                                // do nothing
+                            }else{
+                                Toast.makeText(getActivity(), "Notification failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.d("notification failure: ", t.getLocalizedMessage());
+                            Toast.makeText(getActivity(), "Notification failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    Toast.makeText(getActivity(), "Connection declined.", Toast.LENGTH_LONG).show();
+                });
+
                 break;
             case APPLY_TO_JOB_POST:
 

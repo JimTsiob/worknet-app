@@ -10,7 +10,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.syrtsiob.worknet.enums.NotificationType;
-import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
@@ -96,7 +95,7 @@ public class JobPostingDetails extends AppCompatActivity {
 
         boolean userIsApplicant = false;
 
-        for (ApplicantDTO applicant: jobDTO.getInterestedUsers()){
+        for (EnlargedUserDTO applicant: jobDTO.getInterestedUsers()){
             if (Objects.equals(applicant.getId(), userId)){
                 userIsApplicant = true;
             }

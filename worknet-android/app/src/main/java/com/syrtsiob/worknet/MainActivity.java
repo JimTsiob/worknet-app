@@ -18,8 +18,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
 import com.syrtsiob.worknet.services.UserService;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         // do this to show user image on profile
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
-        ApplicantUserDtoResultLiveData.getInstance().setValue(null);
+        NonConnectedUserDtoResultLiveData.getInstance().setValue(null);
 
         Intent intent = getIntent();
         String email = intent.getStringExtra(getResources().getString(R.string.e_mail));

@@ -16,7 +16,7 @@ public class JobDTO {
     private EmploymentType employmentType;
     private String description;
     private SmallUserDTO jobPoster;
-    private List<ApplicantDTO> interestedUsers;
+    private List<EnlargedUserDTO> interestedUsers;
     private List<ViewDTO> views;
     private List<SkillDTO> skills;
 
@@ -85,11 +85,11 @@ public class JobDTO {
         this.jobPoster = jobPoster;
     }
 
-    public List<ApplicantDTO> getInterestedUsers() {
+    public List<EnlargedUserDTO> getInterestedUsers() {
         return interestedUsers;
     }
 
-    public void setInterestedUsers(List<ApplicantDTO> interestedUsers) {
+    public void setInterestedUsers(List<EnlargedUserDTO> interestedUsers) {
         this.interestedUsers = interestedUsers;
     }
 

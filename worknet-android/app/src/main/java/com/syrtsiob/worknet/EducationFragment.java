@@ -17,10 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.syrtsiob.worknet.LiveData.ApplicantUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
+import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
-import com.syrtsiob.worknet.model.ApplicantDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.services.EducationService;
 import com.syrtsiob.worknet.services.UserService;
@@ -63,11 +62,11 @@ public class EducationFragment extends Fragment {
 
         addEducationButton = requireView().findViewById(R.id.add_education_button);
 
-        ApplicantUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), applicantDTO -> {
-            if (applicantDTO != null) {
+        NonConnectedUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            if (userDTO != null) {
                 addEducationButton.setVisibility(View.GONE);
 
-                fetchApplicantData(applicantDTO);
+                fetchNonConnectedUserData(userDTO);
             }else{
                 ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
                     if (connectionDTO != null){
@@ -144,27 +143,27 @@ public class EducationFragment extends Fragment {
         });
     }
 
-    public void fetchApplicantData(ApplicantDTO applicantDTO){
+    public void fetchNonConnectedUserData(EnlargedUserDTO userDTO){
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         UserService userService = retrofit.create(UserService.class);
 
         educationList = requireView().findViewById(R.id.education_list);
         educationList.removeAllViews(); // clear before showing new ones. Removes duplicates
 
-        userService.getUserByEmail(applicantDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+        userService.getUserByEmail(userDTO.getEmail()).enqueue(new Callback<UserDTO>() {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
                     List<EducationDTO> educations = response.body().getEducations();
 
-                    // if connection has no educations show empty text
-                    if (educations.isEmpty() /*|| isAllPrivateInfo(response.body())*/){
-                        showApplicantEmptyEducation();
+                    // if non-connected user has no educations or all info is private show empty text
+                    if (educations.isEmpty() || isAllPrivateInfo(response.body())){
+                        showNonConnectedUserEmptyEducation();
                     }else{
                         for (EducationDTO education: educations){
-                            //if (education.getIsPublic()){ // show only public educations
-                            AddConnectionEducationListEntry(education); // same method works for applicants
-                            // }
+                            if (education.getIsPublic()){ // show only public educations
+                                AddConnectionEducationListEntry(education); // same method works for applicants
+                            }
                         }
                     }
                 }else{
@@ -339,9 +338,9 @@ public class EducationFragment extends Fragment {
         educationList.addView(noEducationsTextView);
     }
 
-    private void showApplicantEmptyEducation(){
+    private void showNonConnectedUserEmptyEducation(){
         TextView noEducationsTextView = new TextView(getActivity());
-        noEducationsTextView.setText("This applicant has no educations added.");
+        noEducationsTextView.setText("This user has no educations added.");
         noEducationsTextView.setTextSize(20); // Set desired text size
         noEducationsTextView.setTextColor(Color.BLACK);
 
@@ -349,7 +348,7 @@ public class EducationFragment extends Fragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        params.setMargins(100, 300, 16, 16);
+        params.setMargins(200, 300, 16, 16);
         noEducationsTextView.setLayoutParams(params);
 
         educationList.addView(noEducationsTextView);
