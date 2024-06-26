@@ -166,12 +166,13 @@ public class MainActivity extends AppCompatActivity {
         searchBar.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 HomeFragment homeFragmentReference = (HomeFragment) getSupportFragmentManager()
-                        .findFragmentByTag("HomeFragment");
+                        .findFragmentByTag(HomeFragment.class.toString());
                 String searchText = searchBar.getText().toString();
 
                 if (homeFragmentReference != null && homeFragmentReference.isVisible()) {
                     replaceFragment(SearchResultsFragment
                             .newInstance(SearchResultsFragment.HOME_FRAG_MODE, searchText));
+                    Toast.makeText(this, "HELLO", Toast.LENGTH_LONG).show();
                 }
                 else {
                     replaceFragment(SearchResultsFragment
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.mainFrame, fragment);
+        fragmentTransaction.replace(R.id.mainFrame, fragment, fragment.getClass().toString());
         fragmentTransaction.commit();
     }
 
