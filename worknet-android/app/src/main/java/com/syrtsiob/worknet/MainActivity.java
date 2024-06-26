@@ -1,7 +1,5 @@
 package com.syrtsiob.worknet;
 
-import static android.app.PendingIntent.getActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -64,12 +62,20 @@ public class MainActivity extends AppCompatActivity {
 //        startActivity(intent);
 //        finish();
 
+
+
         // do this to show user image on profile
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
         ApplicantUserDtoResultLiveData.getInstance().setValue(null);
 
         Intent intent = getIntent();
         String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
+
+        // used for sending user back to messages with the back button
+        String fragmentToReplace = intent.getStringExtra("fragment_to_replace");
+        if ("message_fragment".equals(fragmentToReplace)) {
+            replaceFragment(MessagesFragment.newInstance());
+        }
 
         Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
         UserService userService = retrofit.create(UserService.class);

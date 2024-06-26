@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EducationDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -43,6 +45,10 @@ public class ProfileFragment extends Fragment {
     TabLayout tabLayout;
     ViewPager2 profileViewPager;
     ProfileViewPagerAdapter profileViewPagerAdapter;
+
+    Button connectButton;
+
+    Button sendMessageButton;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -112,6 +118,10 @@ public class ProfileFragment extends Fragment {
 
         tabLayout = requireView().findViewById(R.id.profileTabLayout);
         profileViewPager = requireView().findViewById(R.id.profileViewPager);
+
+        connectButton = requireView().findViewById(R.id.connectButton);
+        sendMessageButton = requireView().findViewById(R.id.sendMessage);
+
         profileViewPagerAdapter = new ProfileViewPagerAdapter(this);
 
         profileViewPager.setAdapter(profileViewPagerAdapter);
@@ -137,6 +147,40 @@ public class ProfileFragment extends Fragment {
                         // Otherwise show own profile elements.
                         ConnectionUserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), connectionDTO -> {
                             if (connectionDTO != null){
+
+                                connectButton.setVisibility(View.GONE);
+
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                );
+                                params.setMargins(0, 55, 0, 0);
+                                sendMessageButton.setLayoutParams(params);
+
+                                sendMessageButton.setOnClickListener(listener -> {
+                                    UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+                                        if (userDTO != null){
+                                            EnlargedUserDTO loggedInUser = new EnlargedUserDTO();
+                                            loggedInUser.setEducations(userDTO.getEducations());
+                                            loggedInUser.setEmail(userDTO.getEmail());
+                                            loggedInUser.setId(userDTO.getId());
+                                            loggedInUser.setFiles(userDTO.getFiles());
+                                            loggedInUser.setFirstName(userDTO.getFirstName());
+                                            loggedInUser.setLastName(userDTO.getLastName());
+                                            loggedInUser.setProfilePicture(userDTO.getProfilePicture());
+                                            loggedInUser.setSkills(userDTO.getSkills());
+                                            loggedInUser.setWorkExperiences(userDTO.getWorkExperiences());
+
+                                            //  go to chat with this connection
+                                            Intent intent = new Intent(getActivity(), Chat.class);
+                                            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
+                                            intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, connectionDTO);
+                                            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, userDTO);
+                                            startActivity(intent);
+                                        }
+                                    });
+                                });
+
                                 ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
                                 String profilePicName = connectionDTO.getProfilePicture();
                                 List<CustomFileDTO> files = connectionDTO.getFiles();
@@ -153,6 +197,9 @@ public class ProfileFragment extends Fragment {
                             }else{
                                 UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
                                     if (userDTO != null){
+                                        connectButton.setVisibility(View.GONE);
+                                        sendMessageButton.setVisibility(View.GONE);
+
                                         ImageView profilePic = requireView().findViewById(R.id.profilePagePic);
                                         String profilePicName = userDTO.getProfilePicture();
                                         List<CustomFileDTO> files = userDTO.getFiles();

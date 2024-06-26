@@ -101,7 +101,14 @@ public class Chat extends AppCompatActivity {
         editTextMessage = findViewById(R.id.editTextMessage);
 
         buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(l -> { finish(); });
+        buttonBack.setOnClickListener(l -> {
+            // this is done so we can get same result after using the send message button in profiles.
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(getString(R.string.e_mail), loggedInUser.getEmail());
+            intent.putExtra("fragment_to_replace", "message_fragment");
+            startActivity(intent);
+//            finish();
+        });
 
         buttonSend = findViewById(R.id.buttonSend);
 

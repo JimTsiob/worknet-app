@@ -46,6 +46,8 @@ public class MessagesFragment extends Fragment {
 
     LinearLayout chatsList;
 
+    int timesServiceCalled = 0; // used for preventing duplicate entries
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -115,6 +117,11 @@ public class MessagesFragment extends Fragment {
                 @Override
                 public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                     if (response.isSuccessful()){
+                        // do not allow duplicate service calls due to live data.
+                        if (timesServiceCalled == 1){
+                            return;
+                        }
+
                         List<MessageDTO> receivedMessages = response.body().getReceivedMessages();
                         List<MessageDTO> sentMessages = response.body().getSentMessages();
 
@@ -149,6 +156,7 @@ public class MessagesFragment extends Fragment {
 
                         List<EnlargedUserDTO> uniqueUsers = removeDuplicates(users);
 
+                        timesServiceCalled += 1;
 
                         // get all chat entries
                         for (EnlargedUserDTO user: uniqueUsers){

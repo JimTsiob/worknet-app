@@ -45,4 +45,7 @@ public interface UserService {
 
     @GET("users/{id}")
     Call<UserDTO> getUserById(@Path("id") Long userId);
+
+    @GET("users/search")
+    Call<List<UserDTO>> searchUser(@Query("name") String name);
 }
