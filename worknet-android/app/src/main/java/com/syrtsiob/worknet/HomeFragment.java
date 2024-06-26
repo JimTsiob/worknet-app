@@ -1,5 +1,6 @@
 package com.syrtsiob.worknet;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,12 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.syrtsiob.worknet.model.PostDTO;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -96,44 +97,46 @@ public class HomeFragment extends Fragment {
         addPost();
     }
 
-    // TODO Add post content and functionality
+    // TODO REMOVE - EXISTS ONLY FOR TESTING
     private void addPost() {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View postView = inflater.inflate(R.layout.post_template, postsContainer, false);
 
-        // TODO add images
-
+        ImageView posterPicture = postView.findViewById(R.id.poster_picture);
+        TextView posterName = postView.findViewById(R.id.poster_name);
         TextView postText = postView.findViewById(R.id.post_text);
-        Button likeButton = postView.findViewById(R.id.post_like_button);
-        Button commentsButton = postView.findViewById(R.id.post_comments_button);
+        Button seeMoreButton = postView.findViewById(R.id.postSeeMore);
 
-        commentsButton.setOnClickListener(listener -> {
-            postPopup(postsContainer);
+        seeMoreButton.setOnClickListener(listener -> {
+            Intent intent = new Intent(getActivity(), PostActivity.class);
+            startActivity(intent);
         });
 
         postsContainer.addView(postView);
     }
 
-    private void postPopup(View view) {
-        // inflate the layout of the popup window
+    private void addPost(PostDTO postDTO) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View popupView = inflater.inflate(R.layout.post_popup_template, postsContainer, false);
+        View postView = inflater.inflate(R.layout.post_template, postsContainer, false);
 
-        LinearLayout postPopupCommentContainer = popupView.findViewById(R.id.postPopupCommentContainer);
-        for (int i = 0; i < 15; i++) {
-            View comment = inflater.inflate(R.layout.post_popup_comment_template, postPopupCommentContainer, false);
-            TextView commentText = comment.findViewById(R.id.comment_text);
-            commentText.setText("Comment " + i);
-            postPopupCommentContainer.addView(comment);
-        }
+        ImageView posterPicture = postView.findViewById(R.id.poster_picture);
+        TextView posterName = postView.findViewById(R.id.poster_name);
+        TextView postText = postView.findViewById(R.id.post_text);
+        Button seeMoreButton = postView.findViewById(R.id.postSeeMore);
 
-        // create the popup window
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+        seeMoreButton.setOnClickListener(listener -> {
+            Intent intent = new Intent(getActivity(), PostActivity.class);
+            intent.putExtra(PostActivity.POST_DTO, postDTO);
+            startActivity(intent);
+        });
 
-        // show the popup window
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+        // TODO set image
+        // posterPicture.setImageURI(); / posterPicture.setImageBitmap();
+        posterName.setText(String.format("%s %s", postDTO.getUser().getFirstName(),
+                postDTO.getUser().getLastName()));
+        postText.setText(postDTO.getDescription());
+
+        postsContainer.addView(postView);
     }
+
 }
