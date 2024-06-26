@@ -172,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
                 if (homeFragmentReference != null && homeFragmentReference.isVisible()) {
                     replaceFragment(SearchResultsFragment
                             .newInstance(SearchResultsFragment.HOME_FRAG_MODE, searchText));
-                    Toast.makeText(this, "HELLO", Toast.LENGTH_LONG).show();
                 }
                 else {
                     replaceFragment(SearchResultsFragment
