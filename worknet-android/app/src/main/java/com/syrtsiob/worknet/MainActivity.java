@@ -22,16 +22,22 @@ import com.syrtsiob.worknet.LiveData.ConnectionUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.NonConnectedUserDtoResultLiveData;
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
 import com.syrtsiob.worknet.databinding.ActivityMainBinding;
+import com.syrtsiob.worknet.model.SmallCustomFileDTO;
+import com.syrtsiob.worknet.services.CustomFileService;
 import com.syrtsiob.worknet.services.UserService;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -130,25 +136,40 @@ public class MainActivity extends AppCompatActivity {
             profileImage = findViewById(R.id.profileImage);
             if (userDto != null){
                 String profilePicName = userDto.getProfilePicture();
-                List<CustomFileDTO> files = userDto.getFiles();
-                Optional<CustomFileDTO> profilePicture = files.stream()
+                List<SmallCustomFileDTO> files = userDto.getFiles();
+                Optional<SmallCustomFileDTO> profilePicture = files.stream()
                         .filter(file -> file.getFileName().equals(profilePicName))
                         .findFirst();
+
+
+                CustomFileService customFileService = retrofit.create(CustomFileService.class);
+
                 if (profilePicture.isPresent()){
-                    Bitmap bitmap = loadImageFromFile(profilePicture.get());
-                    profileImage.setImageBitmap(bitmap);
-                    profileImage.setOnClickListener(listener -> {
-                        drawerLayout.openDrawer(GravityCompat.START);
+                    customFileService.getCustomFileById(profilePicture.get().getId()).enqueue(new Callback<CustomFileDTO>() {
+                        @Override
+                        public void onResponse(Call<CustomFileDTO> call, Response<CustomFileDTO> response) {
+                            if (response.isSuccessful()){
+                                Bitmap bitmap = loadImageFromFile(response.body());
+                                profileImage.setImageBitmap(bitmap);
+                                profileImage.setOnClickListener(listener -> {
+                                    drawerLayout.openDrawer(GravityCompat.START);
+                                });
+                            }else{
+                                Toast.makeText(MainActivity.this, "File fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CustomFileDTO> call, Throwable t) {
+                            Log.d("file fetch fail: ", t.getLocalizedMessage());
+                            Toast.makeText(MainActivity.this, "File fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
                     });
                 }else{
                     findViewById(R.id.profileImage).setOnClickListener(listener -> {
                         drawerLayout.openDrawer(GravityCompat.START);
                     });
                 }
-            }else{
-                findViewById(R.id.profileImage).setOnClickListener(listener -> {
-                    drawerLayout.openDrawer(GravityCompat.START);
-                });
             }
         });
 
@@ -248,6 +269,28 @@ public class MainActivity extends AppCompatActivity {
     // used to decode the image's base64 string from the db.
     private InputStream decodeBase64ToInputStream(String base64Data) {
         byte[] bytes = Base64.getDecoder().decode(base64Data);
-        return new ByteArrayInputStream(bytes);
+        byte[] decompressedBytes = decompressData(bytes);
+        return new ByteArrayInputStream(decompressedBytes);
+    }
+
+    // used to decompress the compressed data from the DB.
+    private byte[] decompressData(byte[] data) {
+        Inflater inflater = new Inflater();
+        inflater.setInput(data);
+
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+        } catch (IOException | DataFormatException e) {
+            e.printStackTrace();
+        }
+
+        return outputStream.toByteArray();
     }
 }

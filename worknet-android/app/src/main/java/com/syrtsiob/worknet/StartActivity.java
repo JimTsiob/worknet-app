@@ -38,14 +38,6 @@ public class StartActivity extends AppCompatActivity {
 
             SetupButtonListeners();
         }
-
-        // TODO Remove =============
-        findViewById(R.id.devEnter).setOnClickListener(l ->{
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra(getString(R.string.e_mail), email);
-            startActivity(intent);
-        });
-        // =========================
     }
 
     void SetupButtonListeners() {

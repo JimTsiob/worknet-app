@@ -25,13 +25,17 @@ import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.MessageDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
+import com.syrtsiob.worknet.model.SmallCustomFileDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.CustomFileService;
 import com.syrtsiob.worknet.services.MessageService;
 import com.syrtsiob.worknet.services.NotificationService;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -40,6 +44,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -110,19 +116,38 @@ public class Chat extends AppCompatActivity {
         otherUser = getIntent().getSerializableExtra(SERIALIZABLE_OTHER_USER, EnlargedUserDTO.class);
 
         String profilePicName = otherUser.getProfilePicture();
-        List<CustomFileDTO> files = otherUser.getFiles();
-        Optional<CustomFileDTO> profilePicture = files.stream()
+        List<SmallCustomFileDTO> files = otherUser.getFiles();
+        Optional<SmallCustomFileDTO> profilePicture = files.stream()
                 .filter(file -> file.getFileName().equals(profilePicName))
                 .findFirst();
 
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        CustomFileService customFileService = retrofit.create(CustomFileService.class);
+
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
-            chatImage.setImageBitmap(bitmap);
+            customFileService.getCustomFileById(profilePicture.get().getId()).enqueue(new Callback<CustomFileDTO>() {
+                @Override
+                public void onResponse(Call<CustomFileDTO> call, Response<CustomFileDTO> response) {
+                    if (response.isSuccessful()){
+                        Bitmap bitmap = loadImageFromConnectionFile(response.body());
+                        chatImage.setImageBitmap(bitmap);
+                    }else{
+                        Toast.makeText(Chat.this, "File fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<CustomFileDTO> call, Throwable t) {
+                    Log.d("file fetch fail: ", t.getLocalizedMessage());
+                    Toast.makeText(Chat.this, "File fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
         }
+
+
 
         chatUserName.setText("Chat with " + otherUser.getFirstName() + " " + otherUser.getLastName());
 
-        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
         MessageService messageService = retrofit.create(MessageService.class);
 
         messageService.getAllMessages().enqueue(new Callback<List<MessageDTO>>() {
@@ -334,6 +359,28 @@ public class Chat extends AppCompatActivity {
     // used to decode the image's base64 string from the db.
     private InputStream decodeBase64ToInputStream(String base64Data) {
         byte[] bytes = Base64.getDecoder().decode(base64Data);
-        return new ByteArrayInputStream(bytes);
+        byte[] decompressedBytes = decompressData(bytes);
+        return new ByteArrayInputStream(decompressedBytes);
+    }
+
+    // used to decompress the compressed data from the DB.
+    private byte[] decompressData(byte[] data) {
+        Inflater inflater = new Inflater();
+        inflater.setInput(data);
+
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+        } catch (IOException | DataFormatException e) {
+            e.printStackTrace();
+        }
+
+        return outputStream.toByteArray();
     }
 }

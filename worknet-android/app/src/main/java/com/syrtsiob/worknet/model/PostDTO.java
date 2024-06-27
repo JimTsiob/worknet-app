@@ -12,6 +12,8 @@ public class PostDTO implements Serializable {
     private List<PostLikeDTO> likes;
     private List<CommentDTO> comments;
 
+    private String postCreationDate;
+
     public PostDTO() {
     }
 
@@ -61,5 +63,13 @@ public class PostDTO implements Serializable {
 
     public void setComments(List<CommentDTO> comments) {
         this.comments = comments;
+    }
+
+    public String getPostCreationDate() {
+        return postCreationDate;
+    }
+
+    public void setPostCreationDate(String postCreationDate) {
+        this.postCreationDate = postCreationDate;
     }
 }

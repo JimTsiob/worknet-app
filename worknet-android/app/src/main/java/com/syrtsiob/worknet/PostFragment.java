@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -232,6 +234,13 @@ public class PostFragment extends Fragment {
             PostDTO postDTO = new PostDTO();
             postDTO.setDescription(postText.getText().toString());
             postDTO.setUser(enlargedUserDTO);
+
+            // Define formatter and today's date as post creation date to db.
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate currentDate = LocalDate.now();
+            String formattedDate = currentDate.format(formatter);
+
+            postDTO.setPostCreationDate(formattedDate);
 
             postService.addPost(postDTO).enqueue(new Callback<String>() {
                 @Override

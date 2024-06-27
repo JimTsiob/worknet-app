@@ -90,6 +90,10 @@ public class CustomFileController {
                 // Process and save the file
                 String fileName = customFileService.savePostFile(file,postId);
 
+                // compress data for DB
+                byte[] fileBytes = file.getBytes();
+                byte[] compressedBytes = customFileService.compressData(fileBytes);
+
                 // String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
 
                 // Create and save CustomFile entity
@@ -97,7 +101,7 @@ public class CustomFileController {
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());
-                customFile.setFileContent(file.getBytes());
+                customFile.setFileContent(compressedBytes);
 
                 // Set the associated User and Post
                 customFile.setUser(user);
@@ -149,10 +153,14 @@ public class CustomFileController {
                     customFileService.deleteProfilePicture(user.getProfilePicture());
                 }
 
+                // compress data for DB
+                byte[] fileBytes = file.getBytes();
+                byte[] compressedBytes = customFileService.compressData(fileBytes);
+
                 String fileName = customFileService.saveProfilePicture(file, userId);
 
                 CustomFile customFile = new CustomFile();
-                customFile.setFileContent(file.getBytes());
+                customFile.setFileContent(compressedBytes);
                 customFile.setFileName(fileName);
                 customFile.setContentType(file.getContentType());
                 customFile.setSize(file.getSize());

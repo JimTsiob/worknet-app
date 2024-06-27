@@ -4,7 +4,8 @@ public class SmallPostDTO {
 
     private Long id;
     private String description;
-    private SmallUserDTO user;
+    private EnlargedUserDTO user;
+    private String postCreationDate;
 
     public Long getId() {
         return id;
@@ -22,11 +23,19 @@ public class SmallPostDTO {
         this.description = description;
     }
 
-    public SmallUserDTO getUser() {
+    public EnlargedUserDTO getUser() {
         return user;
     }
 
-    public void setUser(SmallUserDTO user) {
+    public void setUser(EnlargedUserDTO user) {
         this.user = user;
+    }
+
+    public String getPostCreationDate() {
+        return postCreationDate;
+    }
+
+    public void setPostCreationDate(String postCreationDate) {
+        this.postCreationDate = postCreationDate;
     }
 }

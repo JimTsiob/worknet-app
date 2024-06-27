@@ -9,7 +9,7 @@ public class PostDTO {
 
     private Long id;
     private String description;
-    private SmallUserDTO user;
+    private EnlargedUserDTO user;
     private List<CustomFileDTO> customFiles;
     private List<PostLikeDTO> likes;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -36,11 +36,11 @@ public class PostDTO {
         this.description = description;
     }
 
-    public SmallUserDTO getUser() {
+    public EnlargedUserDTO getUser() {
         return user;
     }
 
-    public void setUser(SmallUserDTO user) {
+    public void setUser(EnlargedUserDTO user) {
         this.user = user;
     }
 

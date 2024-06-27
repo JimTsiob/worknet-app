@@ -2,6 +2,7 @@ package com.example.worknet.controllers;
 
 
 import com.example.worknet.dto.PostDTO;
+import com.example.worknet.dto.SmallPostDTO;
 import com.example.worknet.entities.Post;
 import com.example.worknet.entities.User;
 import com.example.worknet.modelMapper.StrictModelMapper;
@@ -64,13 +65,13 @@ public class PostController {
 
         List<Post> userPosts = user.getPosts();
 
-        List<PostDTO> postDTOList = new ArrayList<>(userPosts.stream()
-                .map(post -> modelMapper.map(post, PostDTO.class))
+        List<SmallPostDTO> postDTOList = new ArrayList<>(userPosts.stream()
+                .map(post -> modelMapper.map(post, SmallPostDTO.class))
                 .toList());
 
         for (User conUser : user.getConnections()) {
             for (Post post : conUser.getPosts()) {
-                PostDTO postDTO = modelMapper.map(post, PostDTO.class);
+                SmallPostDTO postDTO = modelMapper.map(post, SmallPostDTO.class);
                 postDTOList.add(postDTO);
             }
         }
@@ -85,8 +86,8 @@ public class PostController {
     public ResponseEntity<?> searchPosts(@RequestParam String description) {
         List<Post> posts = postService.searchPostByDescription(description);
 
-        List<PostDTO> postDTOList =  posts.stream()
-                .map(post -> modelMapper.map(post, PostDTO.class))
+        List<SmallPostDTO> postDTOList =  posts.stream()
+                .map(post -> modelMapper.map(post, SmallPostDTO.class))
                 .toList();
 
         return ResponseEntity.ok(postDTOList);

@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.services;
 
 import com.syrtsiob.worknet.model.PostDTO;
+import com.syrtsiob.worknet.model.SmallCustomFileDTO;
+import com.syrtsiob.worknet.model.SmallPostDTO;
 
 import java.util.List;
 
@@ -20,8 +22,11 @@ public interface PostService {
     Call<List<PostDTO>> getAllPosts();
 
     @GET("posts/front-page")
-    Call<List<PostDTO>> getFrontPosts(@Query("userId") Long userId);
+    Call<List<SmallPostDTO>> getFrontPosts(@Query("userId") Long userId);
 
     @GET("posts/{id}")
     Call<PostDTO> getPostById(@Path("id") Long postId);
+
+    @GET("posts/search")
+    Call<List<SmallPostDTO>> searchPosts(@Query("description") String description);
 }
