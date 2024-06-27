@@ -3,7 +3,6 @@ package com.example.worknet.controllers;
 
 import com.example.worknet.dto.*;
 import com.example.worknet.entities.Job;
-import com.example.worknet.entities.Message;
 import com.example.worknet.entities.Skill;
 import com.example.worknet.entities.User;
 import com.example.worknet.entities.View;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController

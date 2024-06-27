@@ -1,12 +1,16 @@
 package com.syrtsiob.worknet;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +20,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.PostDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.PostService;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -83,36 +103,32 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         postsContainer = getView().findViewById(R.id.postsContainer);
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-        addPost();
-    }
 
-    // TODO REMOVE - EXISTS ONLY FOR TESTING
-    private void addPost() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View postView = inflater.inflate(R.layout.post_template, postsContainer, false);
 
-        ImageView posterPicture = postView.findViewById(R.id.poster_picture);
-        TextView posterName = postView.findViewById(R.id.poster_name);
-        TextView postText = postView.findViewById(R.id.post_text);
-        Button seeMoreButton = postView.findViewById(R.id.postSeeMore);
+        UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
 
-        seeMoreButton.setOnClickListener(listener -> {
-            Intent intent = new Intent(getActivity(), PostActivity.class);
-            startActivity(intent);
+            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+            PostService postService = retrofit.create(PostService.class);
+
+            postService.getFrontPosts(userDTO.getId()).enqueue(new Callback<List<PostDTO>>() {
+                @Override
+                public void onResponse(Call<List<PostDTO>> call, Response<List<PostDTO>> response) {
+                    if (response.isSuccessful()){
+                        for (PostDTO post: response.body()){
+                            addPost(post);
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "Post fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<PostDTO>> call, Throwable t) {
+                    Log.d("post fetch fail: ", t.getLocalizedMessage());
+                    Toast.makeText(getActivity(), "Post fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
         });
-
-        postsContainer.addView(postView);
     }
 
     private void addPost(PostDTO postDTO) {
@@ -126,9 +142,20 @@ public class HomeFragment extends Fragment {
 
         seeMoreButton.setOnClickListener(listener -> {
             Intent intent = new Intent(getActivity(), PostActivity.class);
-            intent.putExtra(PostActivity.POST_DTO, postDTO);
+            intent.putExtra(PostActivity.POST_DTO_ID, postDTO.getId());
             startActivity(intent);
         });
+
+        String profilePicName = postDTO.getUser().getProfilePicture();
+        List<CustomFileDTO> files = postDTO.getUser().getFiles();
+        Optional<CustomFileDTO> profilePicture = files.stream()
+                .filter(file -> file.getFileName().equals(profilePicName))
+                .findFirst();
+
+        if (profilePicture.isPresent()){
+            Bitmap bitmap = loadImageFromFile(profilePicture.get());
+            posterPicture.setImageBitmap(bitmap);
+        }
 
         // TODO set image
         // posterPicture.setImageURI(); / posterPicture.setImageBitmap();
@@ -137,6 +164,17 @@ public class HomeFragment extends Fragment {
         postText.setText(postDTO.getDescription());
 
         postsContainer.addView(postView);
+    }
+
+    private Bitmap loadImageFromFile(CustomFileDTO file) {
+        InputStream inputStream = decodeBase64ToInputStream(file.getFileContent());
+        return BitmapFactory.decodeStream(inputStream);
+    }
+
+    // used to decode the image's base64 string from the db.
+    private InputStream decodeBase64ToInputStream(String base64Data) {
+        byte[] bytes = Base64.getDecoder().decode(base64Data);
+        return new ByteArrayInputStream(bytes);
     }
 
 }

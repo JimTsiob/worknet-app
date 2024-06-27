@@ -3,6 +3,7 @@ package com.syrtsiob.worknet;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +26,19 @@ import androidx.core.view.WindowInsetsCompat;
 import com.syrtsiob.worknet.model.CommentDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.PostDTO;
+import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.PostService;
 
 import java.io.Serializable;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+
 public class PostActivity extends AppCompatActivity {
 
-    static final String POST_DTO = "POST_DTO";
+    static final String POST_DTO_ID = "POST_DTO_ID";
 
     LinearLayout postContent, postComments;
     TextView postTitle, postText, likesCounter;
@@ -68,13 +76,32 @@ public class PostActivity extends AppCompatActivity {
         leaveCommentButton = findViewById(R.id.leaveCommentButton);
         leaveCommentButton.setOnClickListener(listener -> LeaveComment());
 
-        PostDTO postDTO = getIntent().getSerializableExtra(POST_DTO, PostDTO.class);
-        if (postDTO != null)
-            InitializePost(postDTO);
-        else {
-            Toast.makeText(this, "Error when loading post...", Toast.LENGTH_LONG).show();
-            finish();
-        }
+        Long postId = getIntent().getLongExtra(POST_DTO_ID, 0L);
+
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        PostService postService = retrofit.create(PostService.class);
+
+        postService.getPostById(postId).enqueue(new Callback<PostDTO>() {
+            @Override
+            public void onResponse(Call<PostDTO> call, Response<PostDTO> response) {
+                if (response.isSuccessful()){
+                    if (response.body() != null)
+                        InitializePost(response.body());
+                    else {
+                        Toast.makeText(PostActivity.this, "Error when loading post...", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                }else{
+                    Toast.makeText(PostActivity.this, "Post fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostDTO> call, Throwable t) {
+                Log.d("post fail: ", t.getLocalizedMessage());
+                Toast.makeText(PostActivity.this, "Post fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
 
         OnBackPressedCallback finishWhenBackPressed = new OnBackPressedCallback(true) {
             @Override

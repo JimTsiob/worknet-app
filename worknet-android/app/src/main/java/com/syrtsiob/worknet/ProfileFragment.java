@@ -256,7 +256,6 @@ public class ProfileFragment extends Fragment {
                                     Intent intent = new Intent(getActivity(), Chat.class);
                                     intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
                                     intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, nonConnectedUserDTO);
-                                    intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, userDTO);
                                     startActivity(intent);
                                 }
                             });
@@ -297,7 +296,6 @@ public class ProfileFragment extends Fragment {
                                             Intent intent = new Intent(getActivity(), Chat.class);
                                             intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
                                             intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, connectionDTO);
-                                            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, userDTO);
                                             startActivity(intent);
                                         }
                                     });

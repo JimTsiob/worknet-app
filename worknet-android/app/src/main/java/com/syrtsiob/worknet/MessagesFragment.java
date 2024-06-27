@@ -230,7 +230,6 @@ public class MessagesFragment extends Fragment {
             Intent intent = new Intent(getContext(), Chat.class);
             intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
             intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, enlargedUserDTO);
-            intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
             startActivity(intent);
         });
 

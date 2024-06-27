@@ -2,9 +2,6 @@ package com.example.worknet.entities;
 
 
 import jakarta.persistence.*;
-
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity

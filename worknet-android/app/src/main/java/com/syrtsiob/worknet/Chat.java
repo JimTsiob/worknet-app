@@ -66,13 +66,11 @@ public class Chat extends AppCompatActivity {
 
     EnlargedUserDTO otherUser;
 
-    UserDTO loggedInUserDto;
-
     static final String SERIALIZABLE_LOGGED_IN_USER = "serializable_logged_in_user";
 
     static final String SERIALIZABLE_OTHER_USER = "serializable_other_user";
 
-    static final String SERIALIZABLE_LOGGED_IN_USER_DTO = "serializable_logged_in_user_dto";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +108,6 @@ public class Chat extends AppCompatActivity {
         loggedInUser = getIntent().getSerializableExtra(SERIALIZABLE_LOGGED_IN_USER, EnlargedUserDTO.class);
 
         otherUser = getIntent().getSerializableExtra(SERIALIZABLE_OTHER_USER, EnlargedUserDTO.class);
-
-        loggedInUserDto = getIntent().getSerializableExtra(SERIALIZABLE_LOGGED_IN_USER_DTO, UserDTO.class);
 
         String profilePicName = otherUser.getProfilePicture();
         List<CustomFileDTO> files = otherUser.getFiles();
@@ -188,7 +184,6 @@ public class Chat extends AppCompatActivity {
                                                 Intent intent = new Intent(Chat.this, Chat.class);
                                                 intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
                                                 intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, otherUser);
-                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
                                                 startActivity(intent);
 
                                             }else{
