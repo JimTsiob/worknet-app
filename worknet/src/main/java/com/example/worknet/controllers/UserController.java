@@ -196,7 +196,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/addConnection")
+    @GetMapping("/addConnection")
     public ResponseEntity<?> addConnection(@RequestParam Long userId,
                                            @RequestParam Long connectionId) {
         try {
