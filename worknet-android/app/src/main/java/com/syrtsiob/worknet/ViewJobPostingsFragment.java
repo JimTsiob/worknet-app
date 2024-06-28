@@ -36,6 +36,8 @@ public class ViewJobPostingsFragment extends Fragment {
 
     LinearLayout viewJobPostingsContainer;
 
+    int timesServiceCalled = 0;
+
     public static ViewJobPostingsFragment newInstance() {
         return new ViewJobPostingsFragment();
     }
@@ -118,10 +120,18 @@ public class ViewJobPostingsFragment extends Fragment {
         UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
 
 
+            if (timesServiceCalled == 1){
+                return;
+            }
+
+            timesServiceCalled += 1; // prevents duplicates
+
             Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
             UserService userService = retrofit.create(UserService.class);
 
             userService.getUserByEmail(userDTO.getEmail()).enqueue(new Callback<UserDTO>() {
+
+
                 @Override
                 public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                     if (response.isSuccessful()){
@@ -137,6 +147,7 @@ public class ViewJobPostingsFragment extends Fragment {
                             @Override
                             public void onResponse(Call<List<JobDTO>> call, Response<List<JobDTO>> response) {
                                 if (response.isSuccessful()) {
+
                                     if (response.body().isEmpty()){
                                         showEmptyJobRecommendations();
                                         return;

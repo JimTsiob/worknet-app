@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.PostDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
@@ -35,6 +36,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -217,14 +220,27 @@ public class PostFragment extends Fragment {
 
         UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
 
-            SmallUserDTO smallUserDTO = new SmallUserDTO();
-            smallUserDTO.setId(userDTO.getId());
-            smallUserDTO.setLastName(userDTO.getLastName());
-            smallUserDTO.setFirstName(userDTO.getFirstName());
+            EnlargedUserDTO enlargedUserDTO = new EnlargedUserDTO();
+            enlargedUserDTO.setFiles(userDTO.getFiles());
+            enlargedUserDTO.setId(userDTO.getId());
+            enlargedUserDTO.setProfilePicture(userDTO.getProfilePicture());
+            enlargedUserDTO.setSkills(userDTO.getSkills());
+            enlargedUserDTO.setEducations(userDTO.getEducations());
+            enlargedUserDTO.setEmail(userDTO.getEmail());
+            enlargedUserDTO.setLastName(userDTO.getLastName());
+            enlargedUserDTO.setFirstName(userDTO.getFirstName());
+            enlargedUserDTO.setWorkExperiences(userDTO.getWorkExperiences());
 
             PostDTO postDTO = new PostDTO();
             postDTO.setDescription(postText.getText().toString());
-            postDTO.setUser(smallUserDTO);
+            postDTO.setUser(enlargedUserDTO);
+
+            // Define formatter and today's date as post creation date to db.
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate currentDate = LocalDate.now();
+            String formattedDate = currentDate.format(formatter);
+
+            postDTO.setPostCreationDate(formattedDate);
 
             postService.addPost(postDTO).enqueue(new Callback<String>() {
                 @Override

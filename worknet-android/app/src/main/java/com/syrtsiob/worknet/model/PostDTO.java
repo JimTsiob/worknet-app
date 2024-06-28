@@ -7,10 +7,12 @@ public class PostDTO implements Serializable {
 
     private Long id;
     private String description;
-    private SmallUserDTO user;
+    private EnlargedUserDTO user;
     private List<CustomFileDTO> customFiles;
     private List<PostLikeDTO> likes;
     private List<CommentDTO> comments;
+
+    private String postCreationDate;
 
     public PostDTO() {
     }
@@ -31,11 +33,11 @@ public class PostDTO implements Serializable {
         this.description = description;
     }
 
-    public SmallUserDTO getUser() {
+    public EnlargedUserDTO getUser() {
         return user;
     }
 
-    public void setUser(SmallUserDTO user) {
+    public void setUser(EnlargedUserDTO user) {
         this.user = user;
     }
 
@@ -61,5 +63,13 @@ public class PostDTO implements Serializable {
 
     public void setComments(List<CommentDTO> comments) {
         this.comments = comments;
+    }
+
+    public String getPostCreationDate() {
+        return postCreationDate;
+    }
+
+    public void setPostCreationDate(String postCreationDate) {
+        this.postCreationDate = postCreationDate;
     }
 }

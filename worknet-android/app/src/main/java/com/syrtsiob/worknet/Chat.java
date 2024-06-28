@@ -5,10 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,17 +23,19 @@ import androidx.fragment.app.FragmentTransaction;
 import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.EnlargedUserDTO;
-import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.MessageDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
+import com.syrtsiob.worknet.model.SmallCustomFileDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.CustomFileService;
 import com.syrtsiob.worknet.services.MessageService;
 import com.syrtsiob.worknet.services.NotificationService;
-import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -45,6 +44,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -55,7 +56,7 @@ public class Chat extends AppCompatActivity {
 
     LinearLayout messages;
 
-    LinearLayout yellowBox;
+    LinearLayout purpleBox;
 
     LinearLayout silverBox;
     ScrollView scrollView;
@@ -71,13 +72,11 @@ public class Chat extends AppCompatActivity {
 
     EnlargedUserDTO otherUser;
 
-    UserDTO loggedInUserDto;
-
     static final String SERIALIZABLE_LOGGED_IN_USER = "serializable_logged_in_user";
 
     static final String SERIALIZABLE_OTHER_USER = "serializable_other_user";
 
-    static final String SERIALIZABLE_LOGGED_IN_USER_DTO = "serializable_logged_in_user_dto";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +85,11 @@ public class Chat extends AppCompatActivity {
 
         messages = findViewById(R.id.messages);
 
-        yellowBox = findViewById(R.id.yellowBox);
+        purpleBox = findViewById(R.id.purpleBox);
 
         silverBox = findViewById(R.id.silverBox);
 
-        yellowBox.setVisibility(View.GONE);
+        purpleBox.setVisibility(View.GONE);
         silverBox.setVisibility(View.GONE);
 
         scrollView = findViewById(R.id.scrollView);
@@ -101,7 +100,14 @@ public class Chat extends AppCompatActivity {
         editTextMessage = findViewById(R.id.editTextMessage);
 
         buttonBack = findViewById(R.id.buttonBack);
-        buttonBack.setOnClickListener(l -> { finish(); });
+        buttonBack.setOnClickListener(l -> {
+            // this is done so we can get same result after using the send message button in profiles.
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(getString(R.string.e_mail), loggedInUser.getEmail());
+            intent.putExtra("fragment_to_replace", "message_fragment");
+            startActivity(intent);
+//            finish();
+        });
 
         buttonSend = findViewById(R.id.buttonSend);
 
@@ -109,22 +115,39 @@ public class Chat extends AppCompatActivity {
 
         otherUser = getIntent().getSerializableExtra(SERIALIZABLE_OTHER_USER, EnlargedUserDTO.class);
 
-        loggedInUserDto = getIntent().getSerializableExtra(SERIALIZABLE_LOGGED_IN_USER_DTO, UserDTO.class);
-
         String profilePicName = otherUser.getProfilePicture();
-        List<CustomFileDTO> files = otherUser.getFiles();
-        Optional<CustomFileDTO> profilePicture = files.stream()
+        List<SmallCustomFileDTO> files = otherUser.getFiles();
+        Optional<SmallCustomFileDTO> profilePicture = files.stream()
                 .filter(file -> file.getFileName().equals(profilePicName))
                 .findFirst();
 
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        CustomFileService customFileService = retrofit.create(CustomFileService.class);
+
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
-            chatImage.setImageBitmap(bitmap);
+            customFileService.getCustomFileById(profilePicture.get().getId()).enqueue(new Callback<CustomFileDTO>() {
+                @Override
+                public void onResponse(Call<CustomFileDTO> call, Response<CustomFileDTO> response) {
+                    if (response.isSuccessful()){
+                        Bitmap bitmap = loadImageFromConnectionFile(response.body());
+                        chatImage.setImageBitmap(bitmap);
+                    }else{
+                        Toast.makeText(Chat.this, "File fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<CustomFileDTO> call, Throwable t) {
+                    Log.d("file fetch fail: ", t.getLocalizedMessage());
+                    Toast.makeText(Chat.this, "File fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
         }
+
+
 
         chatUserName.setText("Chat with " + otherUser.getFirstName() + " " + otherUser.getLastName());
 
-        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
         MessageService messageService = retrofit.create(MessageService.class);
 
         messageService.getAllMessages().enqueue(new Callback<List<MessageDTO>>() {
@@ -186,7 +209,6 @@ public class Chat extends AppCompatActivity {
                                                 Intent intent = new Intent(Chat.this, Chat.class);
                                                 intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER, loggedInUser);
                                                 intent.putExtra(Chat.SERIALIZABLE_OTHER_USER, otherUser);
-                                                intent.putExtra(Chat.SERIALIZABLE_LOGGED_IN_USER_DTO, loggedInUserDto);
                                                 startActivity(intent);
 
                                             }else{
@@ -287,14 +309,14 @@ public class Chat extends AppCompatActivity {
         else
             newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
-        LinearLayout yellowSquare = new LinearLayout(getApplicationContext());
-        yellowSquare.setLayoutParams(yellowBox.getLayoutParams()); // Copy layout params
-        yellowSquare.setOrientation(yellowBox.getOrientation()); // Copy orientation (optional)
+        LinearLayout purpleSquare = new LinearLayout(getApplicationContext());
+        purpleSquare.setLayoutParams(purpleBox.getLayoutParams()); // Copy layout params
+        purpleSquare.setOrientation(purpleBox.getOrientation()); // Copy orientation (optional)
 
-        int yellowColor = getApplicationContext().getResources().getColor(R.color.yellow); // Get color from resources
-        yellowSquare.setBackgroundColor(yellowColor);
+        int yellowColor = getApplicationContext().getResources().getColor(R.color.purple); // Get color from resources
+        purpleSquare.setBackgroundColor(yellowColor);
 
-        yellowSquare.setPadding(yellowBox.getPaddingLeft(), yellowBox.getPaddingTop(), yellowBox.getPaddingRight(), yellowBox.getPaddingBottom());
+        purpleSquare.setPadding(purpleBox.getPaddingLeft(), purpleBox.getPaddingTop(), purpleBox.getPaddingRight(), purpleBox.getPaddingBottom());
 
         LinearLayout silverSquare = new LinearLayout(getApplicationContext());
         silverSquare.setLayoutParams(silverBox.getLayoutParams());
@@ -311,8 +333,9 @@ public class Chat extends AppCompatActivity {
 
         // add other user's messages in the yellow box, our logged in user in the silver box.
         if(!(Objects.equals(message.getSender().getId(), loggedInUser.getId()))){
-            yellowSquare.addView(newMessage);
-            messages.addView(yellowSquare);
+            purpleSquare.addView(newMessage);
+            newMessage.setTextColor(getResources().getColor(R.color.white));
+            messages.addView(purpleSquare);
         }
         else{
             silverSquare.addView(newMessage);
@@ -337,6 +360,28 @@ public class Chat extends AppCompatActivity {
     // used to decode the image's base64 string from the db.
     private InputStream decodeBase64ToInputStream(String base64Data) {
         byte[] bytes = Base64.getDecoder().decode(base64Data);
-        return new ByteArrayInputStream(bytes);
+        byte[] decompressedBytes = decompressData(bytes);
+        return new ByteArrayInputStream(decompressedBytes);
+    }
+
+    // used to decompress the compressed data from the DB.
+    private byte[] decompressData(byte[] data) {
+        Inflater inflater = new Inflater();
+        inflater.setInput(data);
+
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+        } catch (IOException | DataFormatException e) {
+            e.printStackTrace();
+        }
+
+        return outputStream.toByteArray();
     }
 }

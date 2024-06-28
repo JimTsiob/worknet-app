@@ -27,15 +27,23 @@ import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.CustomFileDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
+import com.syrtsiob.worknet.model.SmallCustomFileDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.CustomFileService;
+import com.syrtsiob.worknet.services.EducationService;
+import com.syrtsiob.worknet.services.NotificationService;
 import com.syrtsiob.worknet.services.UserService;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -121,14 +129,33 @@ public class NotificationsFragment extends Fragment {
         ImageView picture = notificationEntry.findViewById(R.id.notificationPicture);
 
         String profilePicName = notificationDTO.getSender().getProfilePicture();
-        List<CustomFileDTO> files = notificationDTO.getSender().getFiles();
-        Optional<CustomFileDTO> profilePicture = files.stream()
+        List<SmallCustomFileDTO> files = notificationDTO.getSender().getFiles();
+        Optional<SmallCustomFileDTO> profilePicture = files.stream()
                 .filter(file -> file.getFileName().equals(profilePicName))
                 .findFirst();
 
+
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
+        CustomFileService customFileService = retrofit.create(CustomFileService.class);
+
         if (profilePicture.isPresent()){
-            Bitmap bitmap = loadImageFromConnectionFile(profilePicture.get());
-            picture.setImageBitmap(bitmap);
+            customFileService.getCustomFileById(profilePicture.get().getId()).enqueue(new Callback<CustomFileDTO>() {
+                @Override
+                public void onResponse(Call<CustomFileDTO> call, Response<CustomFileDTO> response) {
+                    if (response.isSuccessful()){
+                        Bitmap bitmap = loadImageFromConnectionFile(response.body());
+                        picture.setImageBitmap(bitmap);
+                    }else{
+                        Toast.makeText(getActivity(), "File fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<CustomFileDTO> call, Throwable t) {
+                    Log.d("file fetch fail: ", t.getLocalizedMessage());
+                    Toast.makeText(getActivity(), "File fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
         TextView text = notificationEntry.findViewById(R.id.notificationText);
@@ -145,7 +172,75 @@ public class NotificationsFragment extends Fragment {
         NotificationType notificationType = notificationDTO.getNotificationType();
         switch (notificationType) {
             case CONNECTION:
-                // TODO implement
+
+                leftButton.setText("Accept");
+                rightButton.setText("Decline");
+
+                NotificationService notificationService = retrofit.create(NotificationService.class);
+
+                leftButton.setOnClickListener(listener -> {
+
+                    UserService userService = retrofit.create(UserService.class);
+
+                    userService.addConnection(notificationDTO.getSender().getId(), notificationDTO.getReceiver().getId()).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()){
+                                replaceFragment(HomeFragment.newInstance());
+                                Toast.makeText(getActivity(), "Connection with user " + notificationDTO.getSender().getFirstName()
+                                        + " " + notificationDTO.getSender().getLastName() + " added successfully.", Toast.LENGTH_LONG).show();
+
+                                notificationService.deleteNotification(notificationDTO.getId()).enqueue(new Callback<String>() {
+                                    @Override
+                                    public void onResponse(Call<String> call, Response<String> response) {
+                                        if (response.isSuccessful()){
+                                            notificationContainer.removeView(notificationEntry);
+                                        }else{
+                                            Toast.makeText(getActivity(), "Notification failed. Check the format.", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<String> call, Throwable t) {
+                                        Log.d("notification failure: ", t.getLocalizedMessage());
+                                        Toast.makeText(getActivity(), "Notification failed. Server failure.", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }else{
+                                Toast.makeText(getActivity(), "Connection failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.d("connection failure: ", t.getLocalizedMessage());
+                            Toast.makeText(getActivity(), "Connection failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                });
+
+                rightButton.setOnClickListener(listener -> {
+                    notificationContainer.removeView(notificationEntry);
+                    notificationService.deleteNotification(notificationDTO.getId()).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.isSuccessful()){
+                                // do nothing
+                            }else{
+                                Toast.makeText(getActivity(), "Notification failed. Check the format.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+                            Log.d("notification failure: ", t.getLocalizedMessage());
+                            Toast.makeText(getActivity(), "Notification failed. Server failure.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    Toast.makeText(getActivity(), "Connection declined.", Toast.LENGTH_LONG).show();
+                });
+
                 break;
             case APPLY_TO_JOB_POST:
 
@@ -161,7 +256,20 @@ public class NotificationsFragment extends Fragment {
                 rightButton.setVisibility(View.GONE);
                 break;
             case LIKE_POST:
-                // TODO implement
+                params.setMargins(0, 0, 55, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to post");
+
+                leftButton.setOnClickListener(listener -> {
+                    Intent intent = new Intent(getActivity(), PostActivity.class);
+                    intent.putExtra(PostActivity.POST_DTO_ID, notificationDTO.getPost().getId());
+                    intent.putExtra(PostActivity.USER_ID, notificationDTO.getReceiver().getId());
+                    startActivity(intent);
+                });
+
+                rightButton.setVisibility(View.GONE);
+
                 break;
             case MESSAGE:
                 params.setMargins(0, 0, 30, 0);
@@ -176,7 +284,19 @@ public class NotificationsFragment extends Fragment {
                 rightButton.setVisibility(View.GONE);
                 break;
             case COMMENT:
-                // TODO implement
+                params.setMargins(0, 0, 55, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to post");
+
+                leftButton.setOnClickListener(listener -> {
+                    Intent intent = new Intent(getActivity(), PostActivity.class);
+                    intent.putExtra(PostActivity.POST_DTO_ID, notificationDTO.getPost().getId());
+                    intent.putExtra(PostActivity.USER_ID, notificationDTO.getReceiver().getId());
+                    startActivity(intent);
+                });
+
+                rightButton.setVisibility(View.GONE);
                 break;
         }
 
@@ -192,7 +312,29 @@ public class NotificationsFragment extends Fragment {
     // used to decode the image's base64 string from the db.
     private InputStream decodeBase64ToInputStream(String base64Data) {
         byte[] bytes = Base64.getDecoder().decode(base64Data);
-        return new ByteArrayInputStream(bytes);
+        byte[] decompressedBytes = decompressData(bytes);
+        return new ByteArrayInputStream(decompressedBytes);
+    }
+
+    // used to decompress the compressed data from the DB.
+    private byte[] decompressData(byte[] data) {
+        Inflater inflater = new Inflater();
+        inflater.setInput(data);
+
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+        try {
+            while (!inflater.finished()) {
+                int count = inflater.inflate(buffer);
+                outputStream.write(buffer, 0, count);
+            }
+            outputStream.close();
+        } catch (IOException | DataFormatException e) {
+            e.printStackTrace();
+        }
+
+        return outputStream.toByteArray();
     }
 
     private void replaceFragment(Fragment fragment) {

@@ -4,7 +4,7 @@ package com.example.worknet.dto;
 public class CommentDTO {
     private Long id;
     private String text;
-    private SmallUserDTO user;
+    private EnlargedUserDTO user;
     private SmallPostDTO post;
 
     public Long getId() {
@@ -23,11 +23,11 @@ public class CommentDTO {
         this.text = text;
     }
 
-    public SmallUserDTO getUser() {
+    public EnlargedUserDTO getUser() {
         return user;
     }
 
-    public void setUser(SmallUserDTO user) {
+    public void setUser(EnlargedUserDTO user) {
         this.user = user;
     }
 

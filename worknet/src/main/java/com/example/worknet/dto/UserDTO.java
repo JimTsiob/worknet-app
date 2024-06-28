@@ -11,7 +11,7 @@ public class UserDTO {
     private String jwtToken;
     private String password;
     private String profilePicture;
-    private List<CustomFileDTO> files;
+    private List<SmallCustomFileDTO> files;
     private List<EnlargedUserDTO> connections;
     private List<JobDTO> jobs;
     private List<SmallJobDTO> appliedJobs;
@@ -92,11 +92,11 @@ public class UserDTO {
         this.profilePicture = profilePicture;
     }
 
-    public List<CustomFileDTO> getFiles() {
+    public List<SmallCustomFileDTO> getFiles() {
         return files;
     }
 
-    public void setFiles(List<CustomFileDTO> files) {
+    public void setFiles(List<SmallCustomFileDTO> files) {
         this.files = files;
     }
 

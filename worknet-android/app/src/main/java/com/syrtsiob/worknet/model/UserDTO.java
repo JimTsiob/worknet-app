@@ -15,7 +15,7 @@ public class UserDTO implements Serializable {
     private String password;
 
     private String profilePicture;
-    private List<CustomFileDTO> files;
+    private List<SmallCustomFileDTO> files;
     private List<EnlargedUserDTO> connections;
 
     private List<JobDTO> jobs;
@@ -98,11 +98,11 @@ public class UserDTO implements Serializable {
         this.jwtToken = jwtToken;
     }
 
-    public List<CustomFileDTO> getFiles() {
+    public List<SmallCustomFileDTO> getFiles() {
         return files;
     }
 
-    public void setFiles(List<CustomFileDTO> files) {
+    public void setFiles(List<SmallCustomFileDTO> files) {
         this.files = files;
     }
 

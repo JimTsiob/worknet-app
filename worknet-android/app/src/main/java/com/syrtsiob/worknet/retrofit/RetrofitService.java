@@ -67,7 +67,7 @@ public class RetrofitService {
             return new Retrofit.Builder()
                     .baseUrl("https://10.0.2.2:8443/")
                     .client(client)
-                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(ScalarsConverterFactory.create()) // used for running Strings from calls. (Call<String>)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
 

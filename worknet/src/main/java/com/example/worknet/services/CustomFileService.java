@@ -17,4 +17,5 @@ public interface CustomFileService {
     String savePostFile(MultipartFile file, Long postId) throws IOException;
     String saveProfilePicture(MultipartFile file, Long userId) throws IOException;
     void deleteProfilePicture(String fileName) throws IOException;
+    public byte[] compressData(byte[] data);
 }

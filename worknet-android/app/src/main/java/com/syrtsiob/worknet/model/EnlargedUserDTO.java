@@ -16,7 +16,7 @@ public class EnlargedUserDTO implements Serializable {
     private List<EducationDTO> educations;
     private List<SkillDTO> skills;
 
-    private List<CustomFileDTO> files;
+    private List<SmallCustomFileDTO> files;
 
     public Long getId() {
         return id;
@@ -66,11 +66,11 @@ public class EnlargedUserDTO implements Serializable {
         this.workExperiences = workExperiences;
     }
 
-    public List<CustomFileDTO> getFiles() {
+    public List<SmallCustomFileDTO> getFiles() {
         return files;
     }
 
-    public void setFiles(List<CustomFileDTO> files) {
+    public void setFiles(List<SmallCustomFileDTO> files) {
         this.files = files;
     }
 

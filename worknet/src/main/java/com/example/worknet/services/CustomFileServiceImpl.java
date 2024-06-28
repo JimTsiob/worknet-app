@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.zip.Deflater;
 
 @Service
 public class CustomFileServiceImpl implements CustomFileService {
@@ -114,5 +116,26 @@ public class CustomFileServiceImpl implements CustomFileService {
         Files.deleteIfExists(path);
     }
 
+    public byte[] compressData(byte[] data) {
+        Deflater deflater = new Deflater();
+        deflater.setInput(data);
+        deflater.finish();
+
+        byte[] buffer = new byte[1024];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
+
+        while (!deflater.finished()) {
+            int count = deflater.deflate(buffer);
+            outputStream.write(buffer, 0, count);
+        }
+
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return outputStream.toByteArray();
+    }
 
 }
