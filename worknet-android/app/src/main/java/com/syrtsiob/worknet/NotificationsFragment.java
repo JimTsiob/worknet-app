@@ -284,7 +284,19 @@ public class NotificationsFragment extends Fragment {
                 rightButton.setVisibility(View.GONE);
                 break;
             case COMMENT:
-                // TODO implement
+                params.setMargins(0, 0, 55, 0);
+
+                leftButton.setLayoutParams(params);
+                leftButton.setText("Go to post");
+
+                leftButton.setOnClickListener(listener -> {
+                    Intent intent = new Intent(getActivity(), PostActivity.class);
+                    intent.putExtra(PostActivity.POST_DTO_ID, notificationDTO.getPost().getId());
+                    intent.putExtra(PostActivity.USER_ID, notificationDTO.getReceiver().getId());
+                    startActivity(intent);
+                });
+
+                rightButton.setVisibility(View.GONE);
                 break;
         }
 

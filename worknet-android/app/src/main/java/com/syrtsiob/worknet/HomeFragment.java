@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment {
     private static int timesExecutedOnStart = 0;
 
     // TODO: Rename and change types of parameters
-    private String email;
+    private static String email;
     private String mParam2;
 
     private LinearLayout postsContainer;
