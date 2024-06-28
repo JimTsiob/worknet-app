@@ -58,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         replaceFragment(HomeFragment.newInstance());
 
-        // TESTING - in case of emergency
+        // TESTING - in case of emergency, if all users get deleted
+        // and you forgot to logout, use this code, run app, comment the code again
+        // and restart the app.
 //        SharedPreferences sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
 //        editor.remove("jwt_token");

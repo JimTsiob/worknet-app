@@ -3,7 +3,7 @@ package com.syrtsiob.worknet.model;
 public class UserLikeDTO {
 
     private Long id;
-    private PostDTO post;
+    private SmallPostDTO post;
 
     public Long getId() {
         return id;
@@ -13,11 +13,11 @@ public class UserLikeDTO {
         this.id = id;
     }
 
-    public PostDTO getPost() {
+    public SmallPostDTO getPost() {
         return post;
     }
 
-    public void setPost(PostDTO post) {
+    public void setPost(SmallPostDTO post) {
         this.post = post;
     }
 }

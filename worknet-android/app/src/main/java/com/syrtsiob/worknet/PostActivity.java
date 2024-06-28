@@ -23,13 +23,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.syrtsiob.worknet.LiveData.UserDtoResultLiveData;
+import com.syrtsiob.worknet.enums.NotificationType;
 import com.syrtsiob.worknet.model.CommentDTO;
 import com.syrtsiob.worknet.model.CustomFileDTO;
+import com.syrtsiob.worknet.model.EnlargedUserDTO;
+import com.syrtsiob.worknet.model.LikeDTO;
+import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.PostDTO;
+import com.syrtsiob.worknet.model.SmallPostDTO;
+import com.syrtsiob.worknet.model.SmallUserDTO;
+import com.syrtsiob.worknet.model.UserDTO;
+import com.syrtsiob.worknet.model.UserLikeDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
+import com.syrtsiob.worknet.services.LikeService;
+import com.syrtsiob.worknet.services.NotificationService;
 import com.syrtsiob.worknet.services.PostService;
+import com.syrtsiob.worknet.services.UserService;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,11 +54,17 @@ public class PostActivity extends AppCompatActivity {
 
     static final String POST_DTO_ID = "POST_DTO_ID";
 
+    static final String USER_ID = "USER_ID";
+
     LinearLayout postContent, postComments;
     TextView postTitle, postText, likesCounter;
     EditText leaveCommentText;
     Button likeButton;
     ImageButton backButton, leaveCommentButton;
+
+    String postDescription, postCreationDate; // used for likes service below
+
+    EnlargedUserDTO postUser; // used for likes service below
 
     MediaPlayer mediaPlayer;
 
@@ -56,6 +76,37 @@ public class PostActivity extends AppCompatActivity {
         postContent = findViewById(R.id.postContent);
         postComments = findViewById(R.id.postComments);
 
+        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+        UserService userService = retrofit.create(UserService.class);
+
+        Long postId = getIntent().getLongExtra(POST_DTO_ID, 0L);
+        Long userId = getIntent().getLongExtra(USER_ID, 0L);
+
+        // if post is already liked, hide the button
+        userService.getUserById(userId).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<UserLikeDTO> likes = response.body().getLikes();
+
+                    for (UserLikeDTO like: likes){
+                        if (Objects.equals(like.getPost().getId(), postId)){
+                            likeButton.setEnabled(false);
+                        }
+                    }
+
+                }else{
+                    Toast.makeText(PostActivity.this, "User fetch failed. Check the format.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("user fetch fail: ",t.getLocalizedMessage());
+                Toast.makeText(PostActivity.this, "User fetch failed. Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         postTitle = findViewById(R.id.postTitle);
         postText = findViewById(R.id.postText);
@@ -65,7 +116,92 @@ public class PostActivity extends AppCompatActivity {
 
         likeButton = findViewById(R.id.likeButton);
         likeButton.setOnClickListener(listener -> {
-            // TODO database call
+
+            LikeService likeService = retrofit.create(LikeService.class);
+            NotificationService notificationService = retrofit.create(NotificationService.class);
+
+            LikeDTO likeDTO = new LikeDTO();
+            SmallPostDTO smallPostDTO = new SmallPostDTO();
+            smallPostDTO.setUser(postUser);
+            smallPostDTO.setPostCreationDate(postCreationDate);
+            smallPostDTO.setId(postId);
+            smallPostDTO.setDescription(postDescription);
+
+            SmallUserDTO smallUserDTO = new SmallUserDTO();
+            smallUserDTO.setFirstName(postUser.getFirstName());
+            smallUserDTO.setId(postUser.getId());
+            smallUserDTO.setLastName(postUser.getLastName());
+
+            likeDTO.setPost(smallPostDTO);
+            likeDTO.setUser(smallUserDTO);
+
+            likeService.addLike(likeDTO).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    if (response.isSuccessful()){
+                        Toast.makeText(PostActivity.this, "Post liked.", Toast.LENGTH_LONG).show();
+                        likeButton.setEnabled(false);
+
+                        NotificationDTO notificationDTO = new NotificationDTO();
+                        NotificationType notificationType = NotificationType.valueOf("LIKE_POST");
+                        notificationDTO.setNotificationType(notificationType);
+                        notificationDTO.setPost(smallPostDTO);
+                        notificationDTO.setReceiver(smallUserDTO);
+
+                        UserDtoResultLiveData.getInstance().observe(PostActivity.this, userDTO -> {
+
+                            // if logged in user liked their own post, return.
+                            if (Objects.equals(userDTO.getId(), postUser.getId())){
+                                return;
+                            }
+
+                            EnlargedUserDTO enlargedUserDTO = new EnlargedUserDTO();
+                            enlargedUserDTO.setId(userDTO.getId());
+                            enlargedUserDTO.setEducations(userDTO.getEducations());
+                            enlargedUserDTO.setEmail(userDTO.getEmail());
+                            enlargedUserDTO.setSkills(userDTO.getSkills());
+                            enlargedUserDTO.setWorkExperiences(userDTO.getWorkExperiences());
+                            enlargedUserDTO.setProfilePicture(userDTO.getProfilePicture());
+                            enlargedUserDTO.setFirstName(userDTO.getFirstName());
+                            enlargedUserDTO.setLastName(userDTO.getLastName());
+                            enlargedUserDTO.setFiles(userDTO.getFiles());
+
+                            notificationDTO.setSender(enlargedUserDTO);
+
+                            notificationDTO.setText(enlargedUserDTO.getFirstName() + " " +
+                                    enlargedUserDTO.getLastName() + " has liked your post.");
+
+                            notificationService.addNotification(notificationDTO).enqueue(new Callback<String>() {
+                                @Override
+                                public void onResponse(Call<String> call, Response<String> response) {
+                                    if (response.isSuccessful()){
+                                        // do nothing
+                                    }else{
+                                        Toast.makeText(PostActivity.this, "Notification failed. Check the format.", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<String> call, Throwable t) {
+                                    Log.d("notification fail:", t.getLocalizedMessage());
+                                    Toast.makeText(PostActivity.this, "Notification failed. Server failure.", Toast.LENGTH_LONG).show();
+                                }
+                            });
+
+                        });
+
+                    }else{
+                        Toast.makeText(PostActivity.this, "Like failed. Check the format.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d("like addition fail: ", t.getLocalizedMessage());
+                    Toast.makeText(PostActivity.this, "Like failed. Server failure.", Toast.LENGTH_LONG).show();
+                }
+            });
+
             int likes = Integer.parseInt(likesCounter.getText().toString());
             likesCounter.setText(String.format("%s", likes + 1));
         });
@@ -76,17 +212,22 @@ public class PostActivity extends AppCompatActivity {
         leaveCommentButton = findViewById(R.id.leaveCommentButton);
         leaveCommentButton.setOnClickListener(listener -> LeaveComment());
 
-        Long postId = getIntent().getLongExtra(POST_DTO_ID, 0L);
 
-        Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
+
+
         PostService postService = retrofit.create(PostService.class);
 
         postService.getPostById(postId).enqueue(new Callback<PostDTO>() {
             @Override
             public void onResponse(Call<PostDTO> call, Response<PostDTO> response) {
                 if (response.isSuccessful()){
-                    if (response.body() != null)
+                    if (response.body() != null){
+                        postUser = response.body().getUser();
+                        postCreationDate = response.body().getPostCreationDate();
+                        postDescription = response.body().getDescription();
+
                         InitializePost(response.body());
+                    }
                     else {
                         Toast.makeText(PostActivity.this, "Error when loading post...", Toast.LENGTH_LONG).show();
                         finish();

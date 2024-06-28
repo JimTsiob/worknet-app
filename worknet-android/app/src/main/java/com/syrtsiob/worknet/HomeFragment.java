@@ -142,7 +142,7 @@ public class HomeFragment extends Fragment {
                                     }
 
                                     for (SmallPostDTO post: response.body()){
-                                        addPost(post);
+                                        addPost(post, userDTO.getId());
                                     }
                                 }else{
                                     Toast.makeText(getActivity(), "Post fetch failed. Check the format.", Toast.LENGTH_LONG).show();
@@ -202,7 +202,7 @@ public class HomeFragment extends Fragment {
                                     }
 
                                     for (SmallPostDTO post: response.body()){
-                                        addPost(post);
+                                        addPost(post, userDTO.getId());
                                     }
                                 }else{
                                     Toast.makeText(getActivity(), "Post fetch failed. Check the format.", Toast.LENGTH_LONG).show();
@@ -229,7 +229,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void addPost(SmallPostDTO postDTO) {
+    private void addPost(SmallPostDTO postDTO, Long userId) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View postView = inflater.inflate(R.layout.post_template, postsContainer, false);
 
@@ -241,6 +241,7 @@ public class HomeFragment extends Fragment {
         seeMoreButton.setOnClickListener(listener -> {
             Intent intent = new Intent(getActivity(), PostActivity.class);
             intent.putExtra(PostActivity.POST_DTO_ID, postDTO.getId());
+            intent.putExtra(PostActivity.USER_ID, userId);
             startActivity(intent);
         });
 
