@@ -276,11 +276,4 @@ public class HomeFragment extends Fragment {
 
         return outputStream.toByteArray();
     }
-
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.mainFrame, fragment, fragment.getClass().toString());
-        fragmentTransaction.commit();
-    }
 }
