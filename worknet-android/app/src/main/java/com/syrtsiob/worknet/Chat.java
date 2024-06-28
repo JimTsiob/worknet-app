@@ -56,7 +56,7 @@ public class Chat extends AppCompatActivity {
 
     LinearLayout messages;
 
-    LinearLayout yellowBox;
+    LinearLayout purpleBox;
 
     LinearLayout silverBox;
     ScrollView scrollView;
@@ -85,11 +85,11 @@ public class Chat extends AppCompatActivity {
 
         messages = findViewById(R.id.messages);
 
-        yellowBox = findViewById(R.id.yellowBox);
+        purpleBox = findViewById(R.id.purpleBox);
 
         silverBox = findViewById(R.id.silverBox);
 
-        yellowBox.setVisibility(View.GONE);
+        purpleBox.setVisibility(View.GONE);
         silverBox.setVisibility(View.GONE);
 
         scrollView = findViewById(R.id.scrollView);
@@ -309,14 +309,14 @@ public class Chat extends AppCompatActivity {
         else
             newMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
 
-        LinearLayout yellowSquare = new LinearLayout(getApplicationContext());
-        yellowSquare.setLayoutParams(yellowBox.getLayoutParams()); // Copy layout params
-        yellowSquare.setOrientation(yellowBox.getOrientation()); // Copy orientation (optional)
+        LinearLayout purpleSquare = new LinearLayout(getApplicationContext());
+        purpleSquare.setLayoutParams(purpleBox.getLayoutParams()); // Copy layout params
+        purpleSquare.setOrientation(purpleBox.getOrientation()); // Copy orientation (optional)
 
-        int yellowColor = getApplicationContext().getResources().getColor(R.color.yellow); // Get color from resources
-        yellowSquare.setBackgroundColor(yellowColor);
+        int yellowColor = getApplicationContext().getResources().getColor(R.color.purple); // Get color from resources
+        purpleSquare.setBackgroundColor(yellowColor);
 
-        yellowSquare.setPadding(yellowBox.getPaddingLeft(), yellowBox.getPaddingTop(), yellowBox.getPaddingRight(), yellowBox.getPaddingBottom());
+        purpleSquare.setPadding(purpleBox.getPaddingLeft(), purpleBox.getPaddingTop(), purpleBox.getPaddingRight(), purpleBox.getPaddingBottom());
 
         LinearLayout silverSquare = new LinearLayout(getApplicationContext());
         silverSquare.setLayoutParams(silverBox.getLayoutParams());
@@ -333,8 +333,9 @@ public class Chat extends AppCompatActivity {
 
         // add other user's messages in the yellow box, our logged in user in the silver box.
         if(!(Objects.equals(message.getSender().getId(), loggedInUser.getId()))){
-            yellowSquare.addView(newMessage);
-            messages.addView(yellowSquare);
+            purpleSquare.addView(newMessage);
+            newMessage.setTextColor(getResources().getColor(R.color.white));
+            messages.addView(purpleSquare);
         }
         else{
             silverSquare.addView(newMessage);
