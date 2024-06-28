@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.Gravity;
@@ -63,8 +65,10 @@ public class HomeFragment extends Fragment {
 
     int timesServiceCalled = 0;
 
+    private static int timesExecutedOnStart = 0;
+
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String email;
     private String mParam2;
 
     private LinearLayout postsContainer;
@@ -99,7 +103,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            email = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -109,64 +113,6 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
-
-            Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
-            PostService postService = retrofit.create(PostService.class);
-            UserService userService = retrofit.create(UserService.class);
-
-            if (timesServiceCalled == 1){
-                return;
-            }
-
-            timesServiceCalled += 1; // prevents duplicates
-
-            userService.getUserById(userDTO.getId()).enqueue(new Callback<UserDTO>() {
-                @Override
-                public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
-                    if (response.isSuccessful()){
-
-                        postService.getFrontPosts(userDTO.getId()).enqueue(new Callback<List<SmallPostDTO>>() {
-                            @Override
-                            public void onResponse(Call<List<SmallPostDTO>> call, Response<List<SmallPostDTO>> response) {
-                                if (response.isSuccessful()){
-
-                                    if (response.body().isEmpty()){
-                                        showEmptyPosts();
-                                    }
-
-                                    for (SmallPostDTO post: response.body()){
-                                        addPost(post, userDTO.getId());
-                                    }
-                                }else{
-                                    Toast.makeText(getActivity(), "Post fetch failed. Check the format.", Toast.LENGTH_LONG).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<List<SmallPostDTO>> call, Throwable t) {
-                                Log.d("post fetch fail: ", t.getLocalizedMessage());
-                                Toast.makeText(getActivity(), "Post fetch failed. Server failure.", Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }else{
-                        Toast.makeText(getActivity(), "User fetch failed. Check the format.", Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<UserDTO> call, Throwable t) {
-                    Log.d("user fetch fail: ", t.getLocalizedMessage());
-                    Toast.makeText(getActivity(), "User fetch failed. Server failure.", Toast.LENGTH_LONG).show();
-                }
-            });
-        });
     }
 
     @Override
@@ -187,12 +133,12 @@ public class HomeFragment extends Fragment {
 
             timesServiceCalled += 1; // prevents duplicates
 
-            userService.getUserById(userDTO.getId()).enqueue(new Callback<UserDTO>() {
+            userService.getUserByEmail(email).enqueue(new Callback<UserDTO>() {
                 @Override
                 public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                     if (response.isSuccessful()){
 
-                        postService.getFrontPosts(userDTO.getId()).enqueue(new Callback<List<SmallPostDTO>>() {
+                        postService.getFrontPosts(response.body().getId()).enqueue(new Callback<List<SmallPostDTO>>() {
                             @Override
                             public void onResponse(Call<List<SmallPostDTO>> call, Response<List<SmallPostDTO>> response) {
                                 if (response.isSuccessful()){
@@ -331,4 +277,10 @@ public class HomeFragment extends Fragment {
         return outputStream.toByteArray();
     }
 
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.mainFrame, fragment, fragment.getClass().toString());
+        fragmentTransaction.commit();
+    }
 }

@@ -56,7 +56,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(HomeFragment.newInstance());
+
+        Intent intent = getIntent();
+        String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
+
+        // This ensures that the proper front page posts show up.
+        replaceFragment(HomeFragment.newInstance(email, ""));
 
         // TESTING - in case of emergency, if all users get deleted
         // and you forgot to logout, use this code, run app, comment the code again
@@ -76,8 +81,7 @@ public class MainActivity extends AppCompatActivity {
         ConnectionUserDtoResultLiveData.getInstance().setValue(null);
         NonConnectedUserDtoResultLiveData.getInstance().setValue(null);
 
-        Intent intent = getIntent();
-        String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
+
 
         // used for sending user back to messages with the back button
         String fragmentToReplace = intent.getStringExtra("fragment_to_replace");
