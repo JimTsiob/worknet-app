@@ -14,11 +14,13 @@ import com.syrtsiob.worknet.model.EnlargedUserDTO;
 import com.syrtsiob.worknet.model.JobDTO;
 import com.syrtsiob.worknet.model.NotificationDTO;
 import com.syrtsiob.worknet.model.SkillDTO;
+import com.syrtsiob.worknet.model.SmallJobDTO;
 import com.syrtsiob.worknet.model.UserDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 import com.syrtsiob.worknet.services.NotificationService;
 import com.syrtsiob.worknet.services.UserService;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -93,21 +95,34 @@ public class JobPostingDetails extends AppCompatActivity {
 
         applyButton = findViewById(R.id.applyButton);
 
-        boolean userIsApplicant = false;
-
-        for (EnlargedUserDTO applicant: jobDTO.getInterestedUsers()){
-            if (Objects.equals(applicant.getId(), userId)){
-                userIsApplicant = true;
-            }
-        }
-
-        if (userIsApplicant){
-            applyButton.setEnabled(false);
-        }
 
         Retrofit retrofit = RetrofitService.getRetrofitInstance(this);
         UserService userService = retrofit.create(UserService.class);
         NotificationService notificationService = retrofit.create(NotificationService.class);
+
+        // hide apply button
+        userService.getUserById(userId).enqueue(new Callback<UserDTO>() {
+            @Override
+            public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
+                if (response.isSuccessful()){
+                    List<SmallJobDTO> appliedJobs = response.body().getAppliedJobs();
+                    for (SmallJobDTO job: appliedJobs){
+                        if (Objects.equals(job.getId(), jobDTO.getId())){
+                            applyButton.setEnabled(false);
+                        }
+                    }
+                }else{
+                    Toast.makeText(JobPostingDetails.this, "User by id failed! Check the format", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserDTO> call, Throwable t) {
+                Log.d("user fetch fail: ", t.getLocalizedMessage());
+                Toast.makeText(JobPostingDetails.this, "User by id failed! Server failure.", Toast.LENGTH_LONG).show();
+            }
+        });
+
 
         applyButton.setOnClickListener(listener -> {
 

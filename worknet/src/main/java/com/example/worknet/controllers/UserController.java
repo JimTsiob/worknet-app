@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -50,9 +51,37 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
 
-        List<UserDTO> userDTOList =  users.stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
-                .toList();
+        // manual mapping fixes heavy bug with bad mapping of notifications, messages, applications for jobs.
+        List<UserDTO> userDTOList = users.stream()
+                .map(user -> {
+                    UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+                    userDTO.setConnections(user.getConnections().stream()
+                            .map(connection -> modelMapper.map(connection, EnlargedUserDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setSentMessages(user.getSentMessages().stream()
+                            .map(message -> modelMapper.map(message, MessageDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setReceivedMessages(user.getReceivedMessages().stream()
+                            .map(message -> modelMapper.map(message, MessageDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setSentNotifications(user.getSentNotifications().stream()
+                            .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setReceivedNotifications(user.getReceivedNotifications().stream()
+                            .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setJobs(user.getJobs().stream()
+                            .map(job -> modelMapper.map(job, JobDTO.class))
+                            .collect(Collectors.toList()));
+                    userDTO.setLikes(user.getLikes().stream()
+                            .map(like -> modelMapper.map(like, LikeDTO.class))
+                            .collect(Collectors.toList()));
+//                    userDTO.setAppliedJobs(user.getAppliedJobs().stream()
+//                            .map(job -> modelMapper.map(job, SmallJobDTO.class))
+//                            .collect(Collectors.toList()));
+                    return userDTO;
+                })
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDTOList);
     }
@@ -62,7 +91,32 @@ public class UserController {
         User user = userService.getUserById(id);
 
         UserDTO userDTO =  modelMapper.map(user, UserDTO.class);
+
         if (userDTO != null){
+
+            // manual mapping fixes heavy bug with bad mapping of notifications, messages, applications for jobs.
+            userDTO.setConnections(user.getConnections().stream()
+                    .map(connection -> modelMapper.map(connection, EnlargedUserDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setSentMessages(user.getSentMessages().stream()
+                    .map(message -> modelMapper.map(message, MessageDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setReceivedMessages(user.getReceivedMessages().stream()
+                    .map(message -> modelMapper.map(message, MessageDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setSentNotifications(user.getSentNotifications().stream()
+                    .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setReceivedNotifications(user.getReceivedNotifications().stream()
+                    .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setJobs(user.getJobs().stream()
+                    .map(job -> modelMapper.map(job, JobDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setLikes(user.getLikes().stream()
+                    .map(like -> modelMapper.map(like, LikeDTO.class))
+                    .collect(Collectors.toList()));
+
             return ResponseEntity.ok(userDTO);
         }else{
             String errorMessage = "User with ID " + id + " not found.";
@@ -76,6 +130,29 @@ public class UserController {
 
         UserDTO userDTO =  modelMapper.map(user, UserDTO.class);
         if (userDTO != null){
+            // manual mapping fixes heavy bug with bad mapping of notifications, messages, applications for jobs.
+            userDTO.setConnections(user.getConnections().stream()
+                    .map(connection -> modelMapper.map(connection, EnlargedUserDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setSentMessages(user.getSentMessages().stream()
+                    .map(message -> modelMapper.map(message, MessageDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setReceivedMessages(user.getReceivedMessages().stream()
+                    .map(message -> modelMapper.map(message, MessageDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setSentNotifications(user.getSentNotifications().stream()
+                    .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setReceivedNotifications(user.getReceivedNotifications().stream()
+                    .map(notification -> modelMapper.map(notification, NotificationDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setJobs(user.getJobs().stream()
+                    .map(job -> modelMapper.map(job, JobDTO.class))
+                    .collect(Collectors.toList()));
+            userDTO.setLikes(user.getLikes().stream()
+                    .map(like -> modelMapper.map(like, LikeDTO.class))
+                    .collect(Collectors.toList()));
+
             return ResponseEntity.ok(userDTO);
         }else{
             String errorMessage = "User with email " + email + " not found.";

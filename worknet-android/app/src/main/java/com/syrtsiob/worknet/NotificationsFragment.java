@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
@@ -86,6 +87,10 @@ public class NotificationsFragment extends Fragment {
                         List<NotificationDTO> notifications = response.body().getReceivedNotifications();
 
                         if (!notifications.isEmpty()){
+
+                            // Sort the notifications by descending order of IDs to show newest first
+                            notifications.sort(Comparator.comparingLong(NotificationDTO::getId).reversed());
+
                             for (NotificationDTO notification: notifications){
                                 AddNotification(notification);
                             }

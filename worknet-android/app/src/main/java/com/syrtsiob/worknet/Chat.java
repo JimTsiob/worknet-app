@@ -171,6 +171,12 @@ public class Chat extends AppCompatActivity {
                     PopulateChat(filteredMessages);
 
                     buttonSend.setOnClickListener(listener -> {
+
+                        if (editTextMessage.getText().toString().isEmpty()){
+                            Toast.makeText(Chat.this, "message text cannot be empty.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+
                         MessageDTO messageDTO = new MessageDTO();
                         messageDTO.setText(editTextMessage.getText().toString());
                         messageDTO.setReceiver(otherUser);

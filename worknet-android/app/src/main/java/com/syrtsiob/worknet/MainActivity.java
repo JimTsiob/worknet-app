@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 //        Intent intent = new Intent(MainActivity.this, Login.class);
 //        startActivity(intent);
 //        finish();
-
+//        String email = intent.getStringExtra(getResources().getString(R.string.e_mail));
 
 
         // do this to show user image on profile

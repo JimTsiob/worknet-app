@@ -36,7 +36,6 @@ import com.syrtsiob.worknet.model.SmallCustomFileDTO;
 import com.syrtsiob.worknet.model.SmallPostDTO;
 import com.syrtsiob.worknet.model.SmallUserDTO;
 import com.syrtsiob.worknet.model.UserDTO;
-import com.syrtsiob.worknet.model.UserLikeDTO;
 import com.syrtsiob.worknet.retrofit.RetrofitService;
 import com.syrtsiob.worknet.services.CommentService;
 import com.syrtsiob.worknet.services.CustomFileService;
@@ -108,10 +107,10 @@ public class PostActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()){
-                    List<UserLikeDTO> likes = response.body().getLikes();
+                    List<LikeDTO> likes = response.body().getLikes();
 
-                    for (UserLikeDTO like: likes){
-                        if (Objects.equals(like.getPost().getId(), postId)){
+                    for (LikeDTO like: likes){
+                        if ((Objects.equals(like.getUser().getId(), userId)) && (Objects.equals(like.getPost().getId(), postId))){
                             likeButton.setEnabled(false);
                         }
                     }
@@ -153,8 +152,11 @@ public class PostActivity extends AppCompatActivity {
             smallUserDTO.setId(postUser.getId());
             smallUserDTO.setLastName(postUser.getLastName());
 
+            SmallUserDTO smallSenderDTO = new SmallUserDTO();
+            smallSenderDTO.setId(userId);
+
             likeDTO.setPost(smallPostDTO);
-            likeDTO.setUser(smallUserDTO);
+            likeDTO.setUser(smallSenderDTO);
 
             likeService.addLike(likeDTO).enqueue(new Callback<String>() {
                 @Override

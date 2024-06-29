@@ -20,7 +20,7 @@ public class UserDTO implements Serializable {
 
     private List<JobDTO> jobs;
     private List<SmallJobDTO> appliedJobs;
-    private List<UserLikeDTO> likes;
+    private List<LikeDTO> likes;
     private List<MessageDTO> sentMessages;
     private List<MessageDTO> receivedMessages;
     private List<SkillDTO> skills;
@@ -130,11 +130,11 @@ public class UserDTO implements Serializable {
         this.appliedJobs = appliedJobs;
     }
 
-    public List<UserLikeDTO> getLikes() {
+    public List<LikeDTO> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<UserLikeDTO> likes) {
+    public void setLikes(List<LikeDTO> likes) {
         this.likes = likes;
     }
 

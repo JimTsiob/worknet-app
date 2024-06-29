@@ -77,7 +77,7 @@ public class PostController {
         }
 
         // sort by descending order to get the newest posts to show first.
-        postDTOList.sort((p1, p2) -> p2.getPostCreationDate().compareTo(p1.getPostCreationDate()));
+        postDTOList.sort((p1, p2) -> p2.getId().compareTo(p1.getId()));
 
         return ResponseEntity.ok(postDTOList);
     }

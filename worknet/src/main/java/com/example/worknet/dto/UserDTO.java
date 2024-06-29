@@ -15,7 +15,7 @@ public class UserDTO {
     private List<EnlargedUserDTO> connections;
     private List<JobDTO> jobs;
     private List<SmallJobDTO> appliedJobs;
-    private List<UserLikeDTO> likes;
+    private List<LikeDTO> likes;
     private List<SmallPostDTO> posts;
     private List<MessageDTO> sentMessages;
     private List<MessageDTO> receivedMessages;
@@ -124,11 +124,11 @@ public class UserDTO {
         this.appliedJobs = appliedJobs;
     }
 
-    public List<UserLikeDTO> getLikes() {
+    public List<LikeDTO> getLikes() {
         return likes;
     }
 
-    public void setLikes(List<UserLikeDTO> likes) {
+    public void setLikes(List<LikeDTO> likes) {
         this.likes = likes;
     }
 
