@@ -280,6 +280,12 @@ public class PostActivity extends AppCompatActivity {
 
     private void LeaveComment() {
         String commentText = leaveCommentText.getText().toString();
+
+        if (commentText.isEmpty()){
+            Toast.makeText(this, "Comment text cannot be empty.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         leaveCommentText.clearFocus();
         leaveCommentText.setText("");
 
@@ -323,6 +329,11 @@ public class PostActivity extends AppCompatActivity {
                     if (response.isSuccessful()){
                         Toast.makeText(PostActivity.this, "Comment added successfully.", Toast.LENGTH_LONG).show();
                         AddComment(commentDTO);
+
+                        // if user comments on their own post do not send notification
+                        if (Objects.equals(postUserSmall.getId(), enlargedUserDTO.getId())){
+                            return;
+                        }
 
                         NotificationDTO notificationDTO = new NotificationDTO();
                         NotificationType notificationType = NotificationType.valueOf("COMMENT");

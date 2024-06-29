@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +59,9 @@ public class EducationFragment extends Fragment {
         super.onStart();
         // if the user wants to see a connection's profile show connection's education
         // otherwise show user's education (my profile)
+
+        EditText searchBar = getActivity().findViewById(R.id.searchBar);
+        searchBar.setHint("Search users...");
 
 
         addEducationButton = requireView().findViewById(R.id.add_education_button);

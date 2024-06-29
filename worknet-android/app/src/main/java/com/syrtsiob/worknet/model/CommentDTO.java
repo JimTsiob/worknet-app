@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class CommentDTO {
+import java.io.Serializable;
+
+public class CommentDTO implements Serializable {
     private Long id;
     private String text;
     private EnlargedUserDTO user;
