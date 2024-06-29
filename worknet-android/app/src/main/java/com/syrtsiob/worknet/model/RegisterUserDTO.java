@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class RegisterUserDTO {
+import java.io.Serializable;
+
+public class RegisterUserDTO implements Serializable {
     private String email;
     private String password;
     private String firstName;

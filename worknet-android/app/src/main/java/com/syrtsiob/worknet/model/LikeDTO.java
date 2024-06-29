@@ -1,6 +1,8 @@
 package com.syrtsiob.worknet.model;
 
-public class LikeDTO {
+import java.io.Serializable;
+
+public class LikeDTO implements Serializable {
 
     private Long id;
     private SmallUserDTO user;

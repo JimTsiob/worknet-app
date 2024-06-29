@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -112,6 +113,9 @@ public class NetworkFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         networkList = requireView().findViewById(R.id.network_list);
+
+        EditText searchBar = getActivity().findViewById(R.id.searchBar);
+        searchBar.setHint("Search users...");
 
         UserDtoResultLiveData.getInstance().observe(getActivity(), userDTO -> {
 

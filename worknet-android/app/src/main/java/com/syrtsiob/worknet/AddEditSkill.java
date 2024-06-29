@@ -70,7 +70,6 @@ public class AddEditSkill extends AppCompatActivity {
         });
 
         submitButton.setOnClickListener(listener -> {
-            // TODO upload to database
             if (isEmptyField())
                 return;
 

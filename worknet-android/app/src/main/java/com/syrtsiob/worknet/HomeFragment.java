@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -58,16 +59,12 @@ import retrofit2.Retrofit;
  */
 public class HomeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     int timesServiceCalled = 0;
 
-    private static int timesExecutedOnStart = 0;
-
-    // TODO: Rename and change types of parameters
     private static String email;
     private String mParam2;
 
@@ -119,6 +116,9 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         postsContainer = getView().findViewById(R.id.postsContainer);
+
+        EditText searchBar = getActivity().findViewById(R.id.searchBar);
+        searchBar.setHint("Search posts...");
 
 
         UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
