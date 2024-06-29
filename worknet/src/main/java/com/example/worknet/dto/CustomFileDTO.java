@@ -7,8 +7,6 @@ public class CustomFileDTO {
     private String contentType;
     private Long size;
     private byte[] fileContent;
-//    private PostDTO post;
-//    private UserDTO user;
 
     public CustomFileDTO() {}
 

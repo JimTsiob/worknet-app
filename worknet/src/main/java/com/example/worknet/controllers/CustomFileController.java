@@ -94,8 +94,6 @@ public class CustomFileController {
                 byte[] fileBytes = file.getBytes();
                 byte[] compressedBytes = customFileService.compressData(fileBytes);
 
-                // String inputStreamString = customFileService.encodeInputStreamToBase64(file.getInputStream());
-
                 // Create and save CustomFile entity
                 CustomFile customFile = new CustomFile();
                 customFile.setFileName(fileName);

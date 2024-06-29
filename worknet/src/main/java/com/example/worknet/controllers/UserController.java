@@ -76,9 +76,6 @@ public class UserController {
                     userDTO.setLikes(user.getLikes().stream()
                             .map(like -> modelMapper.map(like, LikeDTO.class))
                             .collect(Collectors.toList()));
-//                    userDTO.setAppliedJobs(user.getAppliedJobs().stream()
-//                            .map(job -> modelMapper.map(job, SmallJobDTO.class))
-//                            .collect(Collectors.toList()));
                     return userDTO;
                 })
                 .collect(Collectors.toList());

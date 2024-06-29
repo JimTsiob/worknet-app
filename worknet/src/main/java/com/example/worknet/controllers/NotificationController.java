@@ -75,7 +75,6 @@ public class NotificationController {
     public ResponseEntity<?> addView(@RequestParam Long userId,
                                      @RequestParam Long postId) {
         try {
-//            notificationService.sendNotification(userId, postId);
             return ResponseEntity.status(HttpStatus.CREATED).body("Sent notification successfully");
         } catch (Exception e) {
             String errorMessage = "Failed to send notification: " + e.getMessage();
