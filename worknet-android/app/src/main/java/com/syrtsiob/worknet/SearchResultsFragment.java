@@ -184,28 +184,33 @@ public class SearchResultsFragment extends Fragment {
 
         Retrofit retrofit = RetrofitService.getRetrofitInstance(getActivity());
         PostService postService = retrofit.create(PostService.class);
+        UserService userService = retrofit.create(UserService.class);
 
-        postService.searchPosts(searchInput).enqueue(new Callback<List<SmallPostDTO>>() {
-            @Override
-            public void onResponse(Call<List<SmallPostDTO>> call, Response<List<SmallPostDTO>> response) {
-                if (response.isSuccessful()){
-                    if (response.body().isEmpty()){
-                        ShowNoResults();
+        UserDtoResultLiveData.getInstance().observe(getViewLifecycleOwner(), userDTO -> {
+            if (userDTO != null){
+                postService.searchPosts(searchInput).enqueue(new Callback<List<SmallPostDTO>>() {
+                    @Override
+                    public void onResponse(Call<List<SmallPostDTO>> call, Response<List<SmallPostDTO>> response) {
+                        if (response.isSuccessful()){
+                            if (response.body().isEmpty()){
+                                ShowNoResults();
+                            }
+
+                            for (SmallPostDTO postDTO: response.body()){
+                                addPost(postDTO, userDTO.getId());
+                            }
+
+                        }else{
+                            Toast.makeText(getActivity(), "Post search failed. Check the format.", Toast.LENGTH_LONG).show();
+                        }
                     }
 
-                    for (SmallPostDTO postDTO: response.body()){
-                        addPost(postDTO);
+                    @Override
+                    public void onFailure(Call<List<SmallPostDTO>> call, Throwable t) {
+                        Log.d("post search fail", t.getLocalizedMessage());
+                        Toast.makeText(getActivity(), "Post search failed. Server failure.", Toast.LENGTH_LONG).show();
                     }
-
-                }else{
-                    Toast.makeText(getActivity(), "Post search failed. Check the format.", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<SmallPostDTO>> call, Throwable t) {
-                Log.d("post search fail", t.getLocalizedMessage());
-                Toast.makeText(getActivity(), "Post search failed. Server failure.", Toast.LENGTH_LONG).show();
+                });
             }
         });
     }
@@ -369,7 +374,7 @@ public class SearchResultsFragment extends Fragment {
         resultsContainer.addView(networkListEntry);
     }
 
-    private void addPost(SmallPostDTO postDTO) {
+    private void addPost(SmallPostDTO postDTO, Long userId) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View postView = inflater.inflate(R.layout.post_template, resultsContainer, false);
 
@@ -381,6 +386,7 @@ public class SearchResultsFragment extends Fragment {
         seeMoreButton.setOnClickListener(listener -> {
             Intent intent = new Intent(getActivity(), PostActivity.class);
             intent.putExtra(PostActivity.POST_DTO_ID, postDTO.getId());
+            intent.putExtra(PostActivity.USER_ID, userId);
             startActivity(intent);
         });
 
