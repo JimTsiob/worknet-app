@@ -165,10 +165,6 @@ public class UserController {
     public ResponseEntity<?> searchUser(@RequestParam String name) {
         List<User> users = userService.searchUser(name);
 
-        if (users.isEmpty()){
-            return new ResponseEntity<>("No users were found.", HttpStatus.NOT_FOUND);
-        }
-
         List<UserDTO> userDTOList =  users.stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
                 .toList();
