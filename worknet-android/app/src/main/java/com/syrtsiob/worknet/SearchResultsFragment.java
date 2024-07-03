@@ -101,6 +101,10 @@ public class SearchResultsFragment extends Fragment {
         }
     }
 
+    public String getResultsMode() {
+        return resultsMode;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -200,11 +200,27 @@ public class MainActivity extends AppCompatActivity {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 HomeFragment homeFragmentReference = (HomeFragment) getSupportFragmentManager()
                         .findFragmentByTag(HomeFragment.class.toString());
+
+                SearchResultsFragment searchResultsFragmentReference = (SearchResultsFragment) getSupportFragmentManager()
+                        .findFragmentByTag(SearchResultsFragment.class.toString());
+
                 String searchText = searchBar.getText().toString();
+
+
 
                 if (homeFragmentReference != null && homeFragmentReference.isVisible()) {
                     replaceFragment(SearchResultsFragment
                             .newInstance(SearchResultsFragment.HOME_FRAG_MODE, searchText));
+                }// this is for multiple user or post searches
+                else if (searchResultsFragmentReference != null && searchResultsFragmentReference.isVisible()) {
+                    if (searchResultsFragmentReference.getResultsMode().equals(SearchResultsFragment.HOME_FRAG_MODE)){
+                        replaceFragment(SearchResultsFragment
+                                .newInstance(SearchResultsFragment.HOME_FRAG_MODE, searchText));
+                    }
+                    else {
+                        replaceFragment(SearchResultsFragment
+                                .newInstance(SearchResultsFragment.DEFAULT_MODE, searchText));
+                    }
                 }
                 else {
                     replaceFragment(SearchResultsFragment
@@ -245,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                             // Navigate back to the login screen
                             Intent intent = new Intent(MainActivity.this, StartActivity.class);
                             startActivity(intent);
-                            finish();
+                            finishAffinity();
                         } else {
                             Toast.makeText(MainActivity.this, "user by email failed!", Toast.LENGTH_LONG).show();
                         }
