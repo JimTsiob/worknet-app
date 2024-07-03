@@ -381,6 +381,7 @@ public class SearchResultsFragment extends Fragment {
         ImageView posterPicture = postView.findViewById(R.id.poster_picture);
         TextView posterName = postView.findViewById(R.id.poster_name);
         TextView postText = postView.findViewById(R.id.post_text);
+        TextView postCreationDate = postView.findViewById(R.id.post_creation_date);
         Button seeMoreButton = postView.findViewById(R.id.postSeeMore);
 
         seeMoreButton.setOnClickListener(listener -> {
@@ -423,6 +424,7 @@ public class SearchResultsFragment extends Fragment {
         posterName.setText(String.format("%s %s", postDTO.getUser().getFirstName(),
                 postDTO.getUser().getLastName()));
         postText.setText(postDTO.getDescription());
+        postCreationDate.setText("Post created on: " + postDTO.getPostCreationDate());
 
         resultsContainer.addView(postView);
     }
