@@ -29,6 +29,7 @@ public class StartActivity extends AppCompatActivity {
         if (jwtToken != null){
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(getString(R.string.e_mail), email);
+            finishAffinity();
             startActivity(intent);
         }else{
             setContentView(R.layout.activity_start);
