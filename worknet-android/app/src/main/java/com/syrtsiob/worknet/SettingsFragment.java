@@ -110,6 +110,17 @@ public class SettingsFragment extends Fragment {
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getActivity(), "update successful.", Toast.LENGTH_LONG).show();
+                    // update email in shared preferences too.
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("email", user.getEmail());
+                    editor.apply();
+
+                    UserDtoResultLiveData.getInstance().setValue(user);
+
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    intent.putExtra(getString(R.string.e_mail), user.getEmail());
+                    startActivity(intent);
                 } else {
                     Toast.makeText(getActivity(), "update failed. Check the format.", Toast.LENGTH_LONG).show();
                 }
@@ -163,17 +174,6 @@ public class SettingsFragment extends Fragment {
                 if (userDTO != null) {
                     // Handle user success
                     AttemptDataChange(userDTO);
-                    // update email in shared preferences too.
-                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("email", userDTO.getEmail());
-                    editor.apply();
-
-                    UserDtoResultLiveData.getInstance().setValue(userDTO);
-
-                    Intent intent = new Intent(getActivity(), MainActivity.class);
-                    intent.putExtra(getString(R.string.e_mail), userDTO.getEmail());
-                    startActivity(intent);
                 } else {
                     // Handle user failure
                     Log.d("error", "User not found.");
