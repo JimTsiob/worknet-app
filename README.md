@@ -1,5 +1,5 @@
 # worknet-app
-LinkedIn clone application for our E-commerce technologies MSc course.
+LinkedIn clone application for our E-commerce technologies MSc course. It was built using Spring Boot 3 and Android Studio with API 34 (Vanilla Java).
 
 ## Installation
 
